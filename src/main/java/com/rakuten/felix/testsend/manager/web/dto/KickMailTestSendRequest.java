@@ -1,11 +1,11 @@
 package com.rakuten.felix.testsend.manager.web.dto;
 
 import lombok.Value;
-import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 @Value
 public class KickMailTestSendRequest {
     Integer bundleId;
     Integer bundleType;
-    JSONArray mailJob;
+    JSONObject mailJob;
 }

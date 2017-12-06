@@ -29,7 +29,7 @@ spring:
         producer.prefix: "felix."
     bindings:
       in-kick-test-send-finished:
-        destination: "kick-test-send-finished"
+        destination: "kick-test-send-finish"
         group: "default"
       in-test-send-finished:
         destination: "test-send-finished"

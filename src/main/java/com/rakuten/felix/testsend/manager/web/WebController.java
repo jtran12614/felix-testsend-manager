@@ -5,6 +5,8 @@ import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.messaging.MessageSendException;
 import com.rakuten.felix.testsend.manager.messaging.MessageSender;
+import com.rakuten.felix.testsend.manager.validator.ValidationException;
+import com.rakuten.felix.testsend.manager.validator.Validator;
 import com.rakuten.felix.testsend.manager.web.dto.KickMailTestSendRequest;
 import com.rakuten.felix.testsend.manager.web.dto.TestSendResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -84,11 +86,12 @@ public class WebController {
      * @return Response.
      */
     @PostMapping(value = "/kick-mail-test-send")
-    public TestSendResponse kickTestSend(@RequestBody KickMailTestSendRequest testSendRequest) throws MessageSendException {
+    public TestSendResponse kickTestSend(@RequestBody KickMailTestSendRequest testSendRequest) throws MessageSendException, ValidationException {
         log.debug("Kick test send request received: requestBody={}", testSendRequest);
+        Validator.validate(testSendRequest);
         val history = dataStore.createHistory(testSendRequest.getBundleId(), testSendRequest.getBundleType());
         val mailJobJson = testSendRequest.getMailJob().toJSONString();
-        messageSender.kickTestSendMessage(history.getId(), mailJobJson);
+        messageSender.kickMailTestSendMessage(history.getId(), mailJobJson);
         return TestSendResponse.fromEntity(history);
     }
 }

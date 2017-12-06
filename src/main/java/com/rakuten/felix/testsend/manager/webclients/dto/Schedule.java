@@ -8,7 +8,7 @@ import java.util.List;
 
 @Value
 @JsonIgnoreProperties(ignoreUnknown = true)
-class Schedule {
+public class Schedule {
     private List<Subject> subjects;
     private List<Content> contents;
 }

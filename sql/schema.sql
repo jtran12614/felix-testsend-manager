@@ -6,6 +6,6 @@ CREATE TABLE IF NOT EXISTS test_send_histories (
   status       TINYINT(4) NOT NULL,
   info         TEXT           NULL,
   PRIMARY KEY (id),
-  KEY job_id (job_id) USING BTREE,
+  KEY idx_job_id (job_id) USING BTREE,
   KEY idx_bundle (bundle_type, bundle_id) USING BTREE
 ) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4;
