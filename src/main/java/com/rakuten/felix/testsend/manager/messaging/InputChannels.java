@@ -1,0 +1,21 @@
+package com.rakuten.felix.testsend.manager.messaging;
+
+
+import org.springframework.cloud.stream.annotation.Input;
+import org.springframework.cloud.stream.annotation.Output;
+import org.springframework.messaging.MessageChannel;
+
+public interface InputChannels {
+    String IN_KICK_TEST_SEND_FINISHED = "in-kick-test-send-finished";
+    String IN_TEST_SEND_FINISHED = "in-test-send-finished";
+    String IN_TEST_SEND_ERROR = "in-test-send-error";
+
+    @Input(IN_KICK_TEST_SEND_FINISHED)
+    MessageChannel inKickTestSendFinished();
+
+    @Output(IN_TEST_SEND_FINISHED)
+    MessageChannel inTestSendFinished();
+
+    @Output(IN_TEST_SEND_ERROR)
+    MessageChannel inTestSendError();
+}
