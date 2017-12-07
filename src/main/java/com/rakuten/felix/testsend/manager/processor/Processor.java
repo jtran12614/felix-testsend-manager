@@ -1,12 +1,15 @@
 package com.rakuten.felix.testsend.manager.processor;
 
 import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
+import com.rakuten.felix.testsend.manager.datastore.HistoryNotFoundException;
 import com.rakuten.felix.testsend.manager.jsonutils.ObjectMapperWrapper;
 import com.rakuten.felix.testsend.manager.messaging.NotificationService;
 import com.rakuten.felix.testsend.manager.webclients.JobDataKeeperService;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class Processor {
     private final DataStoreService dataStore;
@@ -77,6 +80,9 @@ public class Processor {
             val bundleId = dataStore.getHistoryByJobId(jobId).getBundleId();
             val userId = mailJobWithContents.getUser().getUserId();
             notificationService.publishSuccessNotification(bundleId, userId);
+        } catch (HistoryNotFoundException e) {
+            // FIXME Until completely migrate to use this API for test sending, keep exception which data is not found by job id as warning.
+            log.warn("Could not update history: jobId={}, scheduleId={}: {} :", jobId, scheduleId, e.getMessage());
         } catch (Exception e) {
             handleError("Mail test send finished", jobId, e);
         }

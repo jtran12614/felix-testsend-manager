@@ -16,6 +16,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 
@@ -105,16 +107,17 @@ class WebControllerTest {
         // Setup
         val bundleId = 1;
         val bundleType = 1;
+        val page = new PageRequest(1, 2);
         // Response
         val mockedHistories = FakeData.getHistories();
-        when(repository.findByBundleIdAndBundleType(bundleId, bundleType))
-                .thenReturn(mockedHistories);
+        when(repository.findByBundleIdAndBundleType(bundleId, bundleType, page))
+                .thenReturn(new PageImpl<>(mockedHistories));
         // Execution
-        val response = controller.getAll(bundleId, bundleType);
+        val response = controller.getAll(bundleId, bundleType, page);
         // Verification
         assertNotNull(response);
-        for (int i = 0; i < response.size(); i++) {
-            assertHistory(mockedHistories.get(i), response.get(i));
+        for (int i = 0; i < response.getContent().size(); i++) {
+            assertHistory(mockedHistories.get(i), response.getContent().get(i));
         }
     }
 

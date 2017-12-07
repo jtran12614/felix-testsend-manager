@@ -6,12 +6,12 @@ import com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -59,12 +59,13 @@ public class DataStoreService {
      *
      * @param bundleId   Bundle id.
      * @param bundleType Bundle type.
+     * @param pageable   Pageable.
      * @return List of test send history.
      */
     @Transactional
     @Retryable(backoff = @Backoff(value = 1000, multiplier = 1.5))
-    public List<TestSendHistory> getHistoriesByBundleIdAndType(Integer bundleId, Integer bundleType) {
-        return repository.findByBundleIdAndBundleType(bundleId, bundleType);
+    public Page<TestSendHistory> getHistoriesByBundleIdAndType(Integer bundleId, Integer bundleType, Pageable pageable) {
+        return repository.findByBundleIdAndBundleType(bundleId, bundleType, pageable);
     }
 
     /**

@@ -12,6 +12,8 @@ import com.rakuten.felix.testsend.manager.web.dto.TestSendResponse;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,8 +22,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -73,10 +73,11 @@ public class WebController {
      * @return Response.
      */
     @GetMapping(value = "/get-all")
-    public List<TestSendHistory> getAll(@RequestParam(value = "bundleId") Integer bundleId,
-                                        @RequestParam(value = "bundleType") Integer bundleType) {
-        log.debug("Get histories by bundleId={}, bundleType={}", bundleId, bundleType);
-        return dataStore.getHistoriesByBundleIdAndType(bundleId, bundleType);
+    public Page<TestSendHistory> getAll(@RequestParam(value = "bundleId") Integer bundleId,
+                                        @RequestParam(value = "bundleType") Integer bundleType,
+                                        Pageable pageable) {
+        log.debug("Get histories by bundleId={}, bundleType={}, pageInfo={}", bundleId, bundleType, pageable);
+        return dataStore.getHistoriesByBundleIdAndType(bundleId, bundleType, pageable);
     }
 
     /**

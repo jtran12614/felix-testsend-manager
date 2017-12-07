@@ -2,12 +2,13 @@ package com.rakuten.felix.testsend.manager.datastore;
 
 
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface TestSendHistoryRepository extends JpaRepository<TestSendHistory, Integer> {
@@ -16,7 +17,7 @@ public interface TestSendHistoryRepository extends JpaRepository<TestSendHistory
 
     Optional<TestSendHistory> findByJobId(Integer jobId);
 
-    List<TestSendHistory> findByBundleIdAndBundleType(Integer bundleId, Integer bundleType);
+    Page<TestSendHistory> findByBundleIdAndBundleType(Integer bundleId, Integer bundleType, Pageable pageable);
 
     /**
      * Update job id by
