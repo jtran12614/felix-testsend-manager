@@ -38,7 +38,7 @@ public class DataStoreService {
     @Transactional
     @Retryable(backoff = @Backoff(value = 1000, multiplier = 1.5), include = Throwable.class, exclude = HistoryNotFoundException.class)
     public TestSendHistory getHistoryById(Integer id) {
-        return repository.findById(id).orElseThrow(() -> new HistoryNotFoundException(id));
+        return repository.findById(id).orElseThrow(() -> new HistoryNotFoundException("Get history by id", id));
     }
 
     /**
@@ -51,7 +51,7 @@ public class DataStoreService {
     @Transactional
     @Retryable(backoff = @Backoff(value = 1000, multiplier = 1.5), include = Throwable.class, exclude = HistoryNotFoundException.class)
     public TestSendHistory getHistoryByJobId(Integer jobId) {
-        return repository.findByJobId(jobId).orElseThrow(() -> new HistoryNotFoundException(jobId));
+        return repository.findByJobId(jobId).orElseThrow(() -> new HistoryNotFoundException("Get history by jobId", jobId));
     }
 
     /**
@@ -99,7 +99,7 @@ public class DataStoreService {
         val rowAffected = repository.updateJobId(id, jobId);
         log.debug("Update job id: id={}, jobId={}, affectedRow={}", id, jobId, rowAffected);
         if (rowAffected < 1) {
-            throw new HistoryNotFoundException(id);
+            throw new HistoryNotFoundException("Update job id", id);
         }
     }
 
@@ -116,12 +116,12 @@ public class DataStoreService {
         val rowAffected = repository.updateInfoAndStatusFinished(jobId, info);
         log.debug("Update status to finished: jobId={}, info={}, affectedRow={}", jobId, info, rowAffected);
         if (rowAffected < 1) {
-            throw new HistoryNotFoundException(jobId);
+            throw new HistoryNotFoundException("Update info and status finished", jobId);
         }
     }
 
     /**
-     * Update status to finished.
+     * Update status to error.
      *
      * @param jobId History id.
      * @param info  Info json string.
@@ -133,7 +133,22 @@ public class DataStoreService {
         val rowAffected = repository.updateInfoAndStatusError(jobId, info);
         log.debug("Update status to error: jobId={}, info={}, affectedRow={}", jobId, info, rowAffected);
         if (rowAffected < 1) {
-            throw new HistoryNotFoundException(jobId);
+            throw new HistoryNotFoundException("Update info and status error", jobId);
+        }
+    }
+
+    /**
+     * Just update status to error.
+     *
+     * @param jobId History id.
+     * @throws HistoryNotFoundException When data is not found.
+     */
+    @Retryable(backoff = @Backoff(value = 1000, multiplier = 1.5), include = Throwable.class, exclude = HistoryNotFoundException.class)
+    public void updateStatusToError(Integer jobId) {
+        val rowAffected = repository.updateStatusError(jobId);
+        log.debug("Only update status to error: jobId={}, affectedRow={}", jobId, rowAffected);
+        if (rowAffected < 1) {
+            throw new HistoryNotFoundException("Only updating status error", jobId);
         }
     }
 }

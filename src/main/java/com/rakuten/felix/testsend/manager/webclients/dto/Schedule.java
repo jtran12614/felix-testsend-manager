@@ -4,11 +4,14 @@ package com.rakuten.felix.testsend.manager.webclients.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Value;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Value
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Schedule {
-    private List<Subject> subjects;
-    private List<Content> contents;
+    @NotNull
+    List<Subject> subjects;
+    @NotNull
+    List<Content> contents;
 }
