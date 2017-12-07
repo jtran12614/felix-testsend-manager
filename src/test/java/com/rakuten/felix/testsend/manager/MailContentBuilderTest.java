@@ -246,7 +246,7 @@ class MailContentBuilderTest {
     @Test
     void buildSubjects_singleCondition() {
         val parts = FakeData.getParts();
-        val subjects = FakeData.getSujectsWithSingleCondition();
+        val subjects = FakeData.getSubjectsWithSingleCondition();
         val result = mailContentBuilder.buildSubjectContents(subjects, parts);
         val expected = Collections.singletonList("Part0Part1Part2");
         assertResult(expected, result);
@@ -255,7 +255,7 @@ class MailContentBuilderTest {
     @Test
     void buildSubjects_multiConditions() {
         val parts = FakeData.getParts();
-        val subjects = FakeData.getSujectsWithMultiCondition();
+        val subjects = FakeData.getSubjectsWithMultiCondition();
         val result = mailContentBuilder.buildSubjectContents(subjects, parts);
         val expected = Arrays.asList("Part0Part1Part2", "Part3Part4Part5");
         assertResult(expected, result);

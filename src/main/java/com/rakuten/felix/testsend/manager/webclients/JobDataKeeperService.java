@@ -40,8 +40,10 @@ public class JobDataKeeperService {
      */
     @Retryable(include = Throwable.class, exclude = HttpResponseException.class, backoff = @Backoff(multiplier = 2))
     public MailJobWithContents getMailJobWithContents(Integer jobId) throws ValidationException {
+        log.debug("Get mail job: url={}, jobId={}", getJobUrl, jobId);
         val jobIdWrapper = new JobIdWrapper(jobId);
         val mailJob = restTemplate.postForObject(getJobUrl, jobIdWrapper, MailJobWithContents.class);
+        log.debug("Get mail job: jobId={}, response={}", jobId, mailJob);
         Validator.validate(mailJob);
         return mailJob;
     }

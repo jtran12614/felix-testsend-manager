@@ -60,11 +60,11 @@ public class FakeData {
         return Arrays.asList("Part0", "Part1", "Part2", "Part3", "Part4", "Part5", "Part6", "Part7");
     }
 
-    List<Subject> getSujectsWithSingleCondition() {
+    List<Subject> getSubjectsWithSingleCondition() {
         return Collections.singletonList(new Subject(Arrays.asList(0, 1, 2)));
     }
 
-    List<Subject> getSujectsWithMultiCondition() {
+    List<Subject> getSubjectsWithMultiCondition() {
         return Arrays.asList(new Subject(Arrays.asList(0, 1, 2)), new Subject(Arrays.asList(3, 4, 5)));
     }
 
