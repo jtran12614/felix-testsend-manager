@@ -1,20 +1,18 @@
 package com.rakuten.felix.testsend.manager.datastore.entities;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j;
 
 import java.util.Arrays;
 
 @Log4j
+@AllArgsConstructor
 public enum TestSendStatus {
     NEW(0),
     FINISHED(1),
     ERROR(2);
 
     private final Integer number;
-
-    TestSendStatus(Integer number) {
-        this.number = number;
-    }
 
     public Integer toNumber() {
         return number;

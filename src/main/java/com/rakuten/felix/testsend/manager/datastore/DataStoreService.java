@@ -1,6 +1,5 @@
 package com.rakuten.felix.testsend.manager.datastore;
 
-
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus;
 import lombok.extern.slf4j.Slf4j;

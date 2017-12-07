@@ -1,6 +1,5 @@
 package com.rakuten.felix.testsend.manager.web;
 
-
 import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.messaging.MessageSendException;

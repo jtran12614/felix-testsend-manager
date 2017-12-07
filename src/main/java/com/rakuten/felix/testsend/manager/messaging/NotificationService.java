@@ -1,6 +1,5 @@
 package com.rakuten.felix.testsend.manager.messaging;
 
-
 import com.rakuten.felix.testsend.manager.messaging.dto.Notification;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;

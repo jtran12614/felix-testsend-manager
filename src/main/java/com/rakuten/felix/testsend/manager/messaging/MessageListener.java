@@ -1,6 +1,5 @@
 package com.rakuten.felix.testsend.manager.messaging;
 
-
 import com.rakuten.felix.testsend.manager.errorhandler.ErrorHandler;
 import com.rakuten.felix.testsend.manager.jsonutils.ObjectMapperWrapper;
 import com.rakuten.felix.testsend.manager.processor.Processor;

@@ -1,6 +1,5 @@
 package com.rakuten.felix.testsend.manager.datastore;
 
-
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

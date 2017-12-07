@@ -1,6 +1,5 @@
 package com.rakuten.felix.testsend.manager.messaging.dto;
 
-
 import lombok.Value;
 
 import javax.validation.constraints.Min;

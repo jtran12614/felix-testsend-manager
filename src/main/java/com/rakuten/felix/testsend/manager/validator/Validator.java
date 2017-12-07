@@ -1,6 +1,5 @@
 package com.rakuten.felix.testsend.manager.validator;
 
-
 import lombok.experimental.UtilityClass;
 
 import javax.validation.ConstraintViolation;
