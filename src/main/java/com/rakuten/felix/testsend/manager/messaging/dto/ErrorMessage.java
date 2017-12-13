@@ -9,5 +9,5 @@ public class ErrorMessage {
     @NotNull
     Integer jobId;
     @NotNull
-    String message;
+    String errorMessage;
 }

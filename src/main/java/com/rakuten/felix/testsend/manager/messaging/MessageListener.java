@@ -87,7 +87,7 @@ public class MessageListener {
             logDebug(InputChannels.IN_TEST_SEND_ERROR, payload);
             val message = objectMapper.deserializeToObject(payload, ErrorMessage.class);
             Validator.validate(message);
-            processor.processTestSendError(message.getJobId(), message.getMessage());
+            processor.processTestSendError(message.getJobId(), message.getErrorMessage());
         } catch (Exception e) {
             errorHandler.handleExceptionWithPayload(e, payload, InputChannels.IN_TEST_SEND_ERROR);
         }
