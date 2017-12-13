@@ -4,8 +4,6 @@ import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.messaging.MessageSendException;
 import com.rakuten.felix.testsend.manager.messaging.MessageSender;
-import com.rakuten.felix.testsend.manager.validator.ValidationException;
-import com.rakuten.felix.testsend.manager.validator.Validator;
 import com.rakuten.felix.testsend.manager.web.dto.KickMailTestSendRequest;
 import com.rakuten.felix.testsend.manager.web.dto.TestSendResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 @Slf4j
 @RestController
@@ -86,9 +86,8 @@ public class WebController {
      * @return Response.
      */
     @PostMapping(value = "/kick-mail-test-send")
-    public TestSendResponse kickTestSend(@RequestBody KickMailTestSendRequest testSendRequest) throws MessageSendException, ValidationException {
+    public TestSendResponse kickTestSend(@RequestBody @Valid KickMailTestSendRequest testSendRequest) throws MessageSendException {
         log.debug("Kick test send request received: requestBody={}", testSendRequest);
-        Validator.validate(testSendRequest);
         val history = dataStore.createHistory(testSendRequest.getBundleId(), testSendRequest.getBundleType());
         val mailJobJson = testSendRequest.getMailJob().toJSONString();
         messageSender.kickMailTestSendMessage(history.getId(), mailJobJson);

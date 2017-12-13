@@ -5,6 +5,7 @@ import com.rakuten.felix.testsend.manager.validator.ValidationException;
 import com.rakuten.felix.testsend.manager.web.dto.MessageOnly;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -21,8 +22,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public MessageOnly handleHistoryNotFound(ValidationException exception) {
-        log.warn("{}", exception.getMessage());
+    public MessageOnly handleHistoryNotFound(MethodArgumentNotValidException exception) {
+        log.warn("{}", exception.getLocalizedMessage());
         return new MessageOnly(exception.getMessage());
     }
 
