@@ -1,11 +1,11 @@
 package com.rakuten.felix.testsend.manager.datastore.entities;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 
-@Log4j
+@Slf4j
 @AllArgsConstructor
 public enum TestSendStatus {
     NEW(0),

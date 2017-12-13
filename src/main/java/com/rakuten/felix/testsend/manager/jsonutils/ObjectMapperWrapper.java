@@ -2,9 +2,6 @@ package com.rakuten.felix.testsend.manager.jsonutils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rakuten.felix.testsend.manager.messaging.dto.ErrorMessage;
-import com.rakuten.felix.testsend.manager.messaging.dto.FinishedMessage;
-import com.rakuten.felix.testsend.manager.messaging.dto.KickedMessage;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -55,43 +52,11 @@ public class ObjectMapperWrapper {
      * @return Object.
      * @throws IllegalArgumentException When deserialization fails.
      */
-    public KickedMessage deserializeToKickedMessage(byte[] bytes) {
+    public <T> T deserializeToObject(byte[] bytes, Class<T> valueType) {
         try {
-            return objectMapper.readValue(bytes, KickedMessage.class);
+            return objectMapper.readValue(bytes, valueType);
         } catch (IOException e) {
             throw new IllegalArgumentException("Can't deserialize to object: json=" + new String(bytes, StandardCharsets.UTF_8), e);
         }
     }
-
-
-    /**
-     * Deserialize to object.
-     *
-     * @param bytes Byte array.
-     * @return Object.
-     * @throws IllegalArgumentException When deserialization fails.
-     */
-    public FinishedMessage deserializeToFinishedMessage(byte[] bytes) {
-        try {
-            return objectMapper.readValue(bytes, FinishedMessage.class);
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Can't deserialize to object: json=" + new String(bytes, StandardCharsets.UTF_8), e);
-        }
-    }
-
-    /**
-     * Deserialize to object.
-     *
-     * @param bytes Byte array.
-     * @return Object.
-     * @throws IllegalArgumentException When deserialization fails.
-     */
-    public ErrorMessage deserializeToErrorMessage(byte[] bytes) {
-        try {
-            return objectMapper.readValue(bytes, ErrorMessage.class);
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Can't deserialize to object: json=" + new String(bytes, StandardCharsets.UTF_8), e);
-        }
-    }
-
 }

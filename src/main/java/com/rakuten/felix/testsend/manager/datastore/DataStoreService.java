@@ -143,6 +143,7 @@ public class DataStoreService {
      * @param jobId History id.
      * @throws HistoryNotFoundException When data is not found.
      */
+    @Transactional
     @Retryable(backoff = @Backoff(value = 1000, multiplier = 1.5), include = Throwable.class, exclude = HistoryNotFoundException.class)
     public void updateStatusToError(Integer jobId) {
         val rowAffected = repository.updateStatusError(jobId);

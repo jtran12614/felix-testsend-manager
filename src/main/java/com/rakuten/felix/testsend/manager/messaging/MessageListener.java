@@ -2,6 +2,9 @@ package com.rakuten.felix.testsend.manager.messaging;
 
 import com.rakuten.felix.testsend.manager.errorhandler.ErrorHandler;
 import com.rakuten.felix.testsend.manager.jsonutils.ObjectMapperWrapper;
+import com.rakuten.felix.testsend.manager.messaging.dto.ErrorMessage;
+import com.rakuten.felix.testsend.manager.messaging.dto.FinishedMessage;
+import com.rakuten.felix.testsend.manager.messaging.dto.KickedMessage;
 import com.rakuten.felix.testsend.manager.processor.Processor;
 import com.rakuten.felix.testsend.manager.validator.Validator;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +51,7 @@ public class MessageListener {
     public void kickTestSendFinished(byte[] payload) {
         try {
             logDebug(InputChannels.IN_KICK_TEST_SEND_FINISHED, payload);
-            val message = objectMapper.deserializeToKickedMessage(payload);
+            val message = objectMapper.deserializeToObject(payload, KickedMessage.class);
             Validator.validate(message);
             processor.processKickingTestSendFinished(message.getId(), message.getJobId());
         } catch (Exception e) {
@@ -65,7 +68,7 @@ public class MessageListener {
     public void testSendFinished(byte[] payload) {
         try {
             logDebug(InputChannels.IN_TEST_SEND_FINISHED, payload);
-            val message = objectMapper.deserializeToFinishedMessage(payload);
+            val message = objectMapper.deserializeToObject(payload, FinishedMessage.class);
             Validator.validate(message);
             processor.processMailTestSendFinished(message.getJobId(), message.getScheduleId());
         } catch (Exception e) {
@@ -82,7 +85,7 @@ public class MessageListener {
     public void testSendError(byte[] payload) {
         try {
             logDebug(InputChannels.IN_TEST_SEND_ERROR, payload);
-            val message = objectMapper.deserializeToErrorMessage(payload);
+            val message = objectMapper.deserializeToObject(payload, ErrorMessage.class);
             Validator.validate(message);
             processor.processTestSendError(message.getJobId(), message.getMessage());
         } catch (Exception e) {

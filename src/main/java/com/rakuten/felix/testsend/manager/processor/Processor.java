@@ -82,7 +82,7 @@ public class Processor {
             notificationService.publishSuccessNotification(bundleId, userId);
         } catch (HistoryNotFoundException e) {
             // FIXME Until completely migrate to use this API for test sending, keep exception which data is not found by job id as warning.
-            log.warn("Could not update history: jobId={}, scheduleId={}: {} :", jobId, scheduleId, e.getMessage());
+            log.warn("Could not update history on mail test send finished: jobId={}, scheduleId={}: {} :", jobId, scheduleId, e.getMessage());
         } catch (Exception e) {
             handleError("Mail test send finished", jobId, e);
         }
@@ -107,6 +107,9 @@ public class Processor {
             val bundleId = dataStore.getHistoryByJobId(jobId).getBundleId();
             val userId = mailJobWithContents.getUser().getUserId();
             notificationService.publishErrorNotification(bundleId, userId);
+        } catch (HistoryNotFoundException e) {
+            // FIXME Until completely migrate to use this API for test sending, keep exception which data is not found by job id as warning.
+            log.warn("Could not update history on test sending error: jobId={}: {} :", jobId, e.getMessage());
         } catch (Exception e) {
             handleError("Test send error", jobId, e);
         }
