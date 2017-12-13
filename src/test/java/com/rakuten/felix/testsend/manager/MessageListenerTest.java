@@ -138,6 +138,24 @@ class MessageListenerTest {
     }
 
     @Test
+    void kickTestSendFinished_jobIdNull() throws Exception {
+        // Setup
+        val historyId = 12345;
+        // Response
+        when(repository.updateStatusErrorById(anyInt()))
+                .thenReturn(1);
+        // Execution
+        val message = new KickedMessage(historyId, null);
+        val payload = MAPPER.writeValueAsBytes(message);
+        messageListener.kickTestSendFinished(payload);
+        // Verification
+        verify(repository, times(1)).updateStatusErrorById(historyId);
+
+        // verify error messaging
+        verify(outError, times(0)).send(any());
+    }
+
+    @Test
     void testSendFinished() throws Exception {
         // Setup
         val jobId = 11111;
@@ -185,7 +203,7 @@ class MessageListenerTest {
         // Response
         when(restTemplate.postForObject(GET_JOB_URL, new JobIdWrapper(jobId), MailJobWithContents.class))
                 .thenReturn(new MailJobWithContents(null, null, null));
-        when(repository.updateStatusError(anyInt()))
+        when(repository.updateStatusErrorByJobId(anyInt()))
                 .thenReturn(1);
         // Execution
         val message = new FinishedMessage(jobId, scheduleId);

@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Slf4j
 @Service
 public class Processor {
@@ -47,7 +49,11 @@ public class Processor {
      */
     public void processKickingTestSendFinished(Integer historyId, Integer jobId) {
         try {
-            dataStore.updateJobId(historyId, jobId);
+            if (Objects.isNull(jobId)) {
+                dataStore.updateStatusToErrorById(historyId);
+            } else {
+                dataStore.updateJobId(historyId, jobId);
+            }
         } catch (Exception e) {
             handleError("Kicking test send finished", jobId, e);
         }
@@ -102,7 +108,7 @@ public class Processor {
                     .errorMessage(errorMessage)
                     .build();
             val infoJson = objectMapper.serializeToString(info);
-            dataStore.updateStatusToError(jobId, infoJson);
+            dataStore.updateStatusToErrorByJobIdAndInfo(jobId, infoJson);
 
             val bundleId = dataStore.getHistoryByJobId(jobId).getBundleId();
             val userId = mailJobWithContents.getUser().getUserId();
@@ -116,7 +122,7 @@ public class Processor {
     }
 
     private void handleError(String name, Integer jobId, Throwable throwable) {
-        dataStore.updateStatusToError(jobId);
+        dataStore.updateStatusToErrorByJobId(jobId);
         throw new ProcessingException(name, jobId, throwable);
     }
 }

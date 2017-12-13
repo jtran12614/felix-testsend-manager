@@ -129,7 +129,7 @@ public class DataStoreService {
      */
     @Transactional
     @Retryable(backoff = @Backoff(value = 1000, multiplier = 1.5), include = Throwable.class, exclude = HistoryNotFoundException.class)
-    public void updateStatusToError(Integer jobId, String info) {
+    public void updateStatusToErrorByJobIdAndInfo(Integer jobId, String info) {
         val rowAffected = repository.updateInfoAndStatusError(jobId, info);
         log.debug("Update status to error: jobId={}, info={}, affectedRow={}", jobId, info, rowAffected);
         if (rowAffected < 1) {
@@ -137,19 +137,36 @@ public class DataStoreService {
         }
     }
 
+
     /**
-     * Just update status to error.
+     * Update status to error by id.
      *
-     * @param jobId History id.
+     * @param id History id.
      * @throws HistoryNotFoundException When data is not found.
      */
     @Transactional
     @Retryable(backoff = @Backoff(value = 1000, multiplier = 1.5), include = Throwable.class, exclude = HistoryNotFoundException.class)
-    public void updateStatusToError(Integer jobId) {
-        val rowAffected = repository.updateStatusError(jobId);
+    public void updateStatusToErrorById(Integer id) {
+        val rowAffected = repository.updateStatusErrorById(id);
+        log.debug("Update status to error by id: id={}, affectedRow={}", id, rowAffected);
+        if (rowAffected < 1) {
+            throw new HistoryNotFoundException("Updating status error by id", id);
+        }
+    }
+
+    /**
+     * Just update status to error.
+     *
+     * @param jobId Job id.
+     * @throws HistoryNotFoundException When data is not found.
+     */
+    @Transactional
+    @Retryable(backoff = @Backoff(value = 1000, multiplier = 1.5), include = Throwable.class, exclude = HistoryNotFoundException.class)
+    public void updateStatusToErrorByJobId(Integer jobId) {
+        val rowAffected = repository.updateStatusErrorByJobId(jobId);
         log.debug("Only update status to error: jobId={}, affectedRow={}", jobId, rowAffected);
         if (rowAffected < 1) {
-            throw new HistoryNotFoundException("Only updating status error", jobId);
+            throw new HistoryNotFoundException("Updating status error by job id", jobId);
         }
     }
 }

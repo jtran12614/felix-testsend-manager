@@ -10,7 +10,5 @@ public class KickedMessage {
     @NotNull
     @Min(0)
     Integer id;
-    @NotNull
-    @Min(0)
     Integer jobId;
 }
