@@ -60,8 +60,6 @@ spring:
     test-on-borrow: true
     validation-query: SELECT 1
     tomcat:
-      test-on-borrow: true
-      validation-query: "SELECT 1"
       initial-size: 1
       max-active: 3
       max-idle: 3
