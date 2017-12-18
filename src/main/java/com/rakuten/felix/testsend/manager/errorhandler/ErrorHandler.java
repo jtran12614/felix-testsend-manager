@@ -44,13 +44,6 @@ public class ErrorHandler {
                 .collect(Collectors.joining(": "));
     }
 
-    /**
-     * Don't use it. Use {@code getErrorMessages(throwable)} instead.
-     *
-     * @param throwable Throwable.
-     * @param builder   Stream builder.
-     * @return Stream builder with messages.
-     */
     private Stream.Builder<String> getStreamBuilderWithErrorMessages(Throwable throwable, Stream.Builder<String> builder) {
         return Optional.ofNullable(throwable)
                 .map(it -> {
