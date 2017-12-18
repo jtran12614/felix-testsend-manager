@@ -58,8 +58,8 @@ public interface TestSendHistoryRepository extends JpaRepository<TestSendHistory
      * @return Number of rows affected.
      */
     @Modifying
-    @Query("update TestSendHistory t set t.status = com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus.ERROR where t.id = :id")
-    int updateStatusErrorById(@Param("id") Integer id);
+    @Query("update TestSendHistory t set t.info = :info, t.status = com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus.ERROR where t.id = :id")
+    int updateInfoAndStatusErrorById(@Param("id") Integer id, @Param("info") String info);
 
     /**
      * Update status to error

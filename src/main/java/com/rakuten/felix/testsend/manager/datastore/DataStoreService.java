@@ -141,14 +141,15 @@ public class DataStoreService {
     /**
      * Update status to error by id.
      *
-     * @param id History id.
+     * @param id   History id.
+     * @param info Info.
      * @throws HistoryNotFoundException When data is not found.
      */
     @Transactional
     @Retryable(backoff = @Backoff(value = 1000, multiplier = 1.5), include = Throwable.class, exclude = HistoryNotFoundException.class)
-    public void updateStatusToErrorById(Integer id) {
-        val rowAffected = repository.updateStatusErrorById(id);
-        log.debug("Update status to error by id: id={}, affectedRow={}", id, rowAffected);
+    public void updateInfoAndStatusToErrorById(Integer id, String info) {
+        val rowAffected = repository.updateInfoAndStatusErrorById(id, info);
+        log.debug("Update status to error by id: id={}, info={}, affectedRow={}", id, info, rowAffected);
         if (rowAffected < 1) {
             throw new HistoryNotFoundException("Updating status error by id", id);
         }

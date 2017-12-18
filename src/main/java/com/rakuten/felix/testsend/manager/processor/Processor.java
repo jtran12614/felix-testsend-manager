@@ -50,7 +50,11 @@ public class Processor {
     public void processKickingTestSendFinished(Integer historyId, Integer jobId) {
         try {
             if (Objects.isNull(jobId)) {
-                dataStore.updateStatusToErrorById(historyId);
+                val info = Info.builder()
+                        .errorMessage("Job initialization failed")
+                        .build();
+                val infoJson = objectMapper.serializeToString(info);
+                dataStore.updateInfoAndStatusToErrorById(historyId, infoJson);
             } else {
                 dataStore.updateJobId(historyId, jobId);
             }

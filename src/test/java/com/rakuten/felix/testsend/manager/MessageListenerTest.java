@@ -142,14 +142,14 @@ class MessageListenerTest {
         // Setup
         val historyId = 12345;
         // Response
-        when(repository.updateStatusErrorById(anyInt()))
+        when(repository.updateInfoAndStatusErrorById(anyInt(), anyString()))
                 .thenReturn(1);
         // Execution
         val message = new KickedMessage(historyId, null);
         val payload = MAPPER.writeValueAsBytes(message);
         messageListener.kickTestSendFinished(payload);
         // Verification
-        verify(repository, times(1)).updateStatusErrorById(historyId);
+        verify(repository, times(1)).updateInfoAndStatusErrorById(historyId, "{\"errorMessage\":\"Job initialization failed\"}");
 
         // verify error messaging
         verify(outError, times(0)).send(any());
