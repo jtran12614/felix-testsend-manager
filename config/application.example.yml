@@ -1,0 +1,99 @@
+server:
+  port: 8765
+  tomcat:
+    remote-ip-header: "x-forwarded-for"
+    protocol-header: "x-forwarded-proto"
+
+logging:
+  file: "log/main.log"
+  level.com.rakuten.felix: "debug"
+
+spring:
+  pid:
+    file: "app.pid"
+    fail-on-write-error: true
+
+  cloud.stream:
+    rabbit.bindings:
+      in-kick-test-send-finished:
+        consumer.prefix: "felix."
+      in-test-send-finished:
+        consumer.prefix: "felix."
+      in-test-send-error:
+        consumer.prefix: "felix."
+      out-kick-test-send:
+        producer.prefix: "felix."
+      out-error:
+        producer.prefix: "felix."
+      out-publish-notification:
+        producer.prefix: "felix."
+    bindings:
+      in-kick-test-send-finished:
+        destination: "kick-test-send-finish"
+        group: "default"
+      in-test-send-finished:
+        destination: "test-send-finished"
+        group: "default"
+      in-test-send-error:
+        destination: "test-send-error"
+        group: "default"
+      out-kick-test-send:
+        destination: "kick-test-send"
+        group: "default"
+      out-error:
+        destination: "error"
+        group: "default"
+      out-publish-notification:
+        destination: "publish-notification"
+        group: "default"
+
+  rabbitmq:
+    addresses: "host1,host2,host3"
+    username: "username"
+    password: "password"
+
+  datasource:
+    url: "jdbc:mysql://host:port/database"
+    username: "user"
+    password: "secret"
+    driver-class-name: com.mysql.jdbc.Driver
+    test-on-borrow: true
+    validation-query: SELECT 1
+    tomcat:
+      initial-size: 1
+      max-active: 3
+      max-idle: 3
+      min-idle: 1
+
+    jpa:
+      show-sql: true
+
+  boot.admin:
+    client.enabled: false
+    url: "http://spring.boot.admin:8888"
+    username: "user"
+    password: "secret"
+
+management.security.enabled: false
+
+com.rakuten.felix.testsend-manager:
+  proxy:
+    host: "host"
+    port: 8888
+  auth:
+    key: "auth-key"
+    enabled: false
+  tomcat:
+    ajp:
+      port: 1234
+      enabled: true
+  notification:
+    url: "http://notification/url/{bundle_id}"
+    success:
+      title: "notification-success-title: {bundle_id}"
+      message: "notification-success-message: {bundle_id}"
+    error:
+      title: "notification-error-title: {bundle_id}"
+      message: "notification-errorr-message: {bundle_id}"
+  job-data-keeper:
+    get-job-url: "http://job-data-keeper/get-job-url"
