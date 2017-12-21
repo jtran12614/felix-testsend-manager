@@ -1,7 +1,6 @@
 package com.rakuten.felix.testsend.manager.web;
 
 import com.rakuten.felix.testsend.manager.datastore.HistoryNotFoundException;
-import com.rakuten.felix.testsend.manager.validator.ValidationException;
 import com.rakuten.felix.testsend.manager.web.dto.MessageOnly;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     /**
-     * Handle {@link ValidationException}.
+     * Handle {@link MethodArgumentNotValidException}.
      *
      * @param exception Exception.
      * @return Error message.
