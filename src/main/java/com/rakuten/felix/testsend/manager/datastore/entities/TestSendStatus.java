@@ -1,5 +1,7 @@
 package com.rakuten.felix.testsend.manager.datastore.entities;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,16 +16,13 @@ public enum TestSendStatus {
 
     private final Integer number;
 
-    public Integer toNumber() {
-        return number;
-    }
-
     /**
      * Deserialization factory.
      *
      * @param number Status number.
      * @return Where type.
      */
+    @JsonValue
     public static TestSendStatus fromNumber(Integer number) {
         return Arrays.stream(values())
                 .filter(whereType -> whereType.number.equals(number))
@@ -32,5 +31,10 @@ public enum TestSendStatus {
                     log.warn("Conversion failed for number: " + number);
                     return null;
                 });
+    }
+
+    @JsonCreator
+    public Integer toNumber() {
+        return number;
     }
 }
