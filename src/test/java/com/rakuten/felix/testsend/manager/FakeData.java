@@ -28,7 +28,7 @@ public class FakeData {
                         .subjects(Collections.singletonList("Subject"))
                         .htmlContents(Collections.singletonList("Html content"))
                         .textContents(Collections.singletonList("Text content"))
-                        .user(new User(1, "user-address@rakuten.com"))
+                        .user(new User(1, "user-name", "user-address@rakuten.com"))
                         .recipients(Arrays.asList("recipient1", "recipient2"))
                         .build())
                 .build();
@@ -57,7 +57,6 @@ public class FakeData {
         return new MailJob(
                 Collections.singletonList(new Schedule(Collections.emptyList(), Collections.emptyList())),
                 Collections.singletonList(""),
-                new User(0, ""),
                 Collections.emptyList());
     }
 

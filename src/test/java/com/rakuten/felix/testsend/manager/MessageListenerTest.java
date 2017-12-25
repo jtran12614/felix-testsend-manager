@@ -132,7 +132,7 @@ class MessageListenerTest {
         assertEquals(mockedHistory.getBundleId(), actualEntity.getBundleId());
         assertEquals(mockedHistory.getBundleType(), actualEntity.getBundleType());
         assertEquals(TestSendStatus.NEW, actualEntity.getStatus());
-        assertEquals(mockedMailJob.getUser(), actualEntity.getInfo().getUser());
+        assertEquals(mockedHistory.getInfo().getUser(), actualEntity.getInfo().getUser());
         assertTrue(actualEntity.getInfo().getSubjects().isEmpty());
         assertTrue(actualEntity.getInfo().getHtmlContents().isEmpty());
         assertTrue(actualEntity.getInfo().getTextContents().isEmpty());

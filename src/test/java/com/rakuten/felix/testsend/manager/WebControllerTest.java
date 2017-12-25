@@ -11,6 +11,7 @@ import com.rakuten.felix.testsend.manager.messaging.OutputChannels;
 import com.rakuten.felix.testsend.manager.messaging.dto.KickMailTestSendMessage;
 import com.rakuten.felix.testsend.manager.web.WebController;
 import com.rakuten.felix.testsend.manager.web.dto.KickMailTestSendRequest;
+import com.rakuten.felix.testsend.manager.webclients.dto.User;
 import lombok.val;
 import org.json.simple.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -136,6 +137,7 @@ class WebControllerTest {
         val bundleType = 1;
         val mailJob = new JSONObject(Collections.singletonMap("key", "value"));
         val started = ZonedDateTime.now(ZoneId.systemDefault());
+        val user = new User(1, "name", "mail-address");
         // Response
         when(repository.saveAndFlush(any()))
                 .then(it -> {
@@ -151,7 +153,7 @@ class WebControllerTest {
         when(kickTestSend.send(any()))
                 .thenReturn(true);
         // Execution
-        val response = controller.kickTestSend(new KickMailTestSendRequest(bundleId, bundleType, mailJob));
+        val response = controller.kickTestSend(new KickMailTestSendRequest(bundleId, bundleType, mailJob, user));
         // Verification
         assertNotNull(response);
 
@@ -159,6 +161,7 @@ class WebControllerTest {
         val capturedEntity = ArgumentCaptor.forClass(TestSendHistory.class);
         verify(repository, times(1)).saveAndFlush(capturedEntity.capture());
         assertEquals(TestSendStatus.NEW, capturedEntity.getValue().getStatus());
+        assertEquals(user, capturedEntity.getValue().getInfo().getUser());
         assertEquals(Integer.valueOf(bundleId), capturedEntity.getValue().getBundleId());
         assertEquals(Integer.valueOf(bundleType), capturedEntity.getValue().getBundleType());
         assertEquals(started, capturedEntity.getValue().getStarted());
