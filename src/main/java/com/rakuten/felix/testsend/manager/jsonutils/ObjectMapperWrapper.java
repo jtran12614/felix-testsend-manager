@@ -16,21 +16,6 @@ public class ObjectMapperWrapper {
     }
 
     /**
-     * Serialize object to string.
-     *
-     * @param object Mail job object.
-     * @return String.
-     * @throws IllegalArgumentException When serialization fails.
-     */
-    public String serializeToString(Object object) {
-        try {
-            return objectMapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("Can't serialize to string: object=" + object, e);
-        }
-    }
-
-    /**
      * Serialize object to bytes.
      *
      * @param object Object.
