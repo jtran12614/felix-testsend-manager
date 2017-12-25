@@ -22,7 +22,7 @@ public enum TestSendStatus {
      * @param number Status number.
      * @return Where type.
      */
-    @JsonValue
+    @JsonCreator
     public static TestSendStatus fromNumber(Integer number) {
         return Arrays.stream(values())
                 .filter(whereType -> whereType.number.equals(number))
@@ -33,7 +33,7 @@ public enum TestSendStatus {
                 });
     }
 
-    @JsonCreator
+    @JsonValue
     public Integer toNumber() {
         return number;
     }
