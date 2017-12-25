@@ -82,14 +82,14 @@ public class WebController {
     /**
      * Handle request for kicking test sending
      *
-     * @param testSendRequest Request body.
+     * @param request Request body.
      * @return Response.
      */
     @PostMapping(value = "/kick-mail-test-send")
-    public TestSendResponse kickTestSend(@RequestBody @Valid KickMailTestSendRequest testSendRequest) throws MessageSendException {
-        log.debug("Kick test send request received: requestBody={}", testSendRequest);
-        val history = dataStore.createHistory(testSendRequest.getBundleId(), testSendRequest.getBundleType());
-        val mailJobJson = testSendRequest.getMailJob().toJSONString();
+    public TestSendResponse kickTestSend(@RequestBody @Valid KickMailTestSendRequest request) throws MessageSendException {
+        log.debug("Kick test send request received: requestBody={}", request);
+        val history = dataStore.createHistory(request.getBundleId(), request.getBundleType(), request.getUser());
+        val mailJobJson = request.getMailJob().toJSONString();
         messageSender.kickMailTestSendMessage(history.getId(), mailJobJson);
         return TestSendResponse.fromEntity(history);
     }

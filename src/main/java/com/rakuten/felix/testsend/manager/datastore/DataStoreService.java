@@ -3,6 +3,7 @@ package com.rakuten.felix.testsend.manager.datastore;
 import com.rakuten.felix.testsend.manager.datastore.entities.Info;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus;
+import com.rakuten.felix.testsend.manager.webclients.dto.User;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.LockModeType;
 import java.time.Clock;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -85,13 +87,13 @@ public class DataStoreService {
      */
     @Transactional
     @Retryable(backoff = @Backoff(value = 1000, multiplier = 1.5))
-    public TestSendHistory createHistory(Integer bundleId, Integer bundleType) {
+    public TestSendHistory createHistory(Integer bundleId, Integer bundleType, User user) {
         val entity = TestSendHistory.builder()
                 .bundleId(bundleId)
                 .bundleType(bundleType)
                 .status(TestSendStatus.NEW)
                 .started(ZonedDateTime.now(clock))
-                .info(Info.builder().build())
+                .info(Info.builder().user(user).build())
                 .build();
         repository.saveAndFlush(entity);
         log.debug("Create history: {}", entity);
@@ -101,17 +103,25 @@ public class DataStoreService {
     /**
      * Update job id.
      *
-     * @param id    History id.
-     * @param jobId Job id.
-     * @param info  Info.
+     * @param id           History id.
+     * @param jobId        Job id.
+     * @param subjects     Subjects.
+     * @param htmlContents Html contents.
+     * @param textContents Text contents.
      * @throws HistoryNotFoundException When data is not found.
      */
     @Transactional
     @Lock(LockModeType.OPTIMISTIC)
     @Retryable(backoff = @Backoff(value = 1000, multiplier = 1.5), include = Throwable.class, exclude = HistoryNotFoundException.class)
-    public void updateJobIdAndInfo(Integer id, Integer jobId, Info info) {
+    public void updateJobIdAndContents(Integer id, Integer jobId, List<String> subjects, List<String> htmlContents, List<String> textContents) {
         val entity = repository.findById(id).orElseThrow(() -> new HistoryNotFoundException("Get history by id", id));
         entity.setJobId(jobId);
+        val info = entity.getInfo()
+                .toBuilder()
+                .subjects(subjects)
+                .htmlContents(htmlContents)
+                .textContents(textContents)
+                .build();
         entity.setInfo(info);
         log.debug("Update job id and info: id={}, jobId={}, info={}", id, jobId, info);
         repository.saveAndFlush(entity);

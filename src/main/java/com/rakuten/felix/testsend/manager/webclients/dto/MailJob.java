@@ -18,8 +18,5 @@ public class MailJob {
     @NotEmpty
     List<String> parts;
     @NotNull
-    @Valid
-    User user;
-    @NotNull
     List<String> prependAddresses;
 }
