@@ -10,7 +10,7 @@ import java.util.List;
 
 @Value
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MailJobWithContents {
+public class MailJob {
     @NotNull
     @Valid
     List<Schedule> schedules;
@@ -20,4 +20,6 @@ public class MailJobWithContents {
     @NotNull
     @Valid
     User user;
+    @NotNull
+    List<String> prependAddresses;
 }

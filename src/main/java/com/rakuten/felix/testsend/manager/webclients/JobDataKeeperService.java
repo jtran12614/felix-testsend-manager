@@ -3,7 +3,7 @@ package com.rakuten.felix.testsend.manager.webclients;
 import com.rakuten.felix.testsend.manager.validator.ValidationException;
 import com.rakuten.felix.testsend.manager.validator.Validator;
 import com.rakuten.felix.testsend.manager.webclients.dto.JobIdWrapper;
-import com.rakuten.felix.testsend.manager.webclients.dto.MailJobWithContents;
+import com.rakuten.felix.testsend.manager.webclients.dto.MailJob;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.http.client.HttpResponseException;
@@ -39,10 +39,10 @@ public class JobDataKeeperService {
      * @return Mail job object with contents.
      */
     @Retryable(include = Throwable.class, exclude = HttpResponseException.class, backoff = @Backoff(multiplier = 2))
-    public MailJobWithContents getMailJobWithContents(Integer jobId) throws ValidationException {
+    public MailJob getMailJob(Integer jobId) throws ValidationException {
         log.debug("Get mail job: url={}, jobId={}", getJobUrl, jobId);
         val jobIdWrapper = new JobIdWrapper(jobId);
-        val mailJob = restTemplate.postForObject(getJobUrl, jobIdWrapper, MailJobWithContents.class);
+        val mailJob = restTemplate.postForObject(getJobUrl, jobIdWrapper, MailJob.class);
         log.debug("Get mail job: jobId={}, response={}", jobId, mailJob);
         Validator.validate(mailJob);
         return mailJob;
