@@ -70,7 +70,7 @@ public class MessageListener {
             logDebug(InputChannels.IN_TEST_SEND_FINISHED, payload);
             val message = objectMapper.deserializeToObject(payload, FinishedMessage.class);
             Validator.validate(message);
-            processor.processMailTestSendFinished(message.getJobId(), message.getScheduleId());
+            processor.processMailTestSendFinished(message.getJobId());
         } catch (Exception e) {
             errorHandler.handleExceptionWithPayload(e, payload, InputChannels.IN_TEST_SEND_FINISHED);
         }

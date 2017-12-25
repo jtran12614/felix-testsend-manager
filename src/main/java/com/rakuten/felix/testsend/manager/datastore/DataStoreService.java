@@ -1,5 +1,6 @@
 package com.rakuten.felix.testsend.manager.datastore;
 
+import com.rakuten.felix.testsend.manager.datastore.entities.Info;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus;
 import lombok.extern.slf4j.Slf4j;
@@ -7,24 +8,32 @@ import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.LockModeType;
+import java.time.Clock;
+import java.time.ZonedDateTime;
+
 @Slf4j
 @Service
 public class DataStoreService {
     private final TestSendHistoryRepository repository;
+    private final Clock clock;
 
     /**
      * Initialize the service.
      *
      * @param repository Repository.
+     * @param clock      Clock.
      */
     @Autowired
-    public DataStoreService(TestSendHistoryRepository repository) {
+    public DataStoreService(TestSendHistoryRepository repository, Clock clock) {
         this.repository = repository;
+        this.clock = clock;
     }
 
     /**
@@ -81,6 +90,8 @@ public class DataStoreService {
                 .bundleId(bundleId)
                 .bundleType(bundleType)
                 .status(TestSendStatus.NEW)
+                .started(ZonedDateTime.now(clock))
+                .info(Info.builder().build())
                 .build();
         repository.saveAndFlush(entity);
         log.debug("Create history: {}", entity);
@@ -90,84 +101,77 @@ public class DataStoreService {
     /**
      * Update job id.
      *
-     * @param id History id.
+     * @param id    History id.
+     * @param jobId Job id.
+     * @param info  Info.
      * @throws HistoryNotFoundException When data is not found.
      */
     @Transactional
+    @Lock(LockModeType.OPTIMISTIC)
     @Retryable(backoff = @Backoff(value = 1000, multiplier = 1.5), include = Throwable.class, exclude = HistoryNotFoundException.class)
-    public void updateJobId(Integer id, Integer jobId) {
-        val rowAffected = repository.updateJobId(id, jobId);
-        log.debug("Update job id: id={}, jobId={}, affectedRow={}", id, jobId, rowAffected);
-        if (rowAffected < 1) {
-            throw new HistoryNotFoundException("Update job id", id);
-        }
+    public void updateJobIdAndInfo(Integer id, Integer jobId, Info info) {
+        val entity = repository.findById(id).orElseThrow(() -> new HistoryNotFoundException("Get history by id", id));
+        entity.setJobId(jobId);
+        entity.setInfo(info);
+        log.debug("Update job id and info: id={}, jobId={}, info={}", id, jobId, info);
+        repository.saveAndFlush(entity);
     }
 
     /**
      * Update status to finished.
      *
-     * @param jobId History id.
-     * @param info  Info json string.
-     * @throws HistoryNotFoundException When data is not found.
-     */
-    @Transactional
-    @Retryable(backoff = @Backoff(value = 1000, multiplier = 1.5), include = Throwable.class, exclude = HistoryNotFoundException.class)
-    public void updateStatusToFinished(Integer jobId, String info) {
-        val rowAffected = repository.updateInfoAndStatusFinished(jobId, info);
-        log.debug("Update status to finished: jobId={}, info={}, affectedRow={}", jobId, info, rowAffected);
-        if (rowAffected < 1) {
-            throw new HistoryNotFoundException("Update info and status finished", jobId);
-        }
-    }
-
-    /**
-     * Update status to error.
-     *
-     * @param jobId History id.
-     * @param info  Info json string.
-     * @throws HistoryNotFoundException When data is not found.
-     */
-    @Transactional
-    @Retryable(backoff = @Backoff(value = 1000, multiplier = 1.5), include = Throwable.class, exclude = HistoryNotFoundException.class)
-    public void updateStatusToErrorByJobIdAndInfo(Integer jobId, String info) {
-        val rowAffected = repository.updateInfoAndStatusError(jobId, info);
-        log.debug("Update status to error: jobId={}, info={}, affectedRow={}", jobId, info, rowAffected);
-        if (rowAffected < 1) {
-            throw new HistoryNotFoundException("Update info and status error", jobId);
-        }
-    }
-
-
-    /**
-     * Update status to error by id.
-     *
-     * @param id   History id.
-     * @param info Info.
-     * @throws HistoryNotFoundException When data is not found.
-     */
-    @Transactional
-    @Retryable(backoff = @Backoff(value = 1000, multiplier = 1.5), include = Throwable.class, exclude = HistoryNotFoundException.class)
-    public void updateInfoAndStatusToErrorById(Integer id, String info) {
-        val rowAffected = repository.updateInfoAndStatusErrorById(id, info);
-        log.debug("Update status to error by id: id={}, info={}, affectedRow={}", id, info, rowAffected);
-        if (rowAffected < 1) {
-            throw new HistoryNotFoundException("Updating status error by id", id);
-        }
-    }
-
-    /**
-     * Just update status to error.
-     *
      * @param jobId Job id.
      * @throws HistoryNotFoundException When data is not found.
      */
     @Transactional
+    @Lock(LockModeType.OPTIMISTIC)
     @Retryable(backoff = @Backoff(value = 1000, multiplier = 1.5), include = Throwable.class, exclude = HistoryNotFoundException.class)
-    public void updateStatusToErrorByJobId(Integer jobId) {
-        val rowAffected = repository.updateStatusErrorByJobId(jobId);
-        log.debug("Only update status to error: jobId={}, affectedRow={}", jobId, rowAffected);
-        if (rowAffected < 1) {
-            throw new HistoryNotFoundException("Updating status error by job id", jobId);
-        }
+    public void updateStatusToFinishedByJobId(Integer jobId) {
+        val entity = repository.findByJobId(jobId).orElseThrow(() -> new HistoryNotFoundException("Get history by job id", jobId));
+        entity.setStatus(TestSendStatus.FINISHED);
+        entity.setFinished(ZonedDateTime.now(clock));
+        log.debug("Update status to finished: jobId={}", jobId);
+        repository.saveAndFlush(entity);
+    }
+
+    /**
+     * Update status to error by job id.
+     *
+     * @param jobId        Job id.
+     * @param errorMessage Error message.
+     * @throws HistoryNotFoundException When data is not found.
+     */
+    @Transactional
+    @Lock(LockModeType.OPTIMISTIC)
+    @Retryable(backoff = @Backoff(value = 1000, multiplier = 1.5), include = Throwable.class, exclude = HistoryNotFoundException.class)
+    public void updateErrorMessageAndStatusToErrorByJobId(Integer jobId, String errorMessage) {
+        val entity = repository.findByJobId(jobId).orElseThrow(() -> new HistoryNotFoundException("Get history by job id", jobId));
+        val info = entity.getInfo().toBuilder().errorMessage(errorMessage).build();
+        entity.setInfo(info);
+        entity.setStatus(TestSendStatus.ERROR);
+        entity.setFinished(ZonedDateTime.now(clock));
+        log.debug("Update status to error: jobId={}, errorMessage={}", jobId, errorMessage);
+        repository.saveAndFlush(entity);
+    }
+
+
+    /**
+     * Update status to error by history id.
+     *
+     * @param id           History id.
+     * @param errorMessage Error message.
+     * @throws HistoryNotFoundException When data is not found.
+     */
+    @Transactional
+    @Lock(LockModeType.OPTIMISTIC)
+    @Retryable(backoff = @Backoff(value = 1000, multiplier = 1.5), include = Throwable.class, exclude = HistoryNotFoundException.class)
+    public void updateErrorMessageAndStatusToErrorById(Integer id, String errorMessage) {
+        val entity = repository.findById(id).orElseThrow(() -> new HistoryNotFoundException("Get history by id", id));
+        val info = entity.getInfo().toBuilder().errorMessage(errorMessage).build();
+        entity.setInfo(info);
+        entity.setStatus(TestSendStatus.ERROR);
+        entity.setFinished(ZonedDateTime.now(clock));
+        log.debug("Update status to error: id={}, errorMessage={}", id, errorMessage);
+        repository.saveAndFlush(entity);
     }
 }
