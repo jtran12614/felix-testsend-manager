@@ -21,7 +21,7 @@ ext.jacocoVersion = '0.7.9'
 ext.mockitoVersion = '2.1.0'
 
 group 'com.rakuten.felix'
-version '0.1.0'
+version '0.1.1'
 
 apply from: 'build-publish.gradle'
 apply from: 'build-version.gradle'
