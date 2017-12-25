@@ -45,12 +45,12 @@ public class TestSendHistory {
     private Info info;
     @Column(nullable = false)
     @Convert(converter = ZonedDateTimeConverter.class)
-    @JsonDeserialize(contentUsing = UnixTimeStampDeserializer.class)
-    @JsonSerialize(contentUsing = UnixTimeStampSerializer.class)
+    @JsonDeserialize(using = UnixTimeStampDeserializer.class)
+    @JsonSerialize(using = UnixTimeStampSerializer.class)
     private ZonedDateTime started;
     @Convert(converter = ZonedDateTimeConverter.class)
-    @JsonDeserialize(contentUsing = UnixTimeStampDeserializer.class)
-    @JsonSerialize(contentUsing = UnixTimeStampSerializer.class)
+    @JsonDeserialize(using = UnixTimeStampDeserializer.class)
+    @JsonSerialize(using = UnixTimeStampSerializer.class)
     private ZonedDateTime finished;
 
     @Version
