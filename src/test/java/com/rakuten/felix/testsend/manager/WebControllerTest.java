@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
 import com.rakuten.felix.testsend.manager.datastore.TestSendHistoryRepository;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
+import com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus;
 import com.rakuten.felix.testsend.manager.jsonutils.ObjectMapperWrapper;
 import com.rakuten.felix.testsend.manager.messaging.MessageSender;
 import com.rakuten.felix.testsend.manager.messaging.OutputChannels;
@@ -21,6 +22,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 
+import java.time.Clock;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -43,11 +47,14 @@ class WebControllerTest {
     @Mock
     private MessageChannel kickTestSend;
 
+    @Mock
+    private Clock clock;
+
 
     @BeforeEach
     void setUp() {
         initMocks(this);
-        val dataStore = new DataStoreService(repository);
+        val dataStore = new DataStoreService(repository, clock);
         val outputChannels = new OutputChannels() {
             @Override
             public MessageChannel outKickTestSend() {
@@ -128,6 +135,7 @@ class WebControllerTest {
         val bundleId = 1;
         val bundleType = 1;
         val mailJob = new JSONObject(Collections.singletonMap("key", "value"));
+        val started = ZonedDateTime.now(ZoneId.systemDefault());
         // Response
         when(repository.saveAndFlush(any()))
                 .then(it -> {
@@ -135,6 +143,10 @@ class WebControllerTest {
                     entity.setId(historyId);
                     return entity;
                 });
+        when(clock.instant())
+                .thenReturn(started.toInstant());
+        when(clock.getZone())
+                .thenReturn(started.getZone());
 
         when(kickTestSend.send(any()))
                 .thenReturn(true);
@@ -146,8 +158,10 @@ class WebControllerTest {
         // verify database
         val capturedEntity = ArgumentCaptor.forClass(TestSendHistory.class);
         verify(repository, times(1)).saveAndFlush(capturedEntity.capture());
+        assertEquals(TestSendStatus.NEW, capturedEntity.getValue().getStatus());
         assertEquals(Integer.valueOf(bundleId), capturedEntity.getValue().getBundleId());
         assertEquals(Integer.valueOf(bundleType), capturedEntity.getValue().getBundleType());
+        assertEquals(started, capturedEntity.getValue().getStarted());
 
         // verify messaging
         val capturedMessage = ArgumentCaptor.forClass(Message.class);
