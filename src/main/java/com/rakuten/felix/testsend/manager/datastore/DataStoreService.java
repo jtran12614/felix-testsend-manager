@@ -113,7 +113,7 @@ public class DataStoreService {
     @Transactional
     @Lock(LockModeType.OPTIMISTIC)
     @Retryable(backoff = @Backoff(value = 1000, multiplier = 1.5), include = Throwable.class, exclude = HistoryNotFoundException.class)
-    public void updateJobIdAndContents(Integer id, Integer jobId, List<String> subjects, List<String> htmlContents, List<String> textContents) {
+    public void updateJob(Integer id, Integer jobId, List<String> subjects, List<String> htmlContents, List<String> textContents, List<String> recipients) {
         val entity = repository.findById(id).orElseThrow(() -> new HistoryNotFoundException("Get history by id", id));
         entity.setJobId(jobId);
         val info = entity.getInfo()
@@ -121,6 +121,7 @@ public class DataStoreService {
                 .subjects(subjects)
                 .htmlContents(htmlContents)
                 .textContents(textContents)
+                .recipients(recipients)
                 .build();
         entity.setInfo(info);
         log.debug("Update job id and info: id={}, jobId={}, info={}", id, jobId, info);

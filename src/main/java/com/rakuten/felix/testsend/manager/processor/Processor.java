@@ -58,7 +58,7 @@ public class Processor {
                 val htmlContents = mailContentBuilder.buildHtmlContents(schedule.getContents(), parts);
                 val textContents = mailContentBuilder.buildTextContents(schedule.getContents(), parts);
 
-                dataStore.updateJobIdAndContents(historyId, jobId, subjects, htmlContents, textContents);
+                dataStore.updateJob(historyId, jobId, subjects, htmlContents, textContents, mailJob.getPrependAddresses());
             }
         } catch (Exception e) {
             handleError("Kicking test send finished", jobId, e);

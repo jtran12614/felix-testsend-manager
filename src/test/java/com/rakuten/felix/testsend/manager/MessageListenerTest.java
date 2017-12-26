@@ -136,6 +136,7 @@ class MessageListenerTest {
         assertTrue(actualEntity.getInfo().getSubjects().isEmpty());
         assertTrue(actualEntity.getInfo().getHtmlContents().isEmpty());
         assertTrue(actualEntity.getInfo().getTextContents().isEmpty());
+        assertEquals(actualEntity.getInfo().getRecipients(), mockedMailJob.getPrependAddresses());
 
         // verify error messaging
         verify(outError, times(0)).send(any());
