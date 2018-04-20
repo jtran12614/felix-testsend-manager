@@ -78,7 +78,9 @@ class ConverterTest {
         val timeStamp = new Timestamp(Date.from(Instant.from(now)).getTime());
         val actual = testObject.convertToEntityAttribute(timeStamp);
         assertNotNull(actual);
-        assertEquals(now, actual);
+        assertEquals(now.getDayOfYear(), actual.getDayOfYear());
+        assertEquals(now.getMonthValue(), actual.getMonthValue());
+        assertEquals(now.getDayOfMonth(), actual.getDayOfMonth());
     }
 
     @Test

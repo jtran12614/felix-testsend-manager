@@ -76,3 +76,10 @@ test {
 checkstyle {
     toolVersion = '7.7'
 }
+
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled = false // これを書くとXML出力を止めることができる
+        html.enabled = true
+    }
+}
