@@ -1,5 +1,6 @@
 package com.rakuten.felix.testsend.manager;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
 import com.rakuten.felix.testsend.manager.datastore.TestSendHistoryRepository;
@@ -36,13 +37,15 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 class MessageListenerTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -132,6 +135,8 @@ class MessageListenerTest {
         assertEquals(mockedHistory.getBundleId(), actualEntity.getBundleId());
         assertEquals(mockedHistory.getBundleType(), actualEntity.getBundleType());
         assertEquals(TestSendStatus.NEW, actualEntity.getStatus());
+        assertEquals(TestSendStatus.NEW, TestSendStatus.fromNumber(actualEntity.getStatus().toNumber()));
+        assertNull(TestSendStatus.fromNumber(9));
         assertEquals(mockedHistory.getInfo().getUser(), actualEntity.getInfo().getUser());
         assertTrue(actualEntity.getInfo().getSubjects().isEmpty());
         assertTrue(actualEntity.getInfo().getHtmlContents().isEmpty());
@@ -238,6 +243,53 @@ class MessageListenerTest {
     }
 
     @Test
+    void testSendFinished_NotHistory() throws Exception {
+        // Setup
+        val jobId = 11111;
+        val finished = ZonedDateTime.now(ZoneId.systemDefault());
+        // Response
+        when(repository.findByJobId(anyInt()))
+                .thenReturn(Optional.empty());
+        when(outPublishNotification.send(any()))
+                .thenReturn(false);
+        when(clock.instant())
+                .thenReturn(finished.toInstant());
+        when(clock.getZone())
+                .thenReturn(finished.getZone());
+        // Execution
+        val message = new FinishedMessage(jobId);
+        val payload = MAPPER.writeValueAsBytes(message);
+        messageListener.testSendFinished(payload);
+        // Verification
+        verify(repository, times(1)).findByJobId(jobId);
+    }
+
+    @Test
+    void testSendFinished_Exception() throws Exception {
+        // Setup
+        val jobId = 11111;
+        val mockedHistory = FakeData.getHistory();
+        val finished = ZonedDateTime.now(ZoneId.systemDefault());
+        // Response
+        when(repository.findByJobId(anyInt()))
+                .thenReturn(Optional.of(mockedHistory));
+        when(outPublishNotification.send(any()))
+                .thenReturn(false);
+        when(clock.instant())
+                .thenReturn(finished.toInstant());
+        when(clock.getZone())
+                .thenReturn(finished.getZone());
+        // Execution
+        val message = new FinishedMessage(jobId);
+        val payload = MAPPER.writeValueAsBytes(message);
+        messageListener.testSendFinished(payload);
+        // Verification
+        verify(repository, times(3)).findByJobId(jobId);
+        // verify error messaging
+        verify(outError, times(1)).send(any());
+    }
+
+    @Test
     void testSendError() throws Exception {
         // Setup
         val jobId = 123456789;
@@ -284,5 +336,64 @@ class MessageListenerTest {
 
         // verify error messaging
         verify(outError, times(0)).send(any());
+    }
+
+    @Test
+    void testSendError_NotHistory() throws JsonProcessingException {
+        // Setup
+        val jobId = 123456789;
+        val errorMessage = "error message";
+        val finished = ZonedDateTime.now(ZoneId.systemDefault());
+        // Response
+        when(repository.findByJobId(anyInt()))
+                .thenReturn(Optional.empty());
+        when(outPublishNotification.send(any()))
+                .thenReturn(false);
+        when(clock.instant())
+                .thenReturn(finished.toInstant());
+        when(clock.getZone())
+                .thenReturn(finished.getZone());
+
+        // Execution
+        val message = new ErrorMessage(jobId, errorMessage);
+        val payload = MAPPER.writeValueAsBytes(message);
+        messageListener.testSendError(payload);
+        // Verification
+        verify(repository, times(1)).findByJobId(jobId);
+    }
+
+    @Test
+    void testSendError_Exception() throws JsonProcessingException {
+        // Setup
+        val jobId = 123456789;
+        val errorMessage = "error message";
+        val mockedHistory = FakeData.getHistory();
+        val finished = ZonedDateTime.now(ZoneId.systemDefault());
+        // Response
+        when(repository.findByJobId(anyInt()))
+                .thenReturn(Optional.of(mockedHistory));
+        when(outPublishNotification.send(any()))
+                .thenReturn(false);
+        when(clock.instant())
+                .thenReturn(finished.toInstant());
+        when(clock.getZone())
+                .thenReturn(finished.getZone());
+
+        // Execution
+        val message = new ErrorMessage(jobId, errorMessage);
+        val payload = MAPPER.writeValueAsBytes(message);
+        messageListener.testSendError(payload);
+        // Verification
+        verify(repository, times(3)).findByJobId(jobId);
+
+        // verify error messaging
+        verify(outError, times(1)).send(any());
+    }
+
+    @Test
+    void deserializeToObject_Exception() {
+        ObjectMapperWrapper objectMapperWrapper = new ObjectMapperWrapper(new ObjectMapper());
+        val mailTestSendPayload = objectMapperWrapper.serializeToBytes(new TestSendHistory().toString());
+        assertThrows(IllegalArgumentException.class, () -> objectMapperWrapper.deserializeToObject(mailTestSendPayload, KickedMessage.class));
     }
 }

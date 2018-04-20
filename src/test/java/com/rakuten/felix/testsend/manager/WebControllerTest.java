@@ -33,10 +33,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 class WebControllerTest {
 
@@ -108,7 +108,6 @@ class WebControllerTest {
         assertNotNull(response);
         assertHistory(mockedHistory, response);
     }
-
 
     @Test
     void getHistoriesByBundleIdAndBundleType() {

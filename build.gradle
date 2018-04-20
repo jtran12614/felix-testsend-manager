@@ -1,68 +1,65 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0'
-    }
-}
-
 plugins {
-    id 'java'
-    id 'findbugs'
+    id 'org.springframework.boot' version '2.0.0.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.3.RELEASE'
+    id 'io.franzbecker.gradle-lombok' version '1.11'
+    id 'org.sonarqube' version '2.6.2'
+    id 'java-library'
     id 'checkstyle'
+    id 'findbugs'
     id 'jacoco'
-    id 'org.springframework.boot' version '1.5.9.RELEASE'
-    id "org.sonarqube" version "2.5"
 }
 
-ext.junitJupiterVersion = '5.0.0'
-ext.jacocoVersion = '0.7.9'
-ext.mockitoVersion = '2.1.0'
+ext {
+    checkStyleVersion = '7.7'
+    jmockitVersion = '1.32'
+    junitJupiterVersion = '5.0.0-M4'
+    junitPlatformVersion = '1.0.0-M4'
+    lombokVersion = '1.16.20'
+    springAdminVersion = '2.0.0-SNAPSHOT'
+    rabbitVersion = '2.0.1.RELEASE'
+    cloudVersion = '1.0.0.RELEASE'
+    mockitoVersion = '2.1.0'
+}
 
 group 'com.rakuten.felix'
-version '0.1.1'
+version rootProject.file('version').text.trim()
 
 apply from: 'build-publish.gradle'
 apply from: 'build-version.gradle'
-apply plugin: 'org.junit.platform.gradle.plugin'
 
 tasks.withType(JavaCompile) {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
+lombok {
+    version = "${lombokVersion}"
+}
+
 repositories {
     mavenCentral()
+    maven { url 'https://repo.spring.io/libs-release' }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 
 dependencies {
-    compile 'org.springframework.cloud:spring-cloud-starter-stream-rabbit'
+    compile group: 'org.springframework.amqp', name: 'spring-rabbit', version: "${rabbitVersion}"
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-stream', version: "${cloudVersion}"
     compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compile 'org.springframework.retry:spring-retry'
     compile 'mysql:mysql-connector-java'
+    compile 'commons-validator:commons-validator:1.5.1'
     compile 'org.springframework.boot:spring-boot-actuator'
-    compile('de.codecentric:spring-boot-admin-starter-client:1.4.+') {
+    compile("de.codecentric:spring-boot-admin-starter-client:${springAdminVersion}") {
         exclude group: 'junit'
     }
     compile 'com.moelholm:prometheus-spring-boot-starter:1.0.1'
-    compileOnly 'org.projectlombok:lombok:1.16.+'
-    testCompile "org.mockito:mockito-core:${mockitoVersion}"
     // JUnit Jupiter API and TestEngine implementation
-    testCompile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
-    testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
-    testCompileOnly 'org.projectlombok:lombok:1.16.+'
-}
-
-dependencyManagement {
-    imports {
-        mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Camden.SR6'
-    }
-}
-
-test {
-    useTestNG {
-        useDefaultListeners = true
-    }
+    testCompile "org.mockito:mockito-core:${mockitoVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+    testImplementation "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}"
+    testImplementation "org.jmockit:jmockit:${jmockitVersion}"
 }
 
 sonarqube {
@@ -72,6 +69,10 @@ sonarqube {
     }
 }
 
+test {
+    useJUnitPlatform()
+}
+
 checkstyle {
-    toolVersion = '7.6'
+    toolVersion = '7.7'
 }
