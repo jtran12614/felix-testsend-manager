@@ -1,0 +1,10 @@
+#----------------------------------------------------------------------------
+# Deployment method has not changed from previous version, so it is enough
+# just to resuse the same tasks.
+#----------------------------------------------------------------------------
+- name: "{{version_to_deploy}} : Deployment tasks included"
+  include: helper-tasks/deploy-given-version.yml
+  with_items:
+    - config-1.0.0.yml.j2
+  loop_control:
+    loop_var: config_template_name

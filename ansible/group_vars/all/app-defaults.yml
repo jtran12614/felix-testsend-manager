@@ -1,0 +1,28 @@
+#----------------------------------------------------------------------------
+# Temporary variable for storing custom facts. It has been used for safety
+# reasons, when custom facts does not exist.
+#----------------------------------------------------------------------------
+temp_facts_ansible_local: "{{ansible_local | default({})}}"
+
+#----------------------------------------------------------------------------
+# Temporary variable for storing running version of currently processing
+# application.
+#----------------------------------------------------------------------------
+app_facts_running:
+  version: "{{temp_facts_app_running['version'] | default('')}}"
+  pid: "{{temp_facts_app_running['pid'] | default('')}}"
+
+#----------------------------------------------------------------------------
+# Log file path for currently processing application.
+#----------------------------------------------------------------------------
+app_log_file: "/usr/local/var/log/felix/{{app_name}}/main-{{version_to_deploy}}.log"
+
+#----------------------------------------------------------------------------
+# Directory for currently processing application. Used during deployment.
+#----------------------------------------------------------------------------
+app_deploy_directory: "/usr/local/rms/platform/{{app_name}}/{{version_to_deploy}}"
+
+#----------------------------------------------------------------------------
+# Directory for currently processing application. Used during removal.
+#----------------------------------------------------------------------------
+app_remove_directory: "/usr/local/rms/platform/{{app_name}}/{{version_to_remove}}"

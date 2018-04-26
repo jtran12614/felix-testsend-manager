@@ -1,0 +1,18 @@
+#----------------------------------------------------------------------------
+# All applications' versions are listed here for better readibility.
+#
+# A `deployed` variable must contain a list of versions that are meant to
+# be deployed. In other words - when script finish successfully, all (and
+# only) versions listed will be deployed.
+#
+# A `running` variable is reserved for future use.
+#
+#----------------------------------------------------------------------------
+felix_components_versions:
+
+  testsend_manager:
+    ports:
+      - "8320"
+    deployed:
+      - "1.0.0-xxxx"
+    running: "1.0.0-xxxx"
