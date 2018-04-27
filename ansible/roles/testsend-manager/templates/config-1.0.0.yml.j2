@@ -54,8 +54,8 @@ spring:
 
   datasource:
     url: "{{felix_persistence['url']['scenario']}}"
-    username: "{{felix_persistence['access']['scenario']['user']}}"
-    password: "{{felix_persistence['access']['scenario']['password']}}"
+    username: "{{felix_persistence['access']['common']['user']}}"
+    password: "{{felix_persistence['access']['common']['password']}}"
     driver-class-name: "com.mysql.jdbc.Driver"
     tomcat:
       test-on-borrow: true
