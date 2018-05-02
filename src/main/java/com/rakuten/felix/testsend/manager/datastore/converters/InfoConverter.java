@@ -1,8 +1,8 @@
 package com.rakuten.felix.testsend.manager.datastore.converters;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rakuten.felix.testsend.manager.datastore.entities.Info;
+import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.AttributeConverter;
@@ -13,12 +13,11 @@ import java.util.Optional;
 @Slf4j
 @Converter
 public class InfoConverter implements AttributeConverter<Info, String> {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Override
     public String convertToDatabaseColumn(Info data) {
         try {
-            return MAPPER.writeValueAsString(data);
+            return ObjectMapperWrapper.getObjectMapper().writeValueAsString(data);
         } catch (JsonProcessingException exception) {
             return null;
         }
@@ -33,7 +32,7 @@ public class InfoConverter implements AttributeConverter<Info, String> {
 
     private Info mapToObject(String json) {
         try {
-            return MAPPER.readValue(json, Info.class);
+            return ObjectMapperWrapper.getObjectMapper().readValue(json, Info.class);
         } catch (IOException exception) {
             log.warn("Failed to convert Info: {}", exception);
             return null;

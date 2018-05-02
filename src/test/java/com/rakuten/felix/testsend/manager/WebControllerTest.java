@@ -5,10 +5,10 @@ import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
 import com.rakuten.felix.testsend.manager.datastore.TestSendHistoryRepository;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus;
-import com.rakuten.felix.testsend.manager.jsonutils.ObjectMapperWrapper;
 import com.rakuten.felix.testsend.manager.messaging.MessageSender;
 import com.rakuten.felix.testsend.manager.messaging.OutputChannels;
 import com.rakuten.felix.testsend.manager.messaging.dto.KickMailTestSendMessage;
+import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
 import com.rakuten.felix.testsend.manager.web.WebController;
 import com.rakuten.felix.testsend.manager.web.dto.KickMailTestSendRequest;
 import com.rakuten.felix.testsend.manager.webclients.dto.User;
@@ -73,9 +73,10 @@ class WebControllerTest {
             }
         };
         val messageSender = new MessageSender(outputChannels,
-                new ObjectMapperWrapper(new ObjectMapper()),
+                new ObjectMapperWrapper(),
                 "prefix.",
-                "destination");
+                "destination",
+                clock);
         controller = new WebController(dataStore, messageSender);
     }
 
@@ -114,7 +115,7 @@ class WebControllerTest {
         // Setup
         val bundleId = 1;
         val bundleType = 1;
-        val page = new PageRequest(1, 2);
+        val page = PageRequest.of(1, 2);
         // Response
         val mockedHistories = FakeData.getHistories();
         when(repository.findByBundleIdAndBundleType(bundleId, bundleType, page))

@@ -1,4 +1,4 @@
-package com.rakuten.felix.testsend.manager.jsonutils;
+package com.rakuten.felix.testsend.manager.serde;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,10 +9,10 @@ import java.nio.charset.StandardCharsets;
 
 @Service
 public class ObjectMapperWrapper {
-    private final ObjectMapper objectMapper;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public ObjectMapperWrapper(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    public static ObjectMapper getObjectMapper() {
+        return objectMapper;
     }
 
     /**
