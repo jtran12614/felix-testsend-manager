@@ -1,4 +1,4 @@
-package com.rakuten.felix.testsend.manager.processor;
+package com.rakuten.felix.testsend.manager.datastore.entities;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.rakuten.felix.testsend.manager.webclients.dto.User;
@@ -8,12 +8,13 @@ import lombok.Value;
 import java.util.List;
 
 @Value
-@Builder
+@Builder(toBuilder = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-class Info {
+public class Info {
     List<String> subjects;
     List<String> htmlContents;
     List<String> textContents;
     String errorMessage;
     User user;
+    List<String> recipients;
 }

@@ -35,7 +35,7 @@ apply plugin: 'maven-publish'
 publishing {
     repositories {
         maven {
-            url 'http://dev-qcmdaci101z.dev.jp.local:8081/nexus/content/repositories/felix'
+            url 'http://dev-qcmdaci101z.dev.jp.local:8082/repository/felix'
             credentials {
                 username this.username
                 password this.password

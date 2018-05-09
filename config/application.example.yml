@@ -74,7 +74,12 @@ spring:
     username: "user"
     password: "secret"
 
-management.security.enabled: false
+management:
+  metrics.export.prometheus.enabled: true
+  endpoints.web:
+    exposure.include: "*"
+    base-path: "/"
+
 
 com.rakuten.felix.testsend-manager:
   proxy:

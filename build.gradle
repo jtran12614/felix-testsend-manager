@@ -1,77 +1,74 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0'
-    }
-}
-
 plugins {
+    id 'org.springframework.boot' version '2.0.1.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.3.RELEASE'
+    id 'io.franzbecker.gradle-lombok' version '1.11'
+    id 'org.sonarqube' version '2.6.2'
     id 'java'
-    id 'findbugs'
     id 'checkstyle'
+    id 'findbugs'
     id 'jacoco'
-    id 'org.springframework.boot' version '1.5.9.RELEASE'
-    id "org.sonarqube" version "2.5"
 }
 
-ext.junitJupiterVersion = '5.0.0'
-ext.jacocoVersion = '0.7.9'
-ext.mockitoVersion = '2.1.0'
+ext {
+    checkStyleVersion = '7.7'
+    junitJupiterVersion = '5.0.1'
+    lombokVersion = '1.16.20'
+    springBootAdminVersion = '2.0.0-SNAPSHOT'
+    mockitoVersion = '2.1.0'
+    jacksonVersion = '2.9.4'
+    jsonVersion = '1.1.1'
+}
 
-group 'com.rakuten.felix'
-version '0.1.0'
+group = 'com.rakuten.felix'
+version = rootProject.file('version').text.trim()
 
 apply from: 'build-publish.gradle'
 apply from: 'build-version.gradle'
-apply plugin: 'org.junit.platform.gradle.plugin'
 
 tasks.withType(JavaCompile) {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
+lombok {
+    version = "${lombokVersion}"
+}
+
 repositories {
     mavenCentral()
+    maven { url = 'https://repo.spring.io/libs-milestone' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 
 dependencies {
-    compile 'org.springframework.cloud:spring-cloud-starter-stream-rabbit'
-    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
-    compile 'mysql:mysql-connector-java'
-    compile 'org.springframework.boot:spring-boot-actuator'
-    compile('de.codecentric:spring-boot-admin-starter-client:1.4.+') {
-        exclude group: 'junit'
+    implementation 'org.springframework.cloud:spring-cloud-starter-stream-rabbit'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.retry:spring-retry'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'mysql:mysql-connector-java'
+    implementation 'org.springframework.boot:spring-boot-actuator'
+    implementation("de.codecentric:spring-boot-admin-starter-client:${springBootAdminVersion}") {
+        exclude module: 'junit'
     }
-    compile 'com.moelholm:prometheus-spring-boot-starter:1.0.1'
-    compileOnly 'org.projectlombok:lombok:1.16.+'
+    // JUnit and jmockit
     testCompile "org.mockito:mockito-core:${mockitoVersion}"
-    // JUnit Jupiter API and TestEngine implementation
-    testCompile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
-    testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
-    testCompileOnly 'org.projectlombok:lombok:1.16.+'
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+    testCompileOnly('org.apiguardian:apiguardian-api:1.0.0')
 }
 
 dependencyManagement {
     imports {
-        mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Camden.SR6'
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:Finchley.RC1"
     }
 }
 
 test {
-    useTestNG {
-        useDefaultListeners = true
-    }
-}
-
-sonarqube {
-    properties {
-        property "sonar.host.url", "http://dev-qcmdaci101z.dev.jp.local:9000"
-        property "sonar.exclusions", "**/resources/version.properties"
-    }
+    useJUnitPlatform()
 }
 
 checkstyle {
-    toolVersion = '7.6'
+    toolVersion = "${checkStyleVersion}"
 }

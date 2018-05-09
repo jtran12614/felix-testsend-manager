@@ -1,10 +1,12 @@
 package com.rakuten.felix.testsend.manager;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
 import com.rakuten.felix.testsend.manager.datastore.TestSendHistoryRepository;
+import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
+import com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus;
 import com.rakuten.felix.testsend.manager.errorhandler.ErrorHandler;
-import com.rakuten.felix.testsend.manager.jsonutils.ObjectMapperWrapper;
 import com.rakuten.felix.testsend.manager.messaging.MessageListener;
 import com.rakuten.felix.testsend.manager.messaging.MessageSender;
 import com.rakuten.felix.testsend.manager.messaging.NotificationService;
@@ -15,30 +17,37 @@ import com.rakuten.felix.testsend.manager.messaging.dto.KickedMessage;
 import com.rakuten.felix.testsend.manager.messaging.dto.Notification;
 import com.rakuten.felix.testsend.manager.processor.MailContentBuilder;
 import com.rakuten.felix.testsend.manager.processor.Processor;
+import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
 import com.rakuten.felix.testsend.manager.webclients.JobDataKeeperService;
 import com.rakuten.felix.testsend.manager.webclients.dto.JobIdWrapper;
-import com.rakuten.felix.testsend.manager.webclients.dto.MailJobWithContents;
+import com.rakuten.felix.testsend.manager.webclients.dto.MailJob;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 class MessageListenerTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -48,6 +57,7 @@ class MessageListenerTest {
     private static final String NOTIFICATION_SUCCESS_MESSAGE = "success message: {bundle_id}";
     private static final String NOTIFICATION_ERROR_TITLE = "error title: {bundle_id}";
     private static final String NOTIFICATION_ERROR_MESSAGE = "error message: {bundle_id}";
+    private static final Clock clock = Clock.systemDefaultZone();
 
     private MessageListener messageListener;
 
@@ -66,10 +76,11 @@ class MessageListenerTest {
     @Mock
     private RestTemplate restTemplate;
 
+
     @BeforeEach
     void setUp() {
         initMocks(this);
-        val dataStore = new DataStoreService(repository);
+        val dataStore = new DataStoreService(repository, clock);
         val outputChannels = new OutputChannels() {
             @Override
             public MessageChannel outKickTestSend() {
@@ -86,8 +97,7 @@ class MessageListenerTest {
                 return outPublishNotification;
             }
         };
-        val mapperWrapper = new ObjectMapperWrapper(new ObjectMapper());
-        val messageSender = new MessageSender(outputChannels, mapperWrapper, null, null);
+        val messageSender = new MessageSender(outputChannels, new ObjectMapperWrapper(), null, null, clock);
         val errorHandler = new ErrorHandler(messageSender);
         val jobDataKeeper = new JobDataKeeperService(GET_JOB_URL, restTemplate);
         val notificationService = new NotificationService(NOTIFICATION_URL,
@@ -96,8 +106,8 @@ class MessageListenerTest {
                 NOTIFICATION_ERROR_TITLE,
                 NOTIFICATION_ERROR_MESSAGE,
                 messageSender);
-        val processor = new Processor(dataStore, mapperWrapper, jobDataKeeper, new MailContentBuilder(), notificationService);
-        messageListener = new MessageListener(mapperWrapper, errorHandler, processor);
+        val processor = new Processor(dataStore, jobDataKeeper, new MailContentBuilder(), notificationService);
+        messageListener = new MessageListener(new ObjectMapperWrapper(), errorHandler, processor);
     }
 
     @Test
@@ -105,15 +115,33 @@ class MessageListenerTest {
         // Setup
         val historyId = 12345;
         val jobId = 6789;
+        val mockedHistory = FakeData.getHistory();
+        val mockedMailJob = FakeData.getEmptyMailJob();
         // Response
-        when(repository.updateJobId(anyInt(), anyInt()))
-                .thenReturn(1);
+        when(restTemplate.postForObject(GET_JOB_URL, new JobIdWrapper(jobId), MailJob.class))
+                .thenReturn(mockedMailJob);
+        when(repository.findById(anyInt()))
+                .thenReturn(Optional.of(mockedHistory));
         // Execution
         val message = new KickedMessage(historyId, jobId);
         val payload = MAPPER.writeValueAsBytes(message);
         messageListener.kickTestSendFinished(payload);
         // Verification
-        verify(repository, times(1)).updateJobId(historyId, jobId);
+        verify(repository, times(1)).findById(historyId);
+
+        val capturedEntity = ArgumentCaptor.forClass(TestSendHistory.class);
+        verify(repository, times(1)).saveAndFlush(capturedEntity.capture());
+        val actualEntity = capturedEntity.getValue();
+        assertEquals(mockedHistory.getBundleId(), actualEntity.getBundleId());
+        assertEquals(mockedHistory.getBundleType(), actualEntity.getBundleType());
+        assertEquals(TestSendStatus.NEW, actualEntity.getStatus());
+        assertEquals(TestSendStatus.NEW, TestSendStatus.fromNumber(actualEntity.getStatus().toNumber()));
+        assertNull(TestSendStatus.fromNumber(9));
+        assertEquals(mockedHistory.getInfo().getUser(), actualEntity.getInfo().getUser());
+        assertTrue(actualEntity.getInfo().getSubjects().isEmpty());
+        assertTrue(actualEntity.getInfo().getHtmlContents().isEmpty());
+        assertTrue(actualEntity.getInfo().getTextContents().isEmpty());
+        assertEquals(actualEntity.getInfo().getRecipients(), mockedMailJob.getPrependAddresses());
 
         // verify error messaging
         verify(outError, times(0)).send(any());
@@ -141,15 +169,24 @@ class MessageListenerTest {
     void kickTestSendFinished_jobIdNull() throws Exception {
         // Setup
         val historyId = 12345;
+        val mockedHistory = FakeData.getHistory();
         // Response
-        when(repository.updateInfoAndStatusErrorById(anyInt(), anyString()))
-                .thenReturn(1);
+        when(repository.findById(anyInt()))
+                .thenReturn(Optional.of(mockedHistory));
         // Execution
         val message = new KickedMessage(historyId, null);
         val payload = MAPPER.writeValueAsBytes(message);
         messageListener.kickTestSendFinished(payload);
         // Verification
-        verify(repository, times(1)).updateInfoAndStatusErrorById(historyId, "{\"errorMessage\":\"Job initialization failed\"}");
+        verify(repository, times(1)).findById(historyId);
+
+        val capturedEntity = ArgumentCaptor.forClass(TestSendHistory.class);
+        verify(repository, times(1)).saveAndFlush(capturedEntity.capture());
+        val actualEntity = capturedEntity.getValue();
+        assertEquals(TestSendStatus.ERROR, actualEntity.getStatus());
+        assertNotNull(actualEntity.getInfo());
+        assertNotNull(actualEntity.getInfo().getErrorMessage());
+        assertEquals("Job initialization failed", actualEntity.getInfo().getErrorMessage());
 
         // verify error messaging
         verify(outError, times(0)).send(any());
@@ -159,24 +196,23 @@ class MessageListenerTest {
     void testSendFinished() throws Exception {
         // Setup
         val jobId = 11111;
-        val scheduleId = 0;
         val mockedHistory = FakeData.getHistory();
         // Response
-        when(restTemplate.postForObject(GET_JOB_URL, new JobIdWrapper(jobId), MailJobWithContents.class))
-                .thenReturn(FakeData.getEmptyMailJob());
-        when(repository.updateInfoAndStatusFinished(anyInt(), anyString()))
-                .thenReturn(1);
+        when(repository.findByJobId(anyInt()))
+                .thenReturn(Optional.of(mockedHistory));
         when(outPublishNotification.send(any()))
                 .thenReturn(true);
-        when(repository.findByJobId(jobId))
-                .thenReturn(Optional.of(mockedHistory));
         // Execution
-        val message = new FinishedMessage(jobId, scheduleId);
+        val message = new FinishedMessage(jobId);
         val payload = MAPPER.writeValueAsBytes(message);
         messageListener.testSendFinished(payload);
         // Verification
-        val expectedInfoJson = "{\"subjects\":[],\"htmlContents\":[],\"textContents\":[],\"user\":{\"userId\":0,\"mailAddress\":\"\"}}";
-        verify(repository, times(1)).updateInfoAndStatusFinished(jobId, expectedInfoJson);
+        verify(repository, times(2)).findByJobId(jobId);
+
+        val capturedEntity = ArgumentCaptor.forClass(TestSendHistory.class);
+        verify(repository, times(1)).saveAndFlush(capturedEntity.capture());
+        val actualEntity = capturedEntity.getValue();
+        assertEquals(TestSendStatus.FINISHED, actualEntity.getStatus());
 
         // verify notification messaging
         val capturedMessage = ArgumentCaptor.forClass(Message.class);
@@ -189,30 +225,47 @@ class MessageListenerTest {
         assertEquals(NOTIFICATION_SUCCESS_TITLE.replaceAll("\\{bundle_id}", bundleId), notificationMessage.getTitle());
         assertEquals(NOTIFICATION_SUCCESS_MESSAGE.replaceAll("\\{bundle_id}", bundleId), notificationMessage.getMessage());
         assertEquals(Boolean.TRUE, notificationMessage.getNoticeFlag());
-        assertEquals(Long.valueOf(0), notificationMessage.getUserId());
+        assertEquals(Long.valueOf(mockedHistory.getInfo().getUser().getUserId()), notificationMessage.getUserId());
 
         // verify error messaging
         verify(outError, times(0)).send(any());
     }
 
     @Test
-    void testSendFinished_validationFailed() throws Exception {
+    void testSendFinished_NotHistory() throws Exception {
         // Setup
         val jobId = 11111;
-        val scheduleId = 0;
         // Response
-        when(restTemplate.postForObject(GET_JOB_URL, new JobIdWrapper(jobId), MailJobWithContents.class))
-                .thenReturn(new MailJobWithContents(null, null, null));
-        when(repository.updateStatusErrorByJobId(anyInt()))
-                .thenReturn(1);
+        when(repository.findByJobId(anyInt()))
+                .thenReturn(Optional.empty());
+        when(outPublishNotification.send(any()))
+                .thenReturn(false);
         // Execution
-        val message = new FinishedMessage(jobId, scheduleId);
+        val message = new FinishedMessage(jobId);
         val payload = MAPPER.writeValueAsBytes(message);
         messageListener.testSendFinished(payload);
         // Verification
-        val capturedMessage = ArgumentCaptor.forClass(Message.class);
-        verify(outError, times(1)).send(capturedMessage.capture());
-        assertNotNull(capturedMessage.getValue().getPayload());
+        verify(repository, times(1)).findByJobId(jobId);
+    }
+
+    @Test
+    void testSendFinished_Exception() throws Exception {
+        // Setup
+        val jobId = 11111;
+        val mockedHistory = FakeData.getHistory();
+        // Response
+        when(repository.findByJobId(anyInt()))
+                .thenReturn(Optional.of(mockedHistory));
+        when(outPublishNotification.send(any()))
+                .thenReturn(false);
+        // Execution
+        val message = new FinishedMessage(jobId);
+        val payload = MAPPER.writeValueAsBytes(message);
+        messageListener.testSendFinished(payload);
+        // Verification
+        verify(repository, times(3)).findByJobId(jobId);
+        // verify error messaging
+        verify(outError, times(1)).send(any());
     }
 
     @Test
@@ -222,21 +275,25 @@ class MessageListenerTest {
         val errorMessage = "error message";
         val mockedHistory = FakeData.getHistory();
         // Response
-        when(restTemplate.postForObject(GET_JOB_URL, new JobIdWrapper(jobId), MailJobWithContents.class))
-                .thenReturn(FakeData.getEmptyMailJob());
-        when(repository.updateInfoAndStatusError(anyInt(), anyString()))
-                .thenReturn(1);
+        when(repository.findByJobId(anyInt()))
+                .thenReturn(Optional.of(mockedHistory));
         when(outPublishNotification.send(any()))
                 .thenReturn(true);
-        when(repository.findByJobId(jobId))
-                .thenReturn(Optional.of(mockedHistory));
+
         // Execution
         val message = new ErrorMessage(jobId, errorMessage);
         val payload = MAPPER.writeValueAsBytes(message);
         messageListener.testSendError(payload);
         // Verification
-        val expectedInfoJson = "{\"errorMessage\":\"error message\",\"user\":{\"userId\":0,\"mailAddress\":\"\"}}";
-        verify(repository, times(1)).updateInfoAndStatusError(jobId, expectedInfoJson);
+        verify(repository, times(2)).findByJobId(jobId);
+
+        val capturedEntity = ArgumentCaptor.forClass(TestSendHistory.class);
+        verify(repository, times(1)).saveAndFlush(capturedEntity.capture());
+        val actualEntity = capturedEntity.getValue();
+        assertEquals(TestSendStatus.ERROR, actualEntity.getStatus());
+        assertNotNull(actualEntity.getInfo());
+        assertNotNull(actualEntity.getInfo().getErrorMessage());
+        assertEquals(errorMessage, actualEntity.getInfo().getErrorMessage());
 
         // verify notification messaging
         val capturedMessage = ArgumentCaptor.forClass(Message.class);
@@ -249,28 +306,58 @@ class MessageListenerTest {
         assertEquals(NOTIFICATION_ERROR_TITLE.replaceAll("\\{bundle_id}", bundleId), notificationMessage.getTitle());
         assertEquals(NOTIFICATION_ERROR_MESSAGE.replaceAll("\\{bundle_id}", bundleId), notificationMessage.getMessage());
         assertEquals(Boolean.TRUE, notificationMessage.getNoticeFlag());
-        assertEquals(Long.valueOf(0), notificationMessage.getUserId());
+        assertEquals(Long.valueOf(mockedHistory.getInfo().getUser().getUserId()), notificationMessage.getUserId());
 
         // verify error messaging
         verify(outError, times(0)).send(any());
     }
 
     @Test
-    void testSendError_validationFailed() throws Exception {
+    void testSendError_NotHistory() throws JsonProcessingException {
         // Setup
         val jobId = 123456789;
         val errorMessage = "error message";
         // Response
-        when(restTemplate.postForObject(GET_JOB_URL, new JobIdWrapper(jobId), MailJobWithContents.class))
-                .thenReturn(new MailJobWithContents(null, null, null));
+        when(repository.findByJobId(anyInt()))
+                .thenReturn(Optional.empty());
+        when(outPublishNotification.send(any()))
+                .thenReturn(false);
+
         // Execution
         val message = new ErrorMessage(jobId, errorMessage);
         val payload = MAPPER.writeValueAsBytes(message);
         messageListener.testSendError(payload);
         // Verification
+        verify(repository, times(1)).findByJobId(jobId);
+    }
+
+    @Test
+    void testSendError_Exception() throws JsonProcessingException {
+        // Setup
+        val jobId = 123456789;
+        val errorMessage = "error message";
+        val mockedHistory = FakeData.getHistory();
+        // Response
+        when(repository.findByJobId(anyInt()))
+                .thenReturn(Optional.of(mockedHistory));
+        when(outPublishNotification.send(any()))
+                .thenReturn(false);
+
+        // Execution
+        val message = new ErrorMessage(jobId, errorMessage);
+        val payload = MAPPER.writeValueAsBytes(message);
+        messageListener.testSendError(payload);
+        // Verification
+        verify(repository, times(3)).findByJobId(jobId);
+
         // verify error messaging
-        val capturedMessage = ArgumentCaptor.forClass(Message.class);
-        verify(outError, times(1)).send(capturedMessage.capture());
-        assertNotNull(capturedMessage.getValue().getPayload());
+        verify(outError, times(1)).send(any());
+    }
+
+    @Test
+    void deserializeToObject_Exception() {
+        ObjectMapperWrapper objectMapperWrapper = new ObjectMapperWrapper();
+        val mailTestSendPayload = objectMapperWrapper.serializeToBytes(new TestSendHistory().toString());
+        assertThrows(IllegalArgumentException.class, () -> objectMapperWrapper.deserializeToObject(mailTestSendPayload, KickedMessage.class));
     }
 }

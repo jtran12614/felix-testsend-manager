@@ -13,13 +13,13 @@ class ValidatorTest {
 
     @Test
     void testValidateNull() {
-        val objToValidate = new KickMailTestSendRequest(null, 1, null);
+        val objToValidate = new KickMailTestSendRequest(null, 1, null, null);
         assertThrows(ValidationException.class, () -> Validator.validate(objToValidate));
     }
 
     @Test
     void testValidateMin() {
-        val objToValidate = new KickMailTestSendRequest(-1, 1, new JSONObject());
+        val objToValidate = new KickMailTestSendRequest(-1, 1, new JSONObject(), null);
         assertThrows(ValidationException.class, () -> Validator.validate(objToValidate));
     }
 }

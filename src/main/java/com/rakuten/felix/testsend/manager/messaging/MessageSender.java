@@ -1,8 +1,8 @@
 package com.rakuten.felix.testsend.manager.messaging;
 
-import com.rakuten.felix.testsend.manager.jsonutils.ObjectMapperWrapper;
 import com.rakuten.felix.testsend.manager.messaging.dto.KickMailTestSendMessage;
 import com.rakuten.felix.testsend.manager.messaging.dto.Notification;
+import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,23 +26,28 @@ public class MessageSender {
     private final OutputChannels outputChannels;
     private final ObjectMapperWrapper objectMapperWrapper;
     private final String kickTestSendReplyChannelName;
-    private final Clock clock = Clock.systemDefaultZone();
+    private final Clock clock;
 
     /**
      * Initialize service.
      *
-     * @param outputChannels      Output channels.
-     * @param objectMapperWrapper JSON object mapper wrapper.
+     * @param outputChannels               Output channels.
+     * @param objectMapperWrapper          JSON object mapper wrapper.
+     * @param kickTestSendReplyDestination Properties value.
+     * @param kickTestSendReplyPrefix      Properties value.
+     * @param clock                        Clock.
      */
     @Autowired
     public MessageSender(OutputChannels outputChannels,
                          ObjectMapperWrapper objectMapperWrapper,
                          @Value("${spring.cloud.stream.bindings." + InputChannels.IN_KICK_TEST_SEND_FINISHED + ".destination}") String kickTestSendReplyDestination,
-                         @Value("${spring.cloud.stream.rabbit.bindings." + InputChannels.IN_KICK_TEST_SEND_FINISHED + ".consumer.prefix}") String kickTestSendReplyPrefix) {
+                         @Value("${spring.cloud.stream.rabbit.bindings." + InputChannels.IN_KICK_TEST_SEND_FINISHED + ".consumer.prefix}") String kickTestSendReplyPrefix,
+                         Clock clock) {
 
         this.outputChannels = outputChannels;
         this.objectMapperWrapper = objectMapperWrapper;
         this.kickTestSendReplyChannelName = kickTestSendReplyPrefix + kickTestSendReplyDestination;
+        this.clock = clock;
     }
 
 

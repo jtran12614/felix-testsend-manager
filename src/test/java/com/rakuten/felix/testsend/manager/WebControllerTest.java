@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
 import com.rakuten.felix.testsend.manager.datastore.TestSendHistoryRepository;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
-import com.rakuten.felix.testsend.manager.jsonutils.ObjectMapperWrapper;
+import com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus;
 import com.rakuten.felix.testsend.manager.messaging.MessageSender;
 import com.rakuten.felix.testsend.manager.messaging.OutputChannels;
 import com.rakuten.felix.testsend.manager.messaging.dto.KickMailTestSendMessage;
+import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
 import com.rakuten.felix.testsend.manager.web.WebController;
 import com.rakuten.felix.testsend.manager.web.dto.KickMailTestSendRequest;
+import com.rakuten.felix.testsend.manager.webclients.dto.User;
 import lombok.val;
 import org.json.simple.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +23,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 
+import java.time.Clock;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -28,10 +33,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 class WebControllerTest {
 
@@ -43,11 +48,14 @@ class WebControllerTest {
     @Mock
     private MessageChannel kickTestSend;
 
+    @Mock
+    private Clock clock;
+
 
     @BeforeEach
     void setUp() {
         initMocks(this);
-        val dataStore = new DataStoreService(repository);
+        val dataStore = new DataStoreService(repository, clock);
         val outputChannels = new OutputChannels() {
             @Override
             public MessageChannel outKickTestSend() {
@@ -65,9 +73,10 @@ class WebControllerTest {
             }
         };
         val messageSender = new MessageSender(outputChannels,
-                new ObjectMapperWrapper(new ObjectMapper()),
+                new ObjectMapperWrapper(),
                 "prefix.",
-                "destination");
+                "destination",
+                clock);
         controller = new WebController(dataStore, messageSender);
     }
 
@@ -101,13 +110,12 @@ class WebControllerTest {
         assertHistory(mockedHistory, response);
     }
 
-
     @Test
     void getHistoriesByBundleIdAndBundleType() {
         // Setup
         val bundleId = 1;
         val bundleType = 1;
-        val page = new PageRequest(1, 2);
+        val page = PageRequest.of(1, 2);
         // Response
         val mockedHistories = FakeData.getHistories();
         when(repository.findByBundleIdAndBundleType(bundleId, bundleType, page))
@@ -128,6 +136,8 @@ class WebControllerTest {
         val bundleId = 1;
         val bundleType = 1;
         val mailJob = new JSONObject(Collections.singletonMap("key", "value"));
+        val started = ZonedDateTime.now(ZoneId.systemDefault());
+        val user = new User(1, "name", "mail-address");
         // Response
         when(repository.saveAndFlush(any()))
                 .then(it -> {
@@ -135,19 +145,26 @@ class WebControllerTest {
                     entity.setId(historyId);
                     return entity;
                 });
+        when(clock.instant())
+                .thenReturn(started.toInstant());
+        when(clock.getZone())
+                .thenReturn(started.getZone());
 
         when(kickTestSend.send(any()))
                 .thenReturn(true);
         // Execution
-        val response = controller.kickTestSend(new KickMailTestSendRequest(bundleId, bundleType, mailJob));
+        val response = controller.kickTestSend(new KickMailTestSendRequest(bundleId, bundleType, mailJob, user));
         // Verification
         assertNotNull(response);
 
         // verify database
         val capturedEntity = ArgumentCaptor.forClass(TestSendHistory.class);
         verify(repository, times(1)).saveAndFlush(capturedEntity.capture());
+        assertEquals(TestSendStatus.NEW, capturedEntity.getValue().getStatus());
+        assertEquals(user, capturedEntity.getValue().getInfo().getUser());
         assertEquals(Integer.valueOf(bundleId), capturedEntity.getValue().getBundleId());
         assertEquals(Integer.valueOf(bundleType), capturedEntity.getValue().getBundleType());
+        assertEquals(started, capturedEntity.getValue().getStarted());
 
         // verify messaging
         val capturedMessage = ArgumentCaptor.forClass(Message.class);

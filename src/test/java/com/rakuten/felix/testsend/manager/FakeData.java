@@ -1,9 +1,10 @@
 package com.rakuten.felix.testsend.manager;
 
+import com.rakuten.felix.testsend.manager.datastore.entities.Info;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus;
 import com.rakuten.felix.testsend.manager.webclients.dto.Content;
-import com.rakuten.felix.testsend.manager.webclients.dto.MailJobWithContents;
+import com.rakuten.felix.testsend.manager.webclients.dto.MailJob;
 import com.rakuten.felix.testsend.manager.webclients.dto.Pattern;
 import com.rakuten.felix.testsend.manager.webclients.dto.Schedule;
 import com.rakuten.felix.testsend.manager.webclients.dto.Subject;
@@ -23,7 +24,13 @@ public class FakeData {
                 .status(TestSendStatus.NEW)
                 .bundleId(1)
                 .bundleType(1)
-                .info("{json}")
+                .info(Info.builder()
+                        .subjects(Collections.singletonList("Subject"))
+                        .htmlContents(Collections.singletonList("Html content"))
+                        .textContents(Collections.singletonList("Text content"))
+                        .user(new User(1, "user-name", "user-address@rakuten.com"))
+                        .recipients(Arrays.asList("recipient1", "recipient2"))
+                        .build())
                 .build();
     }
 
@@ -34,23 +41,23 @@ public class FakeData {
                         .status(TestSendStatus.NEW)
                         .bundleId(11)
                         .bundleType(111)
-                        .info("{json}")
+                        .info(Info.builder().build())
                         .build(),
                 TestSendHistory.builder()
                         .id(2)
                         .status(TestSendStatus.FINISHED)
                         .bundleId(22)
                         .bundleType(222)
-                        .info("{json}")
+                        .info(Info.builder().build())
                         .build()
         );
     }
 
-    MailJobWithContents getEmptyMailJob() {
-        return new MailJobWithContents(
+    MailJob getEmptyMailJob() {
+        return new MailJob(
                 Collections.singletonList(new Schedule(Collections.emptyList(), Collections.emptyList())),
                 Collections.singletonList(""),
-                new User(0, ""));
+                Collections.emptyList());
     }
 
 

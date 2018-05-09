@@ -1,11 +1,11 @@
 package com.rakuten.felix.testsend.manager.messaging;
 
 import com.rakuten.felix.testsend.manager.errorhandler.ErrorHandler;
-import com.rakuten.felix.testsend.manager.jsonutils.ObjectMapperWrapper;
 import com.rakuten.felix.testsend.manager.messaging.dto.ErrorMessage;
 import com.rakuten.felix.testsend.manager.messaging.dto.FinishedMessage;
 import com.rakuten.felix.testsend.manager.messaging.dto.KickedMessage;
 import com.rakuten.felix.testsend.manager.processor.Processor;
+import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
 import com.rakuten.felix.testsend.manager.validator.Validator;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -70,7 +70,7 @@ public class MessageListener {
             logDebug(InputChannels.IN_TEST_SEND_FINISHED, payload);
             val message = objectMapper.deserializeToObject(payload, FinishedMessage.class);
             Validator.validate(message);
-            processor.processMailTestSendFinished(message.getJobId(), message.getScheduleId());
+            processor.processMailTestSendFinished(message.getJobId());
         } catch (Exception e) {
             errorHandler.handleExceptionWithPayload(e, payload, InputChannels.IN_TEST_SEND_FINISHED);
         }

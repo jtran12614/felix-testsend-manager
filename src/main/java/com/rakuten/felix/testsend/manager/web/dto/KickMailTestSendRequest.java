@@ -1,5 +1,6 @@
 package com.rakuten.felix.testsend.manager.web.dto;
 
+import com.rakuten.felix.testsend.manager.webclients.dto.User;
 import lombok.Value;
 import org.json.simple.JSONObject;
 
@@ -16,4 +17,5 @@ public class KickMailTestSendRequest {
     Integer bundleType;
     @NotNull
     JSONObject mailJob;
+    User user;
 }

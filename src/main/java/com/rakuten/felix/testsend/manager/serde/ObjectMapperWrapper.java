@@ -1,4 +1,4 @@
-package com.rakuten.felix.testsend.manager.jsonutils;
+package com.rakuten.felix.testsend.manager.serde;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,25 +9,10 @@ import java.nio.charset.StandardCharsets;
 
 @Service
 public class ObjectMapperWrapper {
-    private final ObjectMapper objectMapper;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public ObjectMapperWrapper(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
-
-    /**
-     * Serialize object to string.
-     *
-     * @param object Mail job object.
-     * @return String.
-     * @throws IllegalArgumentException When serialization fails.
-     */
-    public String serializeToString(Object object) {
-        try {
-            return objectMapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("Can't serialize to string: object=" + object, e);
-        }
+    public static ObjectMapper getObjectMapper() {
+        return objectMapper;
     }
 
     /**
