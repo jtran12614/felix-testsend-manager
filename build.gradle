@@ -21,8 +21,8 @@ ext {
     mockitoVersion = '2.1.0'
 }
 
-group 'com.rakuten.felix'
-version rootProject.file('version').text.trim()
+group = 'com.rakuten.felix'
+version = rootProject.file('version').text.trim()
 
 apply from: 'build-publish.gradle'
 apply from: 'build-version.gradle'
@@ -38,8 +38,8 @@ lombok {
 
 repositories {
     mavenCentral()
-    maven { url 'https://repo.spring.io/libs-release' }
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url = 'https://repo.spring.io/libs-release' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 
 dependencies {
@@ -75,11 +75,4 @@ test {
 
 checkstyle {
     toolVersion = '7.7'
-}
-
-tasks.withType(FindBugs) {
-    reports {
-        xml.enabled = false // これを書くとXML出力を止めることができる
-        html.enabled = true
-    }
 }
