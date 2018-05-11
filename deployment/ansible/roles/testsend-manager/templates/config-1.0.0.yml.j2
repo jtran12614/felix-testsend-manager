@@ -53,9 +53,9 @@ spring:
     password: "{{felix_mq['connection']['password']}}"
 
   datasource:
-    url: "{{felix_persistence['url']['scenario']}}"
-    username: "{{felix_persistence['access']['common']['user']}}"
-    password: "{{felix_persistence['access']['common']['password']}}"
+    url: "{{felix_persistence['url']}}"
+    username: "{{felix_persistence['user']}}"
+    password: "{{felix_persistence['password']}}"
     driver-class-name: "com.mysql.jdbc.Driver"
     tomcat:
       test-on-borrow: true
@@ -74,8 +74,11 @@ spring:
     username: "{{spring_admin['username']}}"
     password: "{{spring_admin['password']}}"
 
-
-management.security.enabled: false
+management:
+  metrics.export.prometheus.enabled: true
+  endpoints.web:
+    exposure.include: "*"
+    base-path: "/"
 
 com.rakuten.felix.testsend-manager:
   proxy:

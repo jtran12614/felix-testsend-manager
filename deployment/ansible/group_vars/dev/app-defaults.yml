@@ -21,12 +21,9 @@ felix_auth_keys:
 # Data store config.
 #----------------------------------------------------------------------------
 felix_persistence:
-  url:
-    scenario: "jdbc:mysql://dev-dm-felix201z.dev.jp.local:3301/felix_scenario_01"
-  access:
-    common:
-      user: "{{vault['db2']['common']['user']}}"
-      password: "{{vault['db2']['common']['password']}}"
+  url: "jdbc:mysql://dev-dm-felix201z.dev.jp.local:3301/felix_scenario_01"
+  user: "{{vault['db2']['common']['user']}}"
+  password: "{{vault['db2']['common']['password']}}"
   show_jpa_query: false
 
 #----------------------------------------------------------------------------
