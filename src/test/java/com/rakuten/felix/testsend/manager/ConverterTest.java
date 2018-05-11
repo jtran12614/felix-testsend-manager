@@ -63,7 +63,7 @@ class ConverterTest {
     }
 
     @Test
-    void infoConverter_convertToEntityAttribute_Exception() throws JsonProcessingException {
+    void infoConverter_convertToEntityAttribute_ParseFail() throws JsonProcessingException {
         val testObject = new InfoConverter();
         val history = FakeData.getHistory();
         val payload = new ObjectMapper().writeValueAsString(history);
@@ -84,7 +84,7 @@ class ConverterTest {
     }
 
     @Test
-    void zonedDateTimeConverter_convertToEntityAttribute_Exception() throws JsonProcessingException {
+    void zonedDateTimeConverter_convertToDatabaseColumn() throws JsonProcessingException {
         val testObject = new ZonedDateTimeConverter();
         val now = ZonedDateTime.now();
         val timeStamp = new Timestamp(Date.from(Instant.from(now)).getTime());

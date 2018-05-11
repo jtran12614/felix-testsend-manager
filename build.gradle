@@ -1,9 +1,9 @@
 plugins {
-    id 'org.springframework.boot' version '2.0.0.RELEASE'
+    id 'org.springframework.boot' version '2.0.1.RELEASE'
     id 'io.spring.dependency-management' version '1.0.3.RELEASE'
     id 'io.franzbecker.gradle-lombok' version '1.11'
     id 'org.sonarqube' version '2.6.2'
-    id 'java-library'
+    id 'java'
     id 'checkstyle'
     id 'findbugs'
     id 'jacoco'
@@ -11,14 +11,12 @@ plugins {
 
 ext {
     checkStyleVersion = '7.7'
-    jmockitVersion = '1.32'
-    junitJupiterVersion = '5.0.0-M4'
-    junitPlatformVersion = '1.0.0-M4'
+    junitJupiterVersion = '5.0.1'
     lombokVersion = '1.16.20'
-    springAdminVersion = '2.0.0-SNAPSHOT'
-    rabbitVersion = '2.0.1.RELEASE'
-    cloudVersion = '1.0.0.RELEASE'
+    springBootAdminVersion = '2.0.0-SNAPSHOT'
     mockitoVersion = '2.1.0'
+    jacksonVersion = '2.9.4'
+    jsonVersion = '1.1.1'
 }
 
 group = 'com.rakuten.felix'
@@ -38,34 +36,32 @@ lombok {
 
 repositories {
     mavenCentral()
-    maven { url = 'https://repo.spring.io/libs-release' }
+    maven { url = 'https://repo.spring.io/libs-milestone' }
     maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 
 dependencies {
-    compile group: 'org.springframework.amqp', name: 'spring-rabbit', version: "${rabbitVersion}"
-    compile group: 'org.springframework.cloud', name: 'spring-cloud-stream', version: "${cloudVersion}"
-    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
-    compile 'org.springframework.retry:spring-retry'
-    compile 'mysql:mysql-connector-java'
-    compile 'commons-validator:commons-validator:1.5.1'
-    compile 'org.springframework.boot:spring-boot-actuator'
-    compile("de.codecentric:spring-boot-admin-starter-client:${springAdminVersion}") {
-        exclude group: 'junit'
+    implementation 'org.springframework.cloud:spring-cloud-starter-stream-rabbit'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.retry:spring-retry'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'mysql:mysql-connector-java'
+    implementation 'org.springframework.boot:spring-boot-actuator'
+    implementation("de.codecentric:spring-boot-admin-starter-client:${springBootAdminVersion}") {
+        exclude module: 'junit'
     }
-    compile 'com.moelholm:prometheus-spring-boot-starter:1.0.1'
-    // JUnit Jupiter API and TestEngine implementation
+    // JUnit and jmockit
     testCompile "org.mockito:mockito-core:${mockitoVersion}"
     testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
-    testImplementation "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}"
-    testImplementation "org.jmockit:jmockit:${jmockitVersion}"
+    testCompileOnly('org.apiguardian:apiguardian-api:1.0.0')
 }
 
-sonarqube {
-    properties {
-        property "sonar.host.url", "http://dev-qcmdaci101z.dev.jp.local:9000"
-        property "sonar.exclusions", "**/resources/version.properties"
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:Finchley.RC1"
     }
 }
 
@@ -74,5 +70,5 @@ test {
 }
 
 checkstyle {
-    toolVersion = '7.7'
+    toolVersion = "${checkStyleVersion}"
 }

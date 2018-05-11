@@ -7,7 +7,6 @@ import com.rakuten.felix.testsend.manager.datastore.TestSendHistoryRepository;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus;
 import com.rakuten.felix.testsend.manager.errorhandler.ErrorHandler;
-import com.rakuten.felix.testsend.manager.jsonutils.ObjectMapperWrapper;
 import com.rakuten.felix.testsend.manager.messaging.MessageListener;
 import com.rakuten.felix.testsend.manager.messaging.MessageSender;
 import com.rakuten.felix.testsend.manager.messaging.NotificationService;
@@ -18,6 +17,7 @@ import com.rakuten.felix.testsend.manager.messaging.dto.KickedMessage;
 import com.rakuten.felix.testsend.manager.messaging.dto.Notification;
 import com.rakuten.felix.testsend.manager.processor.MailContentBuilder;
 import com.rakuten.felix.testsend.manager.processor.Processor;
+import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
 import com.rakuten.felix.testsend.manager.webclients.JobDataKeeperService;
 import com.rakuten.felix.testsend.manager.webclients.dto.JobIdWrapper;
 import com.rakuten.felix.testsend.manager.webclients.dto.MailJob;
@@ -26,11 +26,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Clock;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Optional;
@@ -55,6 +57,7 @@ class MessageListenerTest {
     private static final String NOTIFICATION_SUCCESS_MESSAGE = "success message: {bundle_id}";
     private static final String NOTIFICATION_ERROR_TITLE = "error title: {bundle_id}";
     private static final String NOTIFICATION_ERROR_MESSAGE = "error message: {bundle_id}";
+    private static final Clock clock = Clock.systemDefaultZone();
 
     private MessageListener messageListener;
 
@@ -73,8 +76,6 @@ class MessageListenerTest {
     @Mock
     private RestTemplate restTemplate;
 
-    @Mock
-    private Clock clock;
 
     @BeforeEach
     void setUp() {
@@ -96,8 +97,7 @@ class MessageListenerTest {
                 return outPublishNotification;
             }
         };
-        val mapperWrapper = new ObjectMapperWrapper(new ObjectMapper());
-        val messageSender = new MessageSender(outputChannels, mapperWrapper, null, null);
+        val messageSender = new MessageSender(outputChannels, new ObjectMapperWrapper(), null, null, clock);
         val errorHandler = new ErrorHandler(messageSender);
         val jobDataKeeper = new JobDataKeeperService(GET_JOB_URL, restTemplate);
         val notificationService = new NotificationService(NOTIFICATION_URL,
@@ -107,7 +107,7 @@ class MessageListenerTest {
                 NOTIFICATION_ERROR_MESSAGE,
                 messageSender);
         val processor = new Processor(dataStore, jobDataKeeper, new MailContentBuilder(), notificationService);
-        messageListener = new MessageListener(mapperWrapper, errorHandler, processor);
+        messageListener = new MessageListener(new ObjectMapperWrapper(), errorHandler, processor);
     }
 
     @Test
@@ -170,14 +170,9 @@ class MessageListenerTest {
         // Setup
         val historyId = 12345;
         val mockedHistory = FakeData.getHistory();
-        val finished = ZonedDateTime.now(ZoneId.systemDefault());
         // Response
         when(repository.findById(anyInt()))
                 .thenReturn(Optional.of(mockedHistory));
-        when(clock.instant())
-                .thenReturn(finished.toInstant());
-        when(clock.getZone())
-                .thenReturn(finished.getZone());
         // Execution
         val message = new KickedMessage(historyId, null);
         val payload = MAPPER.writeValueAsBytes(message);
@@ -202,16 +197,11 @@ class MessageListenerTest {
         // Setup
         val jobId = 11111;
         val mockedHistory = FakeData.getHistory();
-        val finished = ZonedDateTime.now(ZoneId.systemDefault());
         // Response
         when(repository.findByJobId(anyInt()))
                 .thenReturn(Optional.of(mockedHistory));
         when(outPublishNotification.send(any()))
                 .thenReturn(true);
-        when(clock.instant())
-                .thenReturn(finished.toInstant());
-        when(clock.getZone())
-                .thenReturn(finished.getZone());
         // Execution
         val message = new FinishedMessage(jobId);
         val payload = MAPPER.writeValueAsBytes(message);
@@ -223,7 +213,6 @@ class MessageListenerTest {
         verify(repository, times(1)).saveAndFlush(capturedEntity.capture());
         val actualEntity = capturedEntity.getValue();
         assertEquals(TestSendStatus.FINISHED, actualEntity.getStatus());
-        assertEquals(finished, actualEntity.getFinished());
 
         // verify notification messaging
         val capturedMessage = ArgumentCaptor.forClass(Message.class);
@@ -246,16 +235,11 @@ class MessageListenerTest {
     void testSendFinished_NotHistory() throws Exception {
         // Setup
         val jobId = 11111;
-        val finished = ZonedDateTime.now(ZoneId.systemDefault());
         // Response
         when(repository.findByJobId(anyInt()))
                 .thenReturn(Optional.empty());
         when(outPublishNotification.send(any()))
                 .thenReturn(false);
-        when(clock.instant())
-                .thenReturn(finished.toInstant());
-        when(clock.getZone())
-                .thenReturn(finished.getZone());
         // Execution
         val message = new FinishedMessage(jobId);
         val payload = MAPPER.writeValueAsBytes(message);
@@ -269,16 +253,11 @@ class MessageListenerTest {
         // Setup
         val jobId = 11111;
         val mockedHistory = FakeData.getHistory();
-        val finished = ZonedDateTime.now(ZoneId.systemDefault());
         // Response
         when(repository.findByJobId(anyInt()))
                 .thenReturn(Optional.of(mockedHistory));
         when(outPublishNotification.send(any()))
                 .thenReturn(false);
-        when(clock.instant())
-                .thenReturn(finished.toInstant());
-        when(clock.getZone())
-                .thenReturn(finished.getZone());
         // Execution
         val message = new FinishedMessage(jobId);
         val payload = MAPPER.writeValueAsBytes(message);
@@ -295,16 +274,11 @@ class MessageListenerTest {
         val jobId = 123456789;
         val errorMessage = "error message";
         val mockedHistory = FakeData.getHistory();
-        val finished = ZonedDateTime.now(ZoneId.systemDefault());
         // Response
         when(repository.findByJobId(anyInt()))
                 .thenReturn(Optional.of(mockedHistory));
         when(outPublishNotification.send(any()))
                 .thenReturn(true);
-        when(clock.instant())
-                .thenReturn(finished.toInstant());
-        when(clock.getZone())
-                .thenReturn(finished.getZone());
 
         // Execution
         val message = new ErrorMessage(jobId, errorMessage);
@@ -343,16 +317,11 @@ class MessageListenerTest {
         // Setup
         val jobId = 123456789;
         val errorMessage = "error message";
-        val finished = ZonedDateTime.now(ZoneId.systemDefault());
         // Response
         when(repository.findByJobId(anyInt()))
                 .thenReturn(Optional.empty());
         when(outPublishNotification.send(any()))
                 .thenReturn(false);
-        when(clock.instant())
-                .thenReturn(finished.toInstant());
-        when(clock.getZone())
-                .thenReturn(finished.getZone());
 
         // Execution
         val message = new ErrorMessage(jobId, errorMessage);
@@ -368,16 +337,11 @@ class MessageListenerTest {
         val jobId = 123456789;
         val errorMessage = "error message";
         val mockedHistory = FakeData.getHistory();
-        val finished = ZonedDateTime.now(ZoneId.systemDefault());
         // Response
         when(repository.findByJobId(anyInt()))
                 .thenReturn(Optional.of(mockedHistory));
         when(outPublishNotification.send(any()))
                 .thenReturn(false);
-        when(clock.instant())
-                .thenReturn(finished.toInstant());
-        when(clock.getZone())
-                .thenReturn(finished.getZone());
 
         // Execution
         val message = new ErrorMessage(jobId, errorMessage);
@@ -392,7 +356,7 @@ class MessageListenerTest {
 
     @Test
     void deserializeToObject_Exception() {
-        ObjectMapperWrapper objectMapperWrapper = new ObjectMapperWrapper(new ObjectMapper());
+        ObjectMapperWrapper objectMapperWrapper = new ObjectMapperWrapper();
         val mailTestSendPayload = objectMapperWrapper.serializeToBytes(new TestSendHistory().toString());
         assertThrows(IllegalArgumentException.class, () -> objectMapperWrapper.deserializeToObject(mailTestSendPayload, KickedMessage.class));
     }
