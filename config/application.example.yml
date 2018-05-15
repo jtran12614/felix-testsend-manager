@@ -80,7 +80,6 @@ management:
     exposure.include: "*"
     base-path: "/"
 
-
 com.rakuten.felix.testsend-manager:
   proxy:
     host: "host"

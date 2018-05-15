@@ -7,7 +7,7 @@ app_log_level: "debug"
 # Spring Boot Admin Setting
 #----------------------------------------------------------------------------
 spring_admin:
-  url: "http://stg-wfelix202z.stg.jp.local:7999"
+  url: "http://stg-wfelix202z.stg.jp.local:11116"
   username: "{{vault['spring_admin']['username']}}"
   password: "{{vault['spring_admin']['password']}}"
 
