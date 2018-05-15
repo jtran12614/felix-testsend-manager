@@ -1,0 +1,62 @@
+#----------------------------------------------------------------------------
+# Default logging level for felix application.
+#----------------------------------------------------------------------------
+app_log_level: "debug"
+
+#----------------------------------------------------------------------------
+# Spring Boot Admin Setting
+#----------------------------------------------------------------------------
+spring_admin:
+  url: "http://stg-wfelix201z.stg.jp.local:11116"
+  username: "{{vault['spring_admin']['username']}}"
+  password: "{{vault['spring_admin']['password']}}"
+
+#----------------------------------------------------------------------------
+# Authentication keys.
+#----------------------------------------------------------------------------
+felix_auth_keys:
+    test_send_manager: "{{vault['auth_keys']['test_send_manager']}}"
+
+#----------------------------------------------------------------------------
+# Data store config.
+#----------------------------------------------------------------------------
+felix_persistence:
+  url: "jdbc:mysql://stg-dm-felix201z.stg.jp.local:3301/felix_scenario_01"
+  user: "{{vault['db2']['common']['user']}}"
+  password: "{{vault['db2']['common']['password']}}"
+  show_jpa_query: false
+
+#----------------------------------------------------------------------------
+# Proxy config. Used for accessing internal APIs.
+#----------------------------------------------------------------------------
+felix_proxy:
+  default:
+    host: "dev-proxy.db.rakuten.co.jp"
+    port: 9502
+
+#----------------------------------------------------------------------------
+# Messaging broker config.
+#----------------------------------------------------------------------------
+felix_mq:
+  connection:
+    addresses:
+      - "stg-amqfelix101z.stg.jp.local:5672"
+      - "stg-amqfelix102z.stg.jp.local:5672"
+      - "stg-amqfelix103z.stg.jp.local:5672"
+    user: "{{vault['mq']['user']}}"
+    password: "{{vault['mq']['password']}}"
+  prefix: "felix."
+  channels:
+    kick_test_send_finished: "kick-test-send-finish"
+    test_send_finished: "test-send-finished"
+    test_send_error: "test-send-error"
+    kick_test_send: "kick-test-send"
+    error_channel: "error"
+    publish_notification: "publish-notification"
+
+#----------------------------------------------------------------------------
+# Internal APIs' URLs.
+#----------------------------------------------------------------------------
+felix_api:
+  job_data_keeper:
+    get_complete_job: "http://api.core.felix.prod.jp.local/v1.0/jobs/get"

@@ -1,0 +1,69 @@
+#----------------------------------------------------------------------------
+# An 'app_name' value should be the same as Maven artifact.
+# It is used in many other places as well.
+#----------------------------------------------------------------------------
+app_name: "felix-testsend-manager"
+
+#----------------------------------------------------------------------------
+# List of ports that are to be deployed on remote host.
+# Stored as a common variable for DRY approach.
+#----------------------------------------------------------------------------
+ports_deployed: "{{felix_components_versions['testsend_manager']['ports']}}"
+
+#----------------------------------------------------------------------------
+# List of versions that are to be deployed on remote host.
+# Stored as a common variable for DRY approach.
+#----------------------------------------------------------------------------
+versions_deployed: "{{felix_components_versions['testsend_manager']['deployed']}}"
+
+#----------------------------------------------------------------------------
+# Versions that are to be running on remote host.
+# Stored as a common variable for DRY approach.
+#----------------------------------------------------------------------------
+version_running: "{{felix_components_versions['testsend_manager']['running']}}"
+
+#----------------------------------------------------------------------------
+# Temporary variable which contains custom facts about deployed port,
+# or empty object if not defined.
+#----------------------------------------------------------------------------
+app_facts_port: "{{temp_facts_ansible_local['felix_testsend_manager_port_' + version_to_deploy] | default([])}}"
+
+#----------------------------------------------------------------------------
+# Temporary variable which contains custom facts about deployed versions,
+# or empty object if not defined.
+#----------------------------------------------------------------------------
+app_facts_deployed: "{{temp_facts_ansible_local['felix_testsend_manager_deployed'] | default([])}}"
+
+#----------------------------------------------------------------------------
+# Temporary variable which contains custom facts about running version,
+# or empty object if not defined.
+#----------------------------------------------------------------------------
+temp_facts_app_running: "{{temp_facts_ansible_local['felix_testsend_manager_running'] | default({})}}"
+
+#----------------------------------------------------------------------------
+# File name for storing custom facts about port.
+# This file name is tied with custom facts variable name. (See above.)
+#----------------------------------------------------------------------------
+app_facts_port_file: "felix_testsend_manager_port_{{version_to_deploy}}.fact"
+
+#----------------------------------------------------------------------------
+# File name for storing custom facts about deployed versions.
+# This file name is tied with custom facts variable name. (See above.)
+#----------------------------------------------------------------------------
+app_facts_deployed_file: "felix_testsend_manager_deployed.fact"
+
+#----------------------------------------------------------------------------
+# File name for storing custom facts about running version.
+# This file name is tied with custom facts variable name. (See above.)
+#----------------------------------------------------------------------------
+app_facts_running_file: "felix_testsend_manager_running.fact"
+
+#----------------------------------------------------------------------------
+# TCP port number of AJP connector.
+#----------------------------------------------------------------------------
+app_port_ajp: 9115
+
+#----------------------------------------------------------------------------
+# Java maximum heap memory.
+#----------------------------------------------------------------------------
+jvm_max_heap_memory: "256m"

@@ -37,8 +37,8 @@ publishing {
         maven {
             url 'http://dev-qcmdaci101z.dev.jp.local:8082/repository/felix'
             credentials {
-                username this.username
-                password this.password
+                username = this.username
+                password = this.password
             }
         }
     }
@@ -46,7 +46,7 @@ publishing {
         maven(MavenPublication) {
             artifactId project.name
             groupId project.group
-            version this.publishVersion
+            version = this.publishVersion
             from components.java
         }
     }
