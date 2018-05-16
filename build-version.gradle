@@ -24,13 +24,13 @@ task generateVersionProperties {
     def file = new File(resourceDir, 'version.properties')
     def prefix = 'com.rakuten.felix.application'
     file.text = "${prefix}.version=${version}\n" +
-            "${prefix}.commit=${this.shortHash}\n" +
+            "${prefix}.commit=${shortHash}\n" +
             "${prefix}.build-start-time=${System.currentTimeMillis()}"
 
     // Add default version info for Spring Boot Admin
     def defaultAppPropertiesFile = new File(resourceDir, "application.properties")
     defaultAppPropertiesFile.text = "info.version=${project.publishVersion}\n" +
-            "spring.boot.admin.client.name=${rootProject.name}"
+            "spring.boot.admin.client.instance.name=${rootProject.name}"
 }
 
 processResources.dependsOn 'generateVersionProperties'
