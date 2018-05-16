@@ -14,5 +14,5 @@ felix_components_versions:
     ports:
       - "8320"
     deployed:
-      - "1.0.0-b33-c38-9662d34"
-    running: "1.0.0-b33-c38-9662d34"
+      - "1.0.0-b41-c49-79db305"
+    running: "1.0.0-b41-c49-79db305"
