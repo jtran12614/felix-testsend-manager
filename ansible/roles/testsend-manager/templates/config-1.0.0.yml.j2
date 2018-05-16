@@ -68,14 +68,15 @@ spring:
   jpa:
     show-sql: "{{felix_persistence['show_jpa_query']}}"
 
-  boot.admin:
-    client.enabled: true
+  boot.admin.client:
+    enabled: true
     url: "{{spring_admin['url']}}"
     username: "{{spring_admin['username']}}"
     password: "{{spring_admin['password']}}"
 
 management:
   metrics.export.prometheus.enabled: true
+  endpoint.health.show-details: "ALWAYS"
   endpoints.web:
     exposure.include: "*"
     base-path: "/"
