@@ -13,16 +13,16 @@ public class ZonedDateTimeConverter implements AttributeConverter<ZonedDateTime,
     @Override
     public ZonedDateTime convertToEntityAttribute(Timestamp databaseDateTime) {
         return Optional.ofNullable(databaseDateTime)
-                .map(Timestamp::toInstant)
-                .map(it -> ZonedDateTime.ofInstant(it, Config.APPLICATION_TIME_ZONE_ID))
-                .orElse(null);
+                       .map(Timestamp::toInstant)
+                       .map(it -> ZonedDateTime.ofInstant(it, Config.APPLICATION_TIME_ZONE_ID))
+                       .orElse(null);
     }
 
     @Override
     public Timestamp convertToDatabaseColumn(ZonedDateTime applicationDateTime) {
         return Optional.ofNullable(applicationDateTime)
-                .map(ZonedDateTime::toInstant)
-                .map(Timestamp::from)
-                .orElse(null);
+                       .map(ZonedDateTime::toInstant)
+                       .map(Timestamp::from)
+                       .orElse(null);
     }
 }

@@ -26,8 +26,8 @@ public class InfoConverter implements AttributeConverter<Info, String> {
     @Override
     public Info convertToEntityAttribute(String json) {
         return Optional.ofNullable(json)
-                .map(this::mapToObject)
-                .orElse(null);
+                       .map(this::mapToObject)
+                       .orElse(null);
     }
 
     private Info mapToObject(String json) {

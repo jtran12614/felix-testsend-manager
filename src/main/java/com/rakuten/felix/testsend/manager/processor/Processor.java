@@ -94,12 +94,12 @@ public class Processor {
             val entity = dataStore.getHistoryByJobId(jobId);
             val bundleId = entity.getBundleId();
             val userId = Optional.ofNullable(entity.getInfo())
-                    .map(Info::getUser)
-                    .map(User::getUserId)
-                    .orElseGet(() -> {
-                        log.warn("User id doesn't exist in info: info={}: Wil notify to userId=0", entity.getInfo());
-                        return 0;
-                    });
+                                 .map(Info::getUser)
+                                 .map(User::getUserId)
+                                 .orElseGet(() -> {
+                                     log.warn("User id doesn't exist in info: info={}: Wil notify to userId=0", entity.getInfo());
+                                     return 0;
+                                 });
             notificationService.publishSuccessNotification(bundleId, userId);
         } catch (HistoryNotFoundException e) {
             // FIXME Until completely migrate to use this API for test sending, keep exception which data is not found by job id as warning.
@@ -122,12 +122,12 @@ public class Processor {
             val entity = dataStore.getHistoryByJobId(jobId);
             val bundleId = entity.getBundleId();
             val userId = Optional.ofNullable(entity.getInfo())
-                    .map(Info::getUser)
-                    .map(User::getUserId)
-                    .orElseGet(() -> {
-                        log.warn("User id doesn't exist in info: Wil notify to userId=0", entity.getInfo());
-                        return 0;
-                    });
+                                 .map(Info::getUser)
+                                 .map(User::getUserId)
+                                 .orElseGet(() -> {
+                                     log.warn("User id doesn't exist in info: Wil notify to userId=0", entity.getInfo());
+                                     return 0;
+                                 });
             notificationService.publishErrorNotification(bundleId, userId);
         } catch (HistoryNotFoundException e) {
             // FIXME Until completely migrate to use this API for test sending, keep exception which data is not found by job id as warning.

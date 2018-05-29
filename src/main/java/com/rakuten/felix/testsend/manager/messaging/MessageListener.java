@@ -3,7 +3,6 @@ package com.rakuten.felix.testsend.manager.messaging;
 import com.rakuten.felix.testsend.manager.errorhandler.ErrorHandler;
 import com.rakuten.felix.testsend.manager.messaging.dto.ErrorMessage;
 import com.rakuten.felix.testsend.manager.messaging.dto.FinishedMessage;
-import com.rakuten.felix.testsend.manager.messaging.dto.KickedMessage;
 import com.rakuten.felix.testsend.manager.processor.Processor;
 import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
 import com.rakuten.felix.testsend.manager.validator.Validator;
@@ -40,23 +39,6 @@ public class MessageListener {
 
     private void logDebug(String inputChannelName, byte[] payload) {
         log.debug("[{}]: Message received: payload={}", inputChannelName, new String(payload, StandardCharsets.UTF_8));
-    }
-
-    /**
-     * Handle messages with notification about kicking test send is finished.
-     *
-     * @param payload Payload.
-     */
-    @ServiceActivator(inputChannel = InputChannels.IN_KICK_TEST_SEND_FINISHED)
-    public void kickTestSendFinished(byte[] payload) {
-        try {
-            logDebug(InputChannels.IN_KICK_TEST_SEND_FINISHED, payload);
-            val message = objectMapper.deserializeToObject(payload, KickedMessage.class);
-            Validator.validate(message);
-            processor.processKickingTestSendFinished(message.getId(), message.getJobId());
-        } catch (Exception e) {
-            errorHandler.handleExceptionWithPayload(e, payload, InputChannels.IN_KICK_TEST_SEND_FINISHED);
-        }
     }
 
     /**

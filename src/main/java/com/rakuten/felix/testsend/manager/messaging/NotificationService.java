@@ -75,12 +75,12 @@ public class NotificationService {
         val replacedMessage = BUNDLE_ID_PATTERN.matcher(message).replaceAll(bundleId.toString());
 
         return Notification.builder()
-                .userId(userId.longValue())
-                .url(replacedUrl)
-                .noticeFlag(true)
-                .title(replacedTitle)
-                .message(replacedMessage)
-                .build();
+                           .userId(userId.longValue())
+                           .url(replacedUrl)
+                           .noticeFlag(true)
+                           .title(replacedTitle)
+                           .message(replacedMessage)
+                           .build();
     }
 
 }

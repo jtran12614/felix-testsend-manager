@@ -28,46 +28,4 @@ public interface TestSendHistoryRepository extends JpaRepository<TestSendHistory
     @Modifying
     @Query("update TestSendHistory t set t.jobId = :jobId where t.id = :id")
     int updateJobId(@Param("id") Integer id, @Param("jobId") Integer jobId);
-
-    /**
-     * Update info and status to finished
-     *
-     * @param jobId Job id.
-     * @param info  Info json string.
-     * @return Number of rows affected.
-     */
-    @Modifying
-    @Query("update TestSendHistory t set t.info = :info, t.status = com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus.FINISHED where t.jobId = :jobId")
-    int updateInfoAndStatusFinished(@Param("jobId") Integer jobId, @Param("info") String info);
-
-    /**
-     * Update info and status to error
-     *
-     * @param jobId Job id.
-     * @param info  Info json string.
-     * @return Number of rows affected.
-     */
-    @Modifying
-    @Query("update TestSendHistory t set t.info = :info, t.status = com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus.ERROR where t.jobId = :jobId")
-    int updateInfoAndStatusError(@Param("jobId") Integer jobId, @Param("info") String info);
-
-    /**
-     * Update status to error by id
-     *
-     * @param id History id.
-     * @return Number of rows affected.
-     */
-    @Modifying
-    @Query("update TestSendHistory t set t.info = :info, t.status = com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus.ERROR where t.id = :id")
-    int updateInfoAndStatusErrorById(@Param("id") Integer id, @Param("info") String info);
-
-    /**
-     * Update status to error
-     *
-     * @param jobId Job id.
-     * @return Number of rows affected.
-     */
-    @Modifying
-    @Query("update TestSendHistory t set t.status = com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus.ERROR where t.jobId = :jobId")
-    int updateStatusErrorByJobId(@Param("jobId") Integer jobId);
 }
