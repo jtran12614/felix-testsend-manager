@@ -3,7 +3,6 @@ package com.rakuten.felix.testsend.manager.datastore;
 import com.rakuten.felix.testsend.manager.datastore.entities.Info;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus;
-import com.rakuten.felix.testsend.manager.webclients.dto.User;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,14 +86,15 @@ public class DataStoreService {
      */
     @Transactional
     @Retryable(backoff = @Backoff(value = 1000, multiplier = 1.5))
-    public TestSendHistory createHistory(Integer bundleId, Integer bundleType, User user) {
+    public TestSendHistory createHistory(Integer bundleId, Integer bundleType, Integer jobId, Info info) {
         val entity = TestSendHistory.builder()
-                .bundleId(bundleId)
-                .bundleType(bundleType)
-                .status(TestSendStatus.NEW)
-                .started(ZonedDateTime.now(clock))
-                .info(Info.builder().user(user).build())
-                .build();
+                                    .bundleId(bundleId)
+                                    .bundleType(bundleType)
+                                    .jobId(jobId)
+                                    .info(info)
+                                    .status(TestSendStatus.NEW)
+                                    .started(ZonedDateTime.now(clock))
+                                    .build();
         repository.saveAndFlush(entity);
         log.debug("Create history: {}", entity);
         return entity;

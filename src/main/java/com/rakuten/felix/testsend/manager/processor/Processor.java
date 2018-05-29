@@ -3,66 +3,83 @@ package com.rakuten.felix.testsend.manager.processor;
 import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
 import com.rakuten.felix.testsend.manager.datastore.HistoryNotFoundException;
 import com.rakuten.felix.testsend.manager.datastore.entities.Info;
+import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.messaging.NotificationService;
-import com.rakuten.felix.testsend.manager.webclients.JobDataKeeperService;
+import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
+import com.rakuten.felix.testsend.manager.validator.ValidationException;
+import com.rakuten.felix.testsend.manager.validator.Validator;
+import com.rakuten.felix.testsend.manager.web.dto.KickMailTestSendRequest;
+import com.rakuten.felix.testsend.manager.webclients.CampaignSchedulerService;
+import com.rakuten.felix.testsend.manager.webclients.dto.MailJob;
 import com.rakuten.felix.testsend.manager.webclients.dto.User;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
 @Service
 public class Processor {
     private final DataStoreService dataStore;
-    private final JobDataKeeperService jobDataKeeperService;
     private final MailContentBuilder mailContentBuilder;
     private final NotificationService notificationService;
+    private final CampaignSchedulerService schedulerService;
+    private final ObjectMapperWrapper objectMapperWrapper;
 
     /**
      * Initialize the service.
      *
-     * @param dataStore            Data store.
-     * @param jobDataKeeperService Job data keeper service.
-     * @param mailContentBuilder   Mail content builder.
-     * @param notificationService  Notification service.
+     * @param dataStore           Data store.
+     * @param mailContentBuilder  Mail content builder.
+     * @param notificationService Notification service.
+     * @param schedulerService    Campaign scheduler service.
+     * @param objectMapperWrapper Object mapper wrapper.
      */
     public Processor(DataStoreService dataStore,
-                     JobDataKeeperService jobDataKeeperService,
                      MailContentBuilder mailContentBuilder,
-                     NotificationService notificationService) {
+                     NotificationService notificationService,
+                     CampaignSchedulerService schedulerService, ObjectMapperWrapper objectMapperWrapper) {
+
         this.dataStore = dataStore;
-        this.jobDataKeeperService = jobDataKeeperService;
         this.mailContentBuilder = mailContentBuilder;
         this.notificationService = notificationService;
+        this.schedulerService = schedulerService;
+        this.objectMapperWrapper = objectMapperWrapper;
     }
 
     /**
-     * Process when mail test send is error.
+     * Process for kicking test send.
      *
-     * @param historyId History id.
-     * @param jobId     Job id.
+     * @param request Kick mail test send request.
      */
-    public void processKickingTestSendFinished(Integer historyId, Integer jobId) {
-        try {
-            if (Objects.isNull(jobId)) {
-                dataStore.updateErrorMessageAndStatusToErrorById(historyId, "Job initialization failed");
-            } else {
-                val mailJob = jobDataKeeperService.getMailJob(jobId);
-                val parts = mailJob.getParts();
+    public TestSendHistory processKickingTestSend(KickMailTestSendRequest request) throws ValidationException {
+        val mailJob = objectMapperWrapper.deserializeToObject(request.getMailJob().toJSONString(), MailJob.class);
+        Validator.validate(mailJob);
 
-                val schedule = mailJob.getSchedules().get(0);
-                val subjects = mailContentBuilder.buildSubjectContents(schedule.getSubjects(), parts);
-                val htmlContents = mailContentBuilder.buildHtmlContents(schedule.getContents(), parts);
-                val textContents = mailContentBuilder.buildTextContents(schedule.getContents(), parts);
+        val reserveDate = mailJob.getSchedules().get(0).getReserveDate();
+        val schedulerResponse = schedulerService.registerSingle(reserveDate, request.getMailJob());
 
-                dataStore.updateJob(historyId, jobId, subjects, htmlContents, textContents, mailJob.getPrependAddresses());
-            }
-        } catch (Exception e) {
-            handleError("Kicking test send finished", jobId, e);
-        }
+        val info = buildInfo(mailJob, request.getUser());
+
+        return dataStore.createHistory(request.getBundleId(), request.getBundleType(), schedulerResponse.getJdkId(), info);
+    }
+
+    private Info buildInfo(MailJob mailJob, User user) {
+        val parts = mailJob.getParts();
+        val schedule = mailJob.getSchedules().get(0);
+
+        val subjects = mailContentBuilder.buildSubjectContents(schedule.getSubjects(), parts);
+        val htmlContents = mailContentBuilder.buildHtmlContents(schedule.getContents(), parts);
+        val textContents = mailContentBuilder.buildTextContents(schedule.getContents(), parts);
+
+        return Info.builder()
+                   .user(user)
+                   .subjects(subjects)
+                   .htmlContents(htmlContents)
+                   .textContents(textContents)
+                   .recipients(mailJob.getPrependAddresses())
+                   .build();
     }
 
     /**

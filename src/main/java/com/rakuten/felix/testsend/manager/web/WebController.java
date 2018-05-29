@@ -3,7 +3,8 @@ package com.rakuten.felix.testsend.manager.web;
 import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.messaging.MessageSendException;
-import com.rakuten.felix.testsend.manager.messaging.MessageSender;
+import com.rakuten.felix.testsend.manager.processor.Processor;
+import com.rakuten.felix.testsend.manager.validator.ValidationException;
 import com.rakuten.felix.testsend.manager.web.dto.KickMailTestSendRequest;
 import com.rakuten.felix.testsend.manager.web.dto.TestSendResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -28,20 +29,18 @@ import javax.validation.Valid;
 @CrossOrigin(origins = "*")
 public class WebController {
     private final DataStoreService dataStore;
-    private final MessageSender messageSender;
+    private final Processor processor;
 
     /**
      * Initialize the controller.
      *
-     * @param dataStore     Data store.
-     * @param messageSender Message sender.
+     * @param dataStore Data store.
+     * @param processor Processor.
      */
     @Autowired
-    public WebController(
-            DataStoreService dataStore,
-            MessageSender messageSender) {
+    public WebController(DataStoreService dataStore, Processor processor) {
         this.dataStore = dataStore;
-        this.messageSender = messageSender;
+        this.processor = processor;
     }
 
     /**
@@ -86,11 +85,11 @@ public class WebController {
      * @return Response.
      */
     @PostMapping(value = "/kick-mail-test-send")
-    public TestSendResponse kickTestSend(@RequestBody @Valid KickMailTestSendRequest request) throws MessageSendException {
+    public TestSendResponse kickTestSend(@RequestBody @Valid KickMailTestSendRequest request)
+            throws MessageSendException, ValidationException {
+
         log.debug("Kick test send request received: requestBody={}", request);
-        val history = dataStore.createHistory(request.getBundleId(), request.getBundleType(), request.getUser());
-        val mailJobJson = request.getMailJob().toJSONString();
-        messageSender.kickMailTestSendMessage(history.getId(), mailJobJson);
+        val history = processor.processKickingTestSend(request);
         return TestSendResponse.fromEntity(history);
     }
 }
