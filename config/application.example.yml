@@ -15,30 +15,20 @@ spring:
 
   cloud.stream:
     rabbit.bindings:
-      in-kick-test-send-finished:
-        consumer.prefix: "felix."
       in-test-send-finished:
         consumer.prefix: "felix."
       in-test-send-error:
         consumer.prefix: "felix."
-      out-kick-test-send:
-        producer.prefix: "felix."
       out-error:
         producer.prefix: "felix."
       out-publish-notification:
         producer.prefix: "felix."
     bindings:
-      in-kick-test-send-finished:
-        destination: "kick-test-send-finish"
-        group: "default"
       in-test-send-finished:
         destination: "test-send-finished"
         group: "default"
       in-test-send-error:
         destination: "test-send-error"
-        group: "default"
-      out-kick-test-send:
-        destination: "kick-test-send"
         group: "default"
       out-error:
         destination: "error"
@@ -68,14 +58,15 @@ spring:
     jpa:
       show-sql: true
 
-  boot.admin:
-    client.enabled: false
+  boot.admin.client:
+    enabled: false
     url: "http://spring.boot.admin:8888"
     username: "user"
     password: "secret"
 
 management:
   metrics.export.prometheus.enabled: true
+  endpoint.health.show-details: "ALWAYS"
   endpoints.web:
     exposure.include: "*"
     base-path: "/"
@@ -99,5 +90,5 @@ com.rakuten.felix.testsend-manager:
     error:
       title: "notification-error-title: {bundle_id}"
       message: "notification-errorr-message: {bundle_id}"
-  job-data-keeper:
-    get-job-url: "http://job-data-keeper/get-job-url"
+  campaign-scheduler:
+    register-and-get-url: "http://campaign-scheduler/register-and-get-single"

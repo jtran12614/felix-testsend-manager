@@ -1,6 +1,0 @@
-#----------------------------------------------------------------------------
-# Proxy used by Ansible when downloading resources from web.
-#----------------------------------------------------------------------------
-proxy_environment:
-  http_proxy: "stb-dev-proxy.db.rakuten.co.jp:9501"
-  https_proxy: "stb-dev-proxy.db.rakuten.co.jp:9501"

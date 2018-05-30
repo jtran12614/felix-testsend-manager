@@ -1,0 +1,4 @@
+- name: Importing Ansible Common
+  hosts: felix-ci
+  roles:
+    - import-ansible-common

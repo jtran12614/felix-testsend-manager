@@ -1,0 +1,17 @@
+#----------------------------------------------------------------------------
+# Get Ansible Common.
+#----------------------------------------------------------------------------
+- name: "Get Ansible Common"
+  include: "git-clone-temp.yml"
+  vars:
+    git_root: "{{felix_git_root}}"
+    repo_name: "{{ansible_common_repo}}"
+
+#----------------------------------------------------------------------------
+# Import Ansible common. Never Overwrite.
+#----------------------------------------------------------------------------
+- name: "Import Ansible Common"
+  copy:
+    src: "/tmp/{{ansible_common_repo}}/"
+    dest: "{{target_ansible_dir}}/"
+    force: no

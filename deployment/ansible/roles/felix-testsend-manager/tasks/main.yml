@@ -1,0 +1,82 @@
+#----------------------------------------------------------------------------
+# Generate Port list.
+#----------------------------------------------------------------------------
+- name: "Generate port list"
+  include: "helper-tasks/generate-port-list.yml"
+
+#----------------------------------------------------------------------------
+# Load custom facts.
+#----------------------------------------------------------------------------
+- name: "{{version_to_deploy}} : Store app deployed facts"
+  include: "helper-tasks/load-custom-facts.yml"
+
+#----------------------------------------------------------------------------
+# Include tasks for deployment.
+#----------------------------------------------------------------------------
+- name: Deploy defined versions
+  include: "deploy-{{version_to_deploy}}.yml"
+  with_items: "{{versions_deployed}}"
+  loop_control:
+    loop_var: version_to_deploy
+
+#----------------------------------------------------------------------------
+# Stop service.
+#----------------------------------------------------------------------------
+- name: "Stop service"
+  include: "helper-tasks/app-stop.yml"
+
+#----------------------------------------------------------------------------
+# Deploy running version file.
+#----------------------------------------------------------------------------
+- name: "Running version:{{version_running}} : Deploy running version file."
+  include: "helper-tasks/deploy-running-version-file.yml"
+
+#----------------------------------------------------------------------------
+# Start service.
+#----------------------------------------------------------------------------
+- name: "Start the service"
+  include: "helper-tasks/app-start.yml"
+
+#----------------------------------------------------------------------------
+# Get versions that are deployed, based on custom facts, but are not
+# listed as deployed for this role.
+#----------------------------------------------------------------------------
+- name: Generate list of versions to remove
+  set_fact:
+    versions_to_remove: "{{app_facts_deployed | difference(versions_deployed)}}"
+
+#----------------------------------------------------------------------------
+# Include tasks for removal.
+#----------------------------------------------------------------------------
+- name: Remove not defined versions
+  include: "helper-tasks/remove-given-version.yml"
+  with_items: "{{versions_to_remove}}"
+  loop_control:
+    loop_var: version_to_remove
+
+#----------------------------------------------------------------------------
+# Remove Apache Proxy Routes.
+#----------------------------------------------------------------------------
+- name: "Remove Apache Proxy Routes"
+  include: "helper-tasks/remove-apache-proxy-route.yml"
+  vars:
+    proxy_file: "api.core.felix.prod.jp.local_proxy.conf"
+    request_url: "v1.0/testsend-manager"
+
+#----------------------------------------------------------------------------
+# Add Apache Proxy Routes.
+#----------------------------------------------------------------------------
+- name: "Add Apache Proxy Routes"
+  include: "helper-tasks/add-apache-proxy-route.yml"
+  vars:
+    proxy_file: "api.core.felix.prod.jp.local_proxy.conf"
+    request_url: "v1.0/testsend-manager"
+    backend_port: "{{app_port_ajp}}"
+    backend_url: "/testsend-manager"
+    app_category: "SCENARIO"
+
+#----------------------------------------------------------------------------
+# Restart Apache
+#----------------------------------------------------------------------------
+- name: "Restart Apache"
+  include: "helper-tasks/restart-apache.yml"

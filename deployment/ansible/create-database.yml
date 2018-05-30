@@ -1,0 +1,4 @@
+- name: Database migration completed
+  hosts: test-group
+  roles:
+    - create-database
