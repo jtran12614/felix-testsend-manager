@@ -61,7 +61,6 @@ public class Processor {
         val schedulerResponse = schedulerService.registerSingle(reserveDate, request.getMailJob());
 
         val info = buildInfo(mailJob, request.getUser());
-
         return dataStore.createHistory(request.getBundleId(), request.getBundleType(), schedulerResponse.getJdkId(), info);
     }
 

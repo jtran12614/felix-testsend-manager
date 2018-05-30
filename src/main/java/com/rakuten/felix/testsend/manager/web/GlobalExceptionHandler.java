@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public MessageOnly handleRequestValidationFailed(ValidationException exception) {
+    public MessageOnly handleValidationFailed(ValidationException exception) {
         log.warn("{}", exception.getLocalizedMessage());
         return new MessageOnly(exception.getMessage());
     }

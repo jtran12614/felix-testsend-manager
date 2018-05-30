@@ -14,8 +14,8 @@ import java.util.List;
 @Value
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Schedule {
-    @JsonDeserialize(contentUsing = UnixTimeStampDeserializer.class)
-    @JsonSerialize(contentUsing = UnixTimeStampSerializer.class)
+    @JsonDeserialize(using = UnixTimeStampDeserializer.class)
+    @JsonSerialize(using = UnixTimeStampSerializer.class)
     @NotNull
     ZonedDateTime reserveDate;
     @NotNull

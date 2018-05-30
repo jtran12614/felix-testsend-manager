@@ -41,10 +41,10 @@ public class CampaignSchedulerService {
      */
     @Retryable(include = Throwable.class, exclude = RestClientException.class, backoff = @Backoff(multiplier = 2))
     public RegisterCampaignResponse registerSingle(ZonedDateTime reserveDate, JSONObject mailJob) throws ValidationException {
-        log.debug("Register campaign: url={}, mailJobJson={}", registerAndGetUrl, mailJob);
         val request = new RegisterCampaignRequest(Collections.singletonList(reserveDate), mailJob);
+        log.debug("Register campaign: url={}, request={}", registerAndGetUrl, request);
         val response = restTemplate.postForObject(registerAndGetUrl, request, RegisterCampaignResponse.class);
-        log.debug("Register campaign: jobId={}, response={}", response);
+        log.debug("Register campaign: response={}", response);
         Validator.validate(request);
         return response;
     }
