@@ -10,9 +10,9 @@
  *
  * Examples:
  *
- *   com.rakuten.felix.auditlog.version=<VERSION>
- *   com.rakuten.felix.auditlog.commit=<SHORT_HASH>
- *   com.rakuten.felix.auditlog.build-start-time=<MILLISECOND>
+ *   com.rakuten.felix.application.version=<VERSION>
+ *   com.rakuten.felix.application.commit=<SHORT_HASH>
+ *   com.rakuten.felix.application.build-start-time=<MILLISECOND>
  */
 
 task generateVersionProperties {
@@ -29,7 +29,7 @@ task generateVersionProperties {
 
     // Add default version info for Spring Boot Admin
     def defaultAppPropertiesFile = new File(resourceDir, "application.properties")
-    defaultAppPropertiesFile.text = "info.version=${project.publishVersion}\n" +
+    defaultAppPropertiesFile.text = "info.version=${project.version}\n" +
             "spring.boot.admin.client.instance.name=${rootProject.name}"
 }
 

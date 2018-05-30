@@ -1,8 +1,0 @@
-#----------------------------------------------------------------------------
-# Create Database and Tables.
-#----------------------------------------------------------------------------
-- name: "Create Database and Tables"
-  include: "helper-tasks/create-database.yml"
-  with_dict: "{{apps}}"
-  loop_control:
-    loop_var: app
