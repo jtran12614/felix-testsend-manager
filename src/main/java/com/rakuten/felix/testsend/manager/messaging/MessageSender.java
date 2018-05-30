@@ -47,7 +47,7 @@ public class MessageSender {
      *
      * @param notification Notification
      */
-    public void publishNotification(Notification notification) throws MessageSendException {
+    public void publishNotification(Notification notification) {
         val payload = objectMapperWrapper.serializeToBytes(notification);
         sendMessage(outputChannels.outPublishNotification(), MessageBuilder.withPayload(payload).build(), "Could not send publish notification");
     }
@@ -60,7 +60,7 @@ public class MessageSender {
      * @param message       Message.
      * @param errorMessages Error message parts.  @throws MessageSendException When send failed.
      */
-    private void sendMessage(MessageChannel channel, Message<?> message, CharSequence... errorMessages) throws MessageSendException {
+    private void sendMessage(MessageChannel channel, Message<?> message, CharSequence... errorMessages) {
         val sendResult = channel.send(message);
         if (!sendResult) {
             final String errorMessage = String.join("", errorMessages);

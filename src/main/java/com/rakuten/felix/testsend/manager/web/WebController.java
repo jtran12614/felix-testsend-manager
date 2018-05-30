@@ -2,7 +2,6 @@ package com.rakuten.felix.testsend.manager.web;
 
 import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
-import com.rakuten.felix.testsend.manager.messaging.MessageSendException;
 import com.rakuten.felix.testsend.manager.processor.Processor;
 import com.rakuten.felix.testsend.manager.validator.ValidationException;
 import com.rakuten.felix.testsend.manager.web.dto.KickMailTestSendRequest;
@@ -86,7 +85,7 @@ public class WebController {
      */
     @PostMapping(value = "/kick-mail-test-send")
     public TestSendResponse kickTestSend(@RequestBody @Valid KickMailTestSendRequest request)
-            throws MessageSendException, ValidationException {
+            throws ValidationException {
 
         log.debug("Kick test send request received: requestBody={}", request);
         val history = processor.processKickingTestSend(request);

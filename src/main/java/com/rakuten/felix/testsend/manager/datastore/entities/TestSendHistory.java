@@ -62,5 +62,6 @@ public class TestSendHistory {
 
     @Tolerate
     public TestSendHistory() {
+        // for default constructor
     }
 }

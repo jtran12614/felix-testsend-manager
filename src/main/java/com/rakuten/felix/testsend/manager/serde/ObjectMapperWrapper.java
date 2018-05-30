@@ -22,7 +22,7 @@ public class ObjectMapperWrapper {
      * @return Bytes.
      * @throws IllegalArgumentException When serialization fails.
      */
-    public byte[] serializeToBytes(Object object) throws IllegalArgumentException {
+    public byte[] serializeToBytes(Object object) {
         try {
             return objectMapper.writeValueAsBytes(object);
         } catch (JsonProcessingException e) {
