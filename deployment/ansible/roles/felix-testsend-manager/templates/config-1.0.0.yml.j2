@@ -1,0 +1,94 @@
+server:
+  port: {{port_to_deploy}}
+  tomcat:
+    remote-ip-header: "x-forwarded-for"
+    protocol-header: "x-forwarded-proto"
+
+logging:
+  file: "{{app_log_file}}"
+  level.com.rakuten.felix: "{{app_log_level}}"
+
+spring:
+  pid:
+    file: "app.pid"
+    fail-on-write-error: true
+
+  cloud.stream:
+    rabbit.bindings:
+      in-test-send-finished:
+        consumer.prefix: "{{felix_mq['prefix']}}"
+      in-test-send-error:
+        consumer.prefix: "{{felix_mq['prefix']}}"
+      out-error:
+        producer.prefix: "{{felix_mq['prefix']}}"
+      out-publish-notification:
+        producer.prefix: "{{felix_mq['prefix']}}"
+    bindings:
+      in-test-send-finished:
+        destination: "{{felix_mq['channels']['test_send_finished']}}"
+        group: "default"
+      in-test-send-error:
+        destination: "{{felix_mq['channels']['test_send_error']}}"
+        group: "default"
+      out-error:
+        destination: "{{felix_mq['channels']['error_channel']}}"
+        group: "default"
+      out-publish-notification:
+        destination: "{{felix_mq['channels']['publish_notification']}}"
+        group: "default"
+
+  rabbitmq:
+    addresses: "{{felix_mq['connection']['addresses'] | join(",") }}"
+    username: "{{felix_mq['connection']['user']}}"
+    password: "{{felix_mq['connection']['password']}}"
+
+  datasource:
+    url: "{{felix_persistence['url']}}"
+    username: "{{felix_persistence['user']}}"
+    password: "{{felix_persistence['password']}}"
+    driver-class-name: "com.mysql.jdbc.Driver"
+    tomcat:
+      test-on-borrow: true
+      validation-query: "SELECT 1"
+      initial-size: 1
+      max-active: 3
+      max-idle: 3
+      min-idle: 1
+
+  jpa:
+    show-sql: "{{felix_persistence['show_jpa_query']}}"
+
+  boot.admin.client:
+    enabled: true
+    url: "{{spring_admin['url']}}"
+    username: "{{spring_admin['username']}}"
+    password: "{{spring_admin['password']}}"
+
+management:
+  metrics.export.prometheus.enabled: true
+  endpoint.health.show-details: "ALWAYS"
+  endpoints.web:
+    exposure.include: "*"
+    base-path: "/"
+
+com.rakuten.felix.testsend-manager:
+  proxy:
+    host: "{{felix_proxy['default']['host']}}"
+    port: "{{felix_proxy['default']['port']}}"
+  auth:
+    key: "{{felix_auth_keys['test_send_manager']}}"
+    enabled: true
+  tomcat:
+    ajp:
+      port: {{app_port_ajp}}
+      enabled: true
+  notification:
+    url: "http://notification/url/{bundle_id}"
+    success:
+      title: "Test send success title!: bundleId={bundle_id}"
+      message: "Test send success message!!: bundleId={bundle_id}"
+    error:
+      title: "Test send error title!: bundleId={bundle_id}"
+      message: "Test send error message!!: bundleId={bundle_id}"
+  campaign-scheduler:
+    register-and-get-url: "{{felix_api['campaign_scheduler']['register_and_get']}}"

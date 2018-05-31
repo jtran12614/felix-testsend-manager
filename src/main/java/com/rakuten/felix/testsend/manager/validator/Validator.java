@@ -21,8 +21,8 @@ public final class Validator {
         final Set<ConstraintViolation<T>> errors = validator.validate(objectToValidate);
         if (!errors.isEmpty()) {
             final String errorMessages = errors.stream()
-                    .map(violation -> violation.getPropertyPath() + " " + violation.getMessage())
-                    .collect(Collectors.joining(", ", "Validation failed: ", ""));
+                                               .map(violation -> violation.getPropertyPath() + " " + violation.getMessage())
+                                               .collect(Collectors.joining(", ", "Validation failed: ", ""));
             throw new ValidationException(errorMessages);
         }
     }

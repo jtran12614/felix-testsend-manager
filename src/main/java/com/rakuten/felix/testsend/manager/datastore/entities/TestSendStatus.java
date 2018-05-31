@@ -25,12 +25,12 @@ public enum TestSendStatus {
     @JsonCreator
     public static TestSendStatus fromNumber(Integer number) {
         return Arrays.stream(values())
-                .filter(whereType -> whereType.number.equals(number))
-                .findFirst()
-                .orElseGet(() -> {
-                    log.warn("Conversion failed for number: " + number);
-                    return null;
-                });
+                     .filter(whereType -> whereType.number.equals(number))
+                     .findFirst()
+                     .orElseGet(() -> {
+                         log.warn("Conversion failed for number: " + number);
+                         return null;
+                     });
     }
 
     @JsonValue

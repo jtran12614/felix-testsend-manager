@@ -44,9 +44,9 @@ publishing {
     }
     publications {
         maven(MavenPublication) {
-            artifactId project.name
-            groupId project.group
-            version = this.publishVersion
+            artifactId = project.name
+            groupId = project.group
+            version = project.version
             from components.java
         }
     }
@@ -71,19 +71,6 @@ tasks.withType(PublishToMavenRepository) {
     }
 }
 
-static def getCommitCount() {
-    return 'git rev-list --count HEAD'.execute().text.trim()
-}
-
-static def getShortHash() {
-    return 'git rev-parse --short HEAD'.execute().text.trim()
-}
-
-static def getBuildNumber() {
-    def buildNumber = System.getenv('BUILD_NUMBER')
-    return buildNumber != null ? buildNumber : 'UNKNOWN'
-}
-
 def getUsername() {
     return project.hasProperty('MAVEN_REPO_DEPLOY_USERNAME') ? project.property('MAVEN_REPO_DEPLOY_USERNAME') : null
 }
@@ -91,9 +78,3 @@ def getUsername() {
 def getPassword() {
     return project.hasProperty('MAVEN_REPO_DEPLOY_PASSWORD') ? project.property('MAVEN_REPO_DEPLOY_PASSWORD') : null
 }
-
-def getPublishVersion() {
-    return "${version}-b${this.buildNumber}-c${this.commitCount}-${this.shortHash}"
-}
-
-project.ext.set("publishVersion", publishVersion)

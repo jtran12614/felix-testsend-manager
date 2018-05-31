@@ -1,0 +1,18 @@
+#----------------------------------------------------------------------------
+# Make sure destination directory for git is not present.
+#----------------------------------------------------------------------------
+- name: "Ensure destination directory is absent"
+  file:
+    path: "/tmp/{{repo_name}}/"
+    state: absent
+
+#----------------------------------------------------------------------------
+# Download Git repo from BitBucket.
+#----------------------------------------------------------------------------
+- name: "Check out Git Repo"
+  local_action:
+    module: git
+    repo: "{{git_root}}/{{repo_name}}.git"
+    dest: "/tmp/{{repo_name}}/"
+    force: yes
+    version: "{{ git_branch | default(HEAD) }}"

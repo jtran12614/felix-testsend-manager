@@ -1,7 +1,7 @@
 package com.rakuten.felix.testsend.manager.validator;
 
 public class ValidationException extends Exception {
-    ValidationException(String message) {
+    public ValidationException(String message) {
         super(message);
     }
 }

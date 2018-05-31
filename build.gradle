@@ -11,9 +11,9 @@ plugins {
 
 ext {
     checkStyleVersion = '7.7'
-    junitJupiterVersion = '5.0.1'
+    junitJupiterVersion = '5.+'
     lombokVersion = '1.16.20'
-    springBootAdminVersion = '2.0.0-SNAPSHOT'
+    springBootAdminVersion = '2.0.0'
     mockitoVersion = '2.1.0'
     jacksonVersion = '2.9.4'
     jsonVersion = '1.1.1'
@@ -37,7 +37,6 @@ lombok {
 repositories {
     mavenCentral()
     maven { url = 'https://repo.spring.io/libs-milestone' }
-    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 
 dependencies {
@@ -48,15 +47,14 @@ dependencies {
     implementation 'org.springframework.retry:spring-retry'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'mysql:mysql-connector-java'
-    implementation 'org.springframework.boot:spring-boot-actuator'
     implementation("de.codecentric:spring-boot-admin-starter-client:${springBootAdminVersion}") {
         exclude module: 'junit'
     }
+
     // JUnit and jmockit
     testCompile "org.mockito:mockito-core:${mockitoVersion}"
     testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
-    testCompileOnly('org.apiguardian:apiguardian-api:1.0.0')
 }
 
 dependencyManagement {

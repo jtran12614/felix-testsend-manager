@@ -22,9 +22,9 @@ public class MailContentBuilder {
      */
     public List<String> buildSubjectContents(List<Subject> subjects, List<String> parts) {
         return subjects.stream()
-                .map(Subject::getPartIds)
-                .map(buildContentFromParts(parts))
-                .collect(Collectors.toList());
+                       .map(Subject::getPartIds)
+                       .map(buildContentFromParts(parts))
+                       .collect(Collectors.toList());
     }
 
     /**
@@ -36,11 +36,11 @@ public class MailContentBuilder {
      */
     public List<String> buildHtmlContents(List<Content> contents, List<String> parts) {
         return contents.stream()
-                .filter(Content::getHtml)
-                .findFirst()
-                .map(Content::getPatterns)
-                .map(mapToMergedContents(parts))
-                .orElse(Collections.emptyList());
+                       .filter(Content::getHtml)
+                       .findFirst()
+                       .map(Content::getPatterns)
+                       .map(mapToMergedContents(parts))
+                       .orElse(Collections.emptyList());
     }
 
     /**
@@ -52,23 +52,23 @@ public class MailContentBuilder {
      */
     public List<String> buildTextContents(List<Content> contents, List<String> parts) {
         return contents.stream()
-                .filter(it -> !it.getHtml())
-                .findFirst()
-                .map(Content::getPatterns)
-                .map(mapToMergedContents(parts))
-                .orElse(Collections.emptyList());
+                       .filter(it -> !it.getHtml())
+                       .findFirst()
+                       .map(Content::getPatterns)
+                       .map(mapToMergedContents(parts))
+                       .orElse(Collections.emptyList());
     }
 
     private Function<List<Pattern>, List<String>> mapToMergedContents(List<String> parts) {
         return patterns -> patterns.stream()
-                .map(Pattern::getPartIds)
-                .flatMap(partsIds -> partsIds.stream().map(buildContentFromParts(parts)))
-                .collect(Collectors.toList());
+                                   .map(Pattern::getPartIds)
+                                   .flatMap(partsIds -> partsIds.stream().map(buildContentFromParts(parts)))
+                                   .collect(Collectors.toList());
     }
 
     private Function<List<Integer>, String> buildContentFromParts(List<String> parts) {
         return partIds -> partIds.stream()
-                .map(parts::get)
-                .collect(Collectors.joining(""));
+                                 .map(parts::get)
+                                 .collect(Collectors.joining(""));
     }
 }

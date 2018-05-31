@@ -46,10 +46,10 @@ public class ErrorHandler {
 
     private Stream.Builder<String> getStreamBuilderWithErrorMessages(Throwable throwable, Stream.Builder<String> builder) {
         return Optional.ofNullable(throwable)
-                .map(it -> {
-                    builder.add(it.getMessage());
-                    return getStreamBuilderWithErrorMessages(it.getCause(), builder);
-                })
-                .orElse(builder);
+                       .map(it -> {
+                           builder.add(it.getMessage());
+                           return getStreamBuilderWithErrorMessages(it.getCause(), builder);
+                       })
+                       .orElse(builder);
     }
 }

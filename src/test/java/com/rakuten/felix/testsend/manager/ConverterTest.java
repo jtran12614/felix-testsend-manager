@@ -12,7 +12,6 @@ import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
-import java.text.ParseException;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -36,12 +35,12 @@ class ConverterTest {
     void infoConverter_convertToDatabaseColumn() {
         val testObject = new InfoConverter();
         val info = Info.builder()
-                .subjects(Collections.singletonList("Subject"))
-                .htmlContents(Collections.singletonList("Html content"))
-                .textContents(Collections.singletonList("Text content"))
-                .user(new User(1, "user-name", "user-address@rakuten.com"))
-                .recipients(Arrays.asList("recipient1", "recipient2"))
-                .build();
+                       .subjects(Collections.singletonList("Subject"))
+                       .htmlContents(Collections.singletonList("Html content"))
+                       .textContents(Collections.singletonList("Text content"))
+                       .user(new User(1, "user-name", "user-address@rakuten.com"))
+                       .recipients(Arrays.asList("recipient1", "recipient2"))
+                       .build();
         val actual = testObject.convertToDatabaseColumn(info);
         assertNotNull(actual);
     }
@@ -50,12 +49,12 @@ class ConverterTest {
     void infoConverter_convertToEntityAttribute() throws JsonProcessingException {
         val testObject = new InfoConverter();
         val info = Info.builder()
-                .subjects(Collections.singletonList("Subject"))
-                .htmlContents(Collections.singletonList("Html content"))
-                .textContents(Collections.singletonList("Text content"))
-                .user(new User(1, "user-name", "user-address@rakuten.com"))
-                .recipients(Arrays.asList("recipient1", "recipient2"))
-                .build();
+                       .subjects(Collections.singletonList("Subject"))
+                       .htmlContents(Collections.singletonList("Html content"))
+                       .textContents(Collections.singletonList("Text content"))
+                       .user(new User(1, "user-name", "user-address@rakuten.com"))
+                       .recipients(Arrays.asList("recipient1", "recipient2"))
+                       .build();
         val payload = new ObjectMapper().writeValueAsString(info);
         val actual = testObject.convertToEntityAttribute(payload);
         assertNotNull(actual);
@@ -72,7 +71,7 @@ class ConverterTest {
     }
 
     @Test
-    void zonedDateTimeConverter_convertToEntityAttribute() throws ParseException {
+    void zonedDateTimeConverter_convertToEntityAttribute() {
         val testObject = new ZonedDateTimeConverter();
         val now = ZonedDateTime.now();
         val timeStamp = new Timestamp(Date.from(Instant.from(now)).getTime());
@@ -84,7 +83,7 @@ class ConverterTest {
     }
 
     @Test
-    void zonedDateTimeConverter_convertToDatabaseColumn() throws JsonProcessingException {
+    void zonedDateTimeConverter_convertToDatabaseColumn() {
         val testObject = new ZonedDateTimeConverter();
         val now = ZonedDateTime.now();
         val timeStamp = new Timestamp(Date.from(Instant.from(now)).getTime());

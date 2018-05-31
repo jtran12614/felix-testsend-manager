@@ -4,15 +4,16 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Value;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Value
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MailJob {
-    @NotNull
+    @NotEmpty
     @Valid
-    List<Schedule> schedules;
+    List<@NotNull Schedule> schedules;
     @NotNull
     List<String> parts;
     @NotNull

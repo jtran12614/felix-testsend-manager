@@ -28,7 +28,7 @@ public class VersionInfo {
      */
     public String getBuildStartTimeAsFormattedString() {
         return Optional.ofNullable(buildStartTime)
-                .map(convertToString)
-                .orElse("n/a");
+                       .map(convertToString)
+                       .orElse("n/a");
     }
 }

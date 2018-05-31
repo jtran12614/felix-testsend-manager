@@ -18,28 +18,20 @@ import com.rakuten.felix.testsend.manager.messaging.dto.Notification;
 import com.rakuten.felix.testsend.manager.processor.MailContentBuilder;
 import com.rakuten.felix.testsend.manager.processor.Processor;
 import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
-import com.rakuten.felix.testsend.manager.webclients.JobDataKeeperService;
-import com.rakuten.felix.testsend.manager.webclients.dto.JobIdWrapper;
-import com.rakuten.felix.testsend.manager.webclients.dto.MailJob;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -51,7 +43,6 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 class MessageListenerTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final String GET_JOB_URL = "http://job-data-keeper/get-job-url";
     private static final String NOTIFICATION_URL = "http://notification-url/{bundle_id}";
     private static final String NOTIFICATION_SUCCESS_TITLE = "success title: {bundle_id}";
     private static final String NOTIFICATION_SUCCESS_MESSAGE = "success message: {bundle_id}";
@@ -83,11 +74,6 @@ class MessageListenerTest {
         val dataStore = new DataStoreService(repository, clock);
         val outputChannels = new OutputChannels() {
             @Override
-            public MessageChannel outKickTestSend() {
-                return kickTestSend;
-            }
-
-            @Override
             public MessageChannel outError() {
                 return outError;
             }
@@ -97,99 +83,16 @@ class MessageListenerTest {
                 return outPublishNotification;
             }
         };
-        val messageSender = new MessageSender(outputChannels, new ObjectMapperWrapper(), null, null, clock);
+        val messageSender = new MessageSender(outputChannels, new ObjectMapperWrapper(), clock);
         val errorHandler = new ErrorHandler(messageSender);
-        val jobDataKeeper = new JobDataKeeperService(GET_JOB_URL, restTemplate);
         val notificationService = new NotificationService(NOTIFICATION_URL,
                 NOTIFICATION_SUCCESS_TITLE,
                 NOTIFICATION_SUCCESS_MESSAGE,
                 NOTIFICATION_ERROR_TITLE,
                 NOTIFICATION_ERROR_MESSAGE,
                 messageSender);
-        val processor = new Processor(dataStore, jobDataKeeper, new MailContentBuilder(), notificationService);
+        val processor = new Processor(dataStore, new MailContentBuilder(), notificationService, null, new ObjectMapperWrapper());
         messageListener = new MessageListener(new ObjectMapperWrapper(), errorHandler, processor);
-    }
-
-    @Test
-    void kickTestSendFinished() throws Exception {
-        // Setup
-        val historyId = 12345;
-        val jobId = 6789;
-        val mockedHistory = FakeData.getHistory();
-        val mockedMailJob = FakeData.getEmptyMailJob();
-        // Response
-        when(restTemplate.postForObject(GET_JOB_URL, new JobIdWrapper(jobId), MailJob.class))
-                .thenReturn(mockedMailJob);
-        when(repository.findById(anyInt()))
-                .thenReturn(Optional.of(mockedHistory));
-        // Execution
-        val message = new KickedMessage(historyId, jobId);
-        val payload = MAPPER.writeValueAsBytes(message);
-        messageListener.kickTestSendFinished(payload);
-        // Verification
-        verify(repository, times(1)).findById(historyId);
-
-        val capturedEntity = ArgumentCaptor.forClass(TestSendHistory.class);
-        verify(repository, times(1)).saveAndFlush(capturedEntity.capture());
-        val actualEntity = capturedEntity.getValue();
-        assertEquals(mockedHistory.getBundleId(), actualEntity.getBundleId());
-        assertEquals(mockedHistory.getBundleType(), actualEntity.getBundleType());
-        assertEquals(TestSendStatus.NEW, actualEntity.getStatus());
-        assertEquals(TestSendStatus.NEW, TestSendStatus.fromNumber(actualEntity.getStatus().toNumber()));
-        assertNull(TestSendStatus.fromNumber(9));
-        assertEquals(mockedHistory.getInfo().getUser(), actualEntity.getInfo().getUser());
-        assertTrue(actualEntity.getInfo().getSubjects().isEmpty());
-        assertTrue(actualEntity.getInfo().getHtmlContents().isEmpty());
-        assertTrue(actualEntity.getInfo().getTextContents().isEmpty());
-        assertEquals(actualEntity.getInfo().getRecipients(), mockedMailJob.getPrependAddresses());
-
-        // verify error messaging
-        verify(outError, times(0)).send(any());
-    }
-
-    @Test
-    void kickTestSendFinished_dataNotFound() throws Exception {
-        // Setup
-        val historyId = 12345;
-        val jobId = 6789;
-        // Response
-        when(repository.updateJobId(anyInt(), anyInt()))
-                .thenReturn(0);
-        // Execution
-        val message = new KickedMessage(historyId, jobId);
-        val payload = MAPPER.writeValueAsBytes(message);
-        messageListener.kickTestSendFinished(payload);
-        // Verification
-        val capturedMessage = ArgumentCaptor.forClass(Message.class);
-        verify(outError, times(1)).send(capturedMessage.capture());
-        assertNotNull(capturedMessage.getValue().getPayload());
-    }
-
-    @Test
-    void kickTestSendFinished_jobIdNull() throws Exception {
-        // Setup
-        val historyId = 12345;
-        val mockedHistory = FakeData.getHistory();
-        // Response
-        when(repository.findById(anyInt()))
-                .thenReturn(Optional.of(mockedHistory));
-        // Execution
-        val message = new KickedMessage(historyId, null);
-        val payload = MAPPER.writeValueAsBytes(message);
-        messageListener.kickTestSendFinished(payload);
-        // Verification
-        verify(repository, times(1)).findById(historyId);
-
-        val capturedEntity = ArgumentCaptor.forClass(TestSendHistory.class);
-        verify(repository, times(1)).saveAndFlush(capturedEntity.capture());
-        val actualEntity = capturedEntity.getValue();
-        assertEquals(TestSendStatus.ERROR, actualEntity.getStatus());
-        assertNotNull(actualEntity.getInfo());
-        assertNotNull(actualEntity.getInfo().getErrorMessage());
-        assertEquals("Job initialization failed", actualEntity.getInfo().getErrorMessage());
-
-        // verify error messaging
-        verify(outError, times(0)).send(any());
     }
 
     @Test

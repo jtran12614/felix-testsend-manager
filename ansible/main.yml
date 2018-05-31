@@ -1,4 +1,0 @@
-- name: Testsend manager is deployed and running
-  hosts: web-api
-  roles:
-    - testsend-manager

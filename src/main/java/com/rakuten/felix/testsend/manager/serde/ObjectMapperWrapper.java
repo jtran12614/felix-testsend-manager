@@ -22,7 +22,7 @@ public class ObjectMapperWrapper {
      * @return Bytes.
      * @throws IllegalArgumentException When serialization fails.
      */
-    public byte[] serializeToBytes(Object object) throws IllegalArgumentException {
+    public byte[] serializeToBytes(Object object) {
         try {
             return objectMapper.writeValueAsBytes(object);
         } catch (JsonProcessingException e) {
@@ -42,6 +42,21 @@ public class ObjectMapperWrapper {
             return objectMapper.readValue(bytes, valueType);
         } catch (IOException e) {
             throw new IllegalArgumentException("Can't deserialize to object: json=" + new String(bytes, StandardCharsets.UTF_8), e);
+        }
+    }
+
+    /**
+     * Deserialize to object.
+     *
+     * @param json Json string.
+     * @return Object.
+     * @throws IllegalArgumentException When deserialization fails.
+     */
+    public <T> T deserializeToObject(String json, Class<T> valueType) {
+        try {
+            return objectMapper.readValue(json, valueType);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Can't deserialize to object: json=" + json, e);
         }
     }
 }

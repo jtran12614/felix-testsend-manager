@@ -12,52 +12,59 @@ import com.rakuten.felix.testsend.manager.webclients.dto.User;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 @UtilityClass
-public class FakeData {
+class FakeData {
     TestSendHistory getHistory() {
         return TestSendHistory.builder()
-                .id(1)
-                .status(TestSendStatus.NEW)
-                .bundleId(1)
-                .bundleType(1)
-                .info(Info.builder()
-                        .subjects(Collections.singletonList("Subject"))
-                        .htmlContents(Collections.singletonList("Html content"))
-                        .textContents(Collections.singletonList("Text content"))
-                        .user(new User(1, "user-name", "user-address@rakuten.com"))
-                        .recipients(Arrays.asList("recipient1", "recipient2"))
-                        .build())
-                .build();
+                              .id(1)
+                              .status(TestSendStatus.NEW)
+                              .bundleId(1)
+                              .bundleType(1)
+                              .info(Info.builder()
+                                        .subjects(Collections.singletonList("Subject"))
+                                        .htmlContents(Collections.singletonList("Html content"))
+                                        .textContents(Collections.singletonList("Text content"))
+                                        .user(new User(1, "user-name", "user-address@rakuten.com"))
+                                        .recipients(Arrays.asList("recipient1", "recipient2"))
+                                        .build())
+                              .build();
     }
 
     List<TestSendHistory> getHistories() {
         return Arrays.asList(
                 TestSendHistory.builder()
-                        .id(1)
-                        .status(TestSendStatus.NEW)
-                        .bundleId(11)
-                        .bundleType(111)
-                        .info(Info.builder().build())
-                        .build(),
+                               .id(1)
+                               .status(TestSendStatus.NEW)
+                               .bundleId(11)
+                               .bundleType(111)
+                               .info(Info.builder().build())
+                               .build(),
                 TestSendHistory.builder()
-                        .id(2)
-                        .status(TestSendStatus.FINISHED)
-                        .bundleId(22)
-                        .bundleType(222)
-                        .info(Info.builder().build())
-                        .build()
+                               .id(2)
+                               .status(TestSendStatus.FINISHED)
+                               .bundleId(22)
+                               .bundleType(222)
+                               .info(Info.builder().build())
+                               .build()
         );
     }
 
-    MailJob getEmptyMailJob() {
+    MailJob getValidMailJob() {
         return new MailJob(
-                Collections.singletonList(new Schedule(Collections.emptyList(), Collections.emptyList())),
-                Collections.singletonList(""),
-                Collections.emptyList());
+                Collections.singletonList(
+                        new Schedule(ZonedDateTime.of(2015, 1, 1, 1, 1, 1, 1, ZoneId.systemDefault()),
+                                getSubjectsWithSingleCondition(),
+                                getHtmlContentsWithSplit1Segment1()
+                        )
+                ),
+                getParts(),
+                Collections.singletonList("Address"));
     }
 
 

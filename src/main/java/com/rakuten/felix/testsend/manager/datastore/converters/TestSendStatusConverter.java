@@ -11,14 +11,14 @@ public class TestSendStatusConverter implements AttributeConverter<TestSendStatu
     @Override
     public Integer convertToDatabaseColumn(TestSendStatus state) {
         return Optional.ofNullable(state)
-                .map(TestSendStatus::toNumber)
-                .orElse(null);
+                       .map(TestSendStatus::toNumber)
+                       .orElse(null);
     }
 
     @Override
     public TestSendStatus convertToEntityAttribute(Integer number) {
         return Optional.ofNullable(number)
-                .map(TestSendStatus::fromNumber)
-                .orElse(null);
+                       .map(TestSendStatus::fromNumber)
+                       .orElse(null);
     }
 }
