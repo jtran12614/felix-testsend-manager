@@ -73,7 +73,7 @@
     request_url: "v1.0/testsend-manager"
     backend_port: "{{app_port_ajp}}"
     backend_url: "/testsend-manager"
-    app_category: "SCENARIO"
+    app_category: "MAIL"
 
 #----------------------------------------------------------------------------
 # Restart Apache
