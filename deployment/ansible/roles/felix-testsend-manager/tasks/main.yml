@@ -14,7 +14,7 @@
 # Include tasks for deployment.
 #----------------------------------------------------------------------------
 - name: Deploy defined versions
-  include: "deploy-{{version_to_deploy}}.yml"
+  include: "deploy.yml"
   with_items: "{{versions_deployed}}"
   loop_control:
     loop_var: version_to_deploy
