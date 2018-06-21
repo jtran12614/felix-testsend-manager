@@ -58,4 +58,4 @@ felix_mq:
 #----------------------------------------------------------------------------
 felix_api:
   campaign_scheduler:
-    register_and_get: "http://api.core.felix.prod.jp.local/v1.0/campaign-scheduler/single-and-get"
+    register_and_get: "http://api.core.felix.prod.jp.local/v1.0/scheduler/single-and-get"

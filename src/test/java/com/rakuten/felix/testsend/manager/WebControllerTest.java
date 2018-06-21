@@ -8,6 +8,7 @@ import com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus;
 import com.rakuten.felix.testsend.manager.processor.MailContentBuilder;
 import com.rakuten.felix.testsend.manager.processor.Processor;
 import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
+import com.rakuten.felix.testsend.manager.validator.ValidationException;
 import com.rakuten.felix.testsend.manager.web.WebController;
 import com.rakuten.felix.testsend.manager.web.dto.KickMailTestSendRequest;
 import com.rakuten.felix.testsend.manager.webclients.CampaignSchedulerService;
@@ -19,18 +20,24 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Clock;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -59,6 +66,15 @@ class WebControllerTest {
         val processor = new Processor(dataStore, new MailContentBuilder(), null, schedulerService, new ObjectMapperWrapper());
 
         controller = new WebController(dataStore, processor);
+    }
+
+    private void assertHistory(TestSendHistory mockedHistory, TestSendHistory result) {
+        assertEquals(mockedHistory.getId(), result.getId());
+        assertEquals(mockedHistory.getBundleId(), result.getBundleId());
+        assertEquals(mockedHistory.getBundleType(), result.getBundleType());
+        assertEquals(mockedHistory.getJobId(), result.getJobId());
+        assertEquals(mockedHistory.getStatus(), result.getStatus());
+        assertEquals(mockedHistory.getInfo(), result.getInfo());
     }
 
     @Test
@@ -133,9 +149,10 @@ class WebControllerTest {
                 .thenReturn(started.toInstant());
         when(clock.getZone())
                 .thenReturn(started.getZone());
-
-        when(restTemplate.postForObject(eq(SCHEDULER_REGISTER_AND_GET_URL), any(), eq(RegisterCampaignResponse.class)))
-                .thenReturn(new RegisterCampaignResponse(jdkId));
+        val listResponseType = new ParameterizedTypeReference<List<RegisterCampaignResponse>>() {
+        };
+        when(restTemplate.exchange(eq(SCHEDULER_REGISTER_AND_GET_URL), eq(HttpMethod.POST), any(), eq(listResponseType)))
+                .thenReturn(new ResponseEntity(Collections.singletonList(new RegisterCampaignResponse(jdkId)), HttpStatus.OK));
         // Execution
         val response = controller.kickTestSend(new KickMailTestSendRequest(bundleId, bundleType, mailJobJsonObj, user));
         // Verification
@@ -159,12 +176,29 @@ class WebControllerTest {
         assertEquals(actualEntity.getInfo().getRecipients(), mailJob.getPrependAddresses());
     }
 
-    private void assertHistory(TestSendHistory mockedHistory, TestSendHistory result) {
-        assertEquals(mockedHistory.getId(), result.getId());
-        assertEquals(mockedHistory.getBundleId(), result.getBundleId());
-        assertEquals(mockedHistory.getBundleType(), result.getBundleType());
-        assertEquals(mockedHistory.getJobId(), result.getJobId());
-        assertEquals(mockedHistory.getStatus(), result.getStatus());
-        assertEquals(mockedHistory.getInfo(), result.getInfo());
+    @Test
+    void kickMailTestSend_registerResponseValidationFailed() throws Exception {
+        // Setup
+        val mailJob = FakeData.getValidMailJob();
+        val mailJobJsonObj = mapper.readValue(mapper.writeValueAsString(mailJob), JSONObject.class);
+        val started = ZonedDateTime.now(ZoneId.systemDefault());
+        val user = new User(1, "name", "mail-address");
+        // Response
+        when(clock.instant())
+                .thenReturn(started.toInstant());
+        when(clock.getZone())
+                .thenReturn(started.getZone());
+
+        val listResponseType = new ParameterizedTypeReference<List<RegisterCampaignResponse>>() {
+        };
+        when(restTemplate.exchange(eq(SCHEDULER_REGISTER_AND_GET_URL), eq(HttpMethod.POST), any(), eq(listResponseType)))
+                .thenReturn(new ResponseEntity(Collections.emptyList(), HttpStatus.OK));
+
+        // Execution
+        assertThrows(ValidationException.class, () -> controller.kickTestSend(new KickMailTestSendRequest(1, 2, mailJobJsonObj, user)));
+
+        // verify database
+        verify(repository, times(0)).saveAndFlush(any());
+
     }
 }
