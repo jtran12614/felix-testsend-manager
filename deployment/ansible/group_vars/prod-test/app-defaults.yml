@@ -21,10 +21,20 @@ felix_auth_keys:
 # Data store config.
 #----------------------------------------------------------------------------
 felix_persistence:
-  url: "jdbc:mysql://dm-felix201z.prod.jp.local:3301/felix_scenario_02"
-  user: "{{vault['db2']['common']['user']}}"
-  password: "{{vault['db2']['common']['password']}}"
+  url: "jdbc:mysql://dm-felix301z.prod.jp.local:3301/felix_testsend_manager_test"
+  user: "{{vault['db3']['common']['user']}}"
+  password: "{{vault['db3']['common']['password']}}"
   show_jpa_query: false
+
+#----------------------------------------------------------------------------
+# For creating database.
+#----------------------------------------------------------------------------
+felix_db:
+  db_user: "{{vault['db3']['felix_deploy']['user']}}"
+  db_password: "{{vault['db3']['felix_deploy']['password']}}"
+  db_name: "felix_testsend_manager_test"
+  db_host: "dm-felix301z.prod.jp.local"
+  db_port: "3301"
 
 #----------------------------------------------------------------------------
 # Proxy config. Used for accessing internal APIs.

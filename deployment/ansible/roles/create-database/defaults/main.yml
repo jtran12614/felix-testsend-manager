@@ -1,0 +1,16 @@
+#----------------------------------------------------------------------------
+# Common Bitbucket Felix Project SSH URL
+#----------------------------------------------------------------------------
+felix_git_root: "ssh://git@git.dev.db.rakuten.co.jp:7999/felix"
+
+#----------------------------------------------------------------------------
+# Apps
+#----------------------------------------------------------------------------
+apps:
+  felix_testsend_manager:
+    name: "felix_testsend_manager"
+    db_user: "{{felix_db['db_user']}}"
+    db_password: "{{felix_db['db_password']}}"
+    db_name: "{{felix_db['db_name']}}"
+    db_host: "{{felix_db['db_host']}}"
+    db_port: "{{felix_db['db_port']}}"
