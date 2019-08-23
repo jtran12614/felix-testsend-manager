@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 1.1.7
+### Added
+- Logback-spring
+
 ## 1.1.6 - 2020-05-12
 ### Added
 - Add Hikari configuration
@@ -14,16 +18,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 1.1.4 - 2018-06-25
 ### Fixed
-- Andible script for deployment
+- Ansible script for deployment
 
 ## 1.1.3 - 2018-06-21
 ### Fixed
-- Andible script for app template config
+- Ansible script for app template config
 - Reserve campaign response json parameter
 
 ## 1.1.1 - 2018-06-01
 ### Fixed
-- Andible script for deployment
+- Ansible script for deployment
 
 ## 1.1.0 - 2018-05-30
 ### Changed

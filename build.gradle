@@ -36,6 +36,10 @@ ext {
     mockitoVersion = '2.1.0'
     jacksonVersion = '2.9.4'
     jsonVersion = '1.1.1'
+
+    //Logback
+    logbackLogstashVersion = '5.3'
+    logbackClassicVersion = '1.2.3'
 }
 
 group = 'com.rakuten.felix'
@@ -74,6 +78,9 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
 
+    // Logback
+    compile "net.logstash.logback:logstash-logback-encoder:${logbackLogstashVersion}"
+    compile "ch.qos.logback:logback-classic:${logbackClassicVersion}"
 }
 
 dependencyManagement {
