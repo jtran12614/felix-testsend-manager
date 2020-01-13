@@ -2,6 +2,7 @@ package com.rakuten.felix.testsend.manager.messaging;
 
 import com.rakuten.felix.testsend.manager.messaging.dto.Notification;
 import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
+import com.rakuten.felix.testsend.manager.webclients.dto.LineJob;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +12,12 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -99,5 +102,21 @@ public class MessageSender {
         if (!sent) {
             log.warn("Unable to send an error message: Source {}: {}: Payload {}", inputChannelName, message, new String(payload, StandardCharsets.UTF_8));
         }
+    }
+
+    /**
+     * Request start directly to Job-Manager.
+     *
+     * @param header  Header to send
+     * @param lineJob Job start payload
+     * @throws IOException When can't serialize or send the kick message.
+     */
+    public void sendJobManager(Map<String, Object> header, LineJob lineJob) throws IOException {
+        log.info("Send job manager lineTask: Started: CampaignId: {}", lineJob.getInfo().getCampaignId());
+        val payload = objectMapperWrapper.serializeToBytes(lineJob);
+        val message = MessageBuilder.withPayload(payload)
+                                    .copyHeaders(header)
+                                    .build();
+        sendMessage(outputChannels.sendJobManager(), message, "Could not send line job");
     }
 }

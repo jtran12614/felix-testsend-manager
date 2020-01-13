@@ -3,6 +3,7 @@ package com.rakuten.felix.testsend.manager;
 import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
 import com.rakuten.felix.testsend.manager.datastore.HistoryNotFoundException;
 import com.rakuten.felix.testsend.manager.datastore.TestSendHistoryRepository;
+import com.rakuten.felix.testsend.manager.messaging.MessageSender;
 import com.rakuten.felix.testsend.manager.processor.Processor;
 import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
 import com.rakuten.felix.testsend.manager.validator.ValidationException;
@@ -48,7 +49,7 @@ class CommonClassesTest {
     void setUp() {
         initMocks(this);
         val dataStore = new DataStoreService(repository, clock);
-        val processor = new Processor(dataStore, null, null, null, new ObjectMapperWrapper());
+        val processor = new Processor(dataStore, null, null, null, new ObjectMapperWrapper(), null);
         controller = new WebController(dataStore, processor);
         versionInfo = new VersionInfo();
         authConfiguration = new AuthConfiguration(new AuthInterceptor("auth-key", true));

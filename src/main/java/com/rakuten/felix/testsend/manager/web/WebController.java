@@ -5,6 +5,7 @@ import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.processor.Processor;
 import com.rakuten.felix.testsend.manager.validator.ValidationException;
 import com.rakuten.felix.testsend.manager.web.dto.KickMailTestSendRequest;
+import com.rakuten.felix.testsend.manager.web.dto.KickTestSendRequest;
 import com.rakuten.felix.testsend.manager.web.dto.TestSendResponse;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 
 @Slf4j
 @RestController
@@ -78,7 +80,7 @@ public class WebController {
     }
 
     /**
-     * Handle request for kicking test sending
+     * Handle request for kicking test mail sending
      *
      * @param request Request body.
      * @return Response.
@@ -87,7 +89,22 @@ public class WebController {
     public TestSendResponse kickTestSend(@RequestBody @Valid KickMailTestSendRequest request)
             throws ValidationException {
 
-        log.debug("Kick test send request received: requestBody={}", request);
+        log.debug("Kick mail test send request received: requestBody={}", request);
+        val history = processor.processKickingTestSend(request);
+        return TestSendResponse.fromEntity(history);
+    }
+
+    /**
+     * Handle request for kicking test line sending
+     *
+     * @param request Request body.
+     * @return Response.
+     */
+    @PostMapping(value = "/kick-line-test-send")
+    public TestSendResponse kickLineTestSend(@RequestBody @Valid KickTestSendRequest request)
+            throws IOException, ValidationException {
+
+        log.debug("Kick line test send request received: requestBody={}", request);
         val history = processor.processKickingTestSend(request);
         return TestSendResponse.fromEntity(history);
     }

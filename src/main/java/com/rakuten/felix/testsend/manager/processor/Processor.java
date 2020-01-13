@@ -4,18 +4,23 @@ import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
 import com.rakuten.felix.testsend.manager.datastore.HistoryNotFoundException;
 import com.rakuten.felix.testsend.manager.datastore.entities.Info;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
+import com.rakuten.felix.testsend.manager.messaging.MessageSender;
 import com.rakuten.felix.testsend.manager.messaging.NotificationService;
+import com.rakuten.felix.testsend.manager.messaging.dto.Header;
 import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
 import com.rakuten.felix.testsend.manager.validator.ValidationException;
 import com.rakuten.felix.testsend.manager.validator.Validator;
 import com.rakuten.felix.testsend.manager.web.dto.KickMailTestSendRequest;
+import com.rakuten.felix.testsend.manager.web.dto.KickTestSendRequest;
 import com.rakuten.felix.testsend.manager.webclients.CampaignSchedulerService;
+import com.rakuten.felix.testsend.manager.webclients.dto.LineJob;
 import com.rakuten.felix.testsend.manager.webclients.dto.MailJob;
 import com.rakuten.felix.testsend.manager.webclients.dto.User;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @Slf4j
@@ -26,6 +31,7 @@ public class Processor {
     private final NotificationService notificationService;
     private final CampaignSchedulerService schedulerService;
     private final ObjectMapperWrapper objectMapperWrapper;
+    private final MessageSender messageSender;
 
     /**
      * Initialize the service.
@@ -35,21 +41,25 @@ public class Processor {
      * @param notificationService Notification service.
      * @param schedulerService    Campaign scheduler service.
      * @param objectMapperWrapper Object mapper wrapper.
+     * @param messageSender       Message sender.
      */
     public Processor(DataStoreService dataStore,
                      MailContentBuilder mailContentBuilder,
                      NotificationService notificationService,
-                     CampaignSchedulerService schedulerService, ObjectMapperWrapper objectMapperWrapper) {
+                     CampaignSchedulerService schedulerService,
+                     ObjectMapperWrapper objectMapperWrapper,
+                     MessageSender messageSender) {
 
         this.dataStore = dataStore;
         this.mailContentBuilder = mailContentBuilder;
         this.notificationService = notificationService;
         this.schedulerService = schedulerService;
         this.objectMapperWrapper = objectMapperWrapper;
+        this.messageSender = messageSender;
     }
 
     /**
-     * Process for kicking test send.
+     * Process for kicking mail test send.
      *
      * @param request Kick mail test send request.
      */
@@ -62,6 +72,23 @@ public class Processor {
 
         val info = buildInfo(mailJob, request.getUser());
         return dataStore.createHistory(request.getBundleId(), request.getBundleType(), schedulerResponse.getJdkId(), info);
+    }
+
+    /**
+     * Process for kicking line test send.
+     *
+     * @param request Kick mail test send request.
+     */
+    public TestSendHistory processKickingTestSend(KickTestSendRequest request) throws IOException, ValidationException {
+        val lineJob = objectMapperWrapper.deserializeToObject(request.getJob().toJSONString(), LineJob.class);
+        Validator.validate(lineJob);
+
+        // TODO: Get job id
+        val jobHeader = Header.buildNoReply(lineJob.getInfo().getLogId());
+        messageSender.sendJobManager(jobHeader, lineJob);
+
+        val info = Info.builder().user(request.getUser()).build();
+        return dataStore.createHistory(request.getBundleId(), request.getBundleType(), null, info);
     }
 
     private Info buildInfo(MailJob mailJob, User user) {

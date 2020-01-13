@@ -5,6 +5,8 @@ import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
 import com.rakuten.felix.testsend.manager.datastore.TestSendHistoryRepository;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus;
+import com.rakuten.felix.testsend.manager.messaging.MessageSender;
+import com.rakuten.felix.testsend.manager.messaging.OutputChannels;
 import com.rakuten.felix.testsend.manager.processor.MailContentBuilder;
 import com.rakuten.felix.testsend.manager.processor.Processor;
 import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
@@ -26,6 +28,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Clock;
@@ -63,7 +66,7 @@ class WebControllerTest {
         initMocks(this);
         val dataStore = new DataStoreService(repository, clock);
         val schedulerService = new CampaignSchedulerService(SCHEDULER_REGISTER_AND_GET_URL, restTemplate);
-        val processor = new Processor(dataStore, new MailContentBuilder(), null, schedulerService, new ObjectMapperWrapper());
+        val processor = new Processor(dataStore, new MailContentBuilder(), null, schedulerService, new ObjectMapperWrapper(), null);
 
         controller = new WebController(dataStore, processor);
     }

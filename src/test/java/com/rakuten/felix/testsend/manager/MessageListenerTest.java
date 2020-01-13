@@ -65,6 +65,9 @@ class MessageListenerTest {
     private MessageChannel outPublishNotification;
 
     @Mock
+    private MessageChannel sendJobManager;
+
+    @Mock
     private RestTemplate restTemplate;
 
 
@@ -82,6 +85,11 @@ class MessageListenerTest {
             public MessageChannel outPublishNotification() {
                 return outPublishNotification;
             }
+
+            @Override
+            public MessageChannel sendJobManager() {
+                return sendJobManager;
+            }
         };
         val messageSender = new MessageSender(outputChannels, new ObjectMapperWrapper(), clock);
         val errorHandler = new ErrorHandler(messageSender);
@@ -91,7 +99,7 @@ class MessageListenerTest {
                 NOTIFICATION_ERROR_TITLE,
                 NOTIFICATION_ERROR_MESSAGE,
                 messageSender);
-        val processor = new Processor(dataStore, new MailContentBuilder(), notificationService, null, new ObjectMapperWrapper());
+        val processor = new Processor(dataStore, new MailContentBuilder(), notificationService, null, new ObjectMapperWrapper(), messageSender);
         messageListener = new MessageListener(new ObjectMapperWrapper(), errorHandler, processor);
     }
 
