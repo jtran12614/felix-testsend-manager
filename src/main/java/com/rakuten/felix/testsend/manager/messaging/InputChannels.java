@@ -6,7 +6,7 @@ import org.springframework.messaging.MessageChannel;
 public interface InputChannels {
     String IN_TEST_SEND_FINISHED = "in-test-send-finished";
     String IN_TEST_SEND_ERROR = "in-test-send-error";
-    String JOB_MANAGER_REPLY = "job-manager-reply";
+    String JOB_MANAGER_REPLY = "input-job-manager-reply-test";
 
     @Input(IN_TEST_SEND_FINISHED)
     MessageChannel inTestSendFinished();
