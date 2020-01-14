@@ -117,6 +117,23 @@ public class DataStoreService {
     }
 
     /**
+     * Update status to finished.
+     *
+     * @param testId Test id.
+     * @throws HistoryNotFoundException When data is not found.
+     */
+    @Transactional
+    @Lock(LockModeType.OPTIMISTIC)
+    @Retryable(backoff = @Backoff(value = 1000, multiplier = 1.5), include = Throwable.class, exclude = HistoryNotFoundException.class)
+    public void updateStatusToFinishedByTestId(Integer testId) {
+        val entity = repository.findById(testId).orElseThrow(() -> new HistoryNotFoundException("Get history by test id", testId));
+        entity.setStatus(TestSendStatus.FINISHED);
+        entity.setFinished(ZonedDateTime.now(clock));
+        log.debug("Update status to finished: testId={}", testId);
+        repository.saveAndFlush(entity);
+    }
+
+    /**
      * Update status to error by job id.
      *
      * @param jobId        Job id.
@@ -133,6 +150,26 @@ public class DataStoreService {
         entity.setStatus(TestSendStatus.ERROR);
         entity.setFinished(ZonedDateTime.now(clock));
         log.debug("Update status to error: jobId={}, errorMessage={}", jobId, errorMessage);
+        repository.saveAndFlush(entity);
+    }
+
+    /**
+     * Update status to error by test id.
+     *
+     * @param testId        Test id.
+     * @param errorMessage Error message.
+     * @throws HistoryNotFoundException When data is not found.
+     */
+    @Transactional
+    @Lock(LockModeType.OPTIMISTIC)
+    @Retryable(backoff = @Backoff(value = 1000, multiplier = 1.5), include = Throwable.class, exclude = HistoryNotFoundException.class)
+    public void updateErrorMessageAndStatusToErrorByTestId(Integer testId, String errorMessage) {
+        val entity = repository.findById(testId).orElseThrow(() -> new HistoryNotFoundException("Get history by test id", testId));
+        val info = entity.getInfo().toBuilder().errorMessage(errorMessage).build();
+        entity.setInfo(info);
+        entity.setStatus(TestSendStatus.ERROR);
+        entity.setFinished(ZonedDateTime.now(clock));
+        log.debug("Update status to error: testId={}, errorMessage={}", testId, errorMessage);
         repository.saveAndFlush(entity);
     }
 }

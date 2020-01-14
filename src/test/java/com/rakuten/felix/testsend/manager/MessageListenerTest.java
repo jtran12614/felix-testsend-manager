@@ -99,7 +99,7 @@ class MessageListenerTest {
                 NOTIFICATION_ERROR_TITLE,
                 NOTIFICATION_ERROR_MESSAGE,
                 messageSender);
-        val processor = new Processor(dataStore, new MailContentBuilder(), notificationService, null, new ObjectMapperWrapper(), messageSender);
+        val processor = new Processor(dataStore, new MailContentBuilder(), notificationService, null, new ObjectMapperWrapper(), messageSender, null);
         messageListener = new MessageListener(new ObjectMapperWrapper(), errorHandler, processor);
     }
 

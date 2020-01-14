@@ -15,6 +15,8 @@ spring:
 
   cloud.stream:
     rabbit.bindings:
+      job-manager-reply:
+        consumer.prefix: "{{felix_mq['prefix']}}"
       in-test-send-finished:
         consumer.prefix: "{{felix_mq['prefix']}}"
       in-test-send-error:
@@ -23,7 +25,13 @@ spring:
         producer.prefix: "{{felix_mq['prefix']}}"
       out-publish-notification:
         producer.prefix: "{{felix_mq['prefix']}}"
+      send-job-manager:
+        producer.prefix: "{{felix_mq['prefix']}}
+
     bindings:
+      job-manager-reply:
+        destination: "input-job-manager-reply-test"
+        group: "default"
       in-test-send-finished:
         destination: "{{felix_mq['channels']['test_send_finished']}}"
         group: "default"
@@ -35,6 +43,9 @@ spring:
         group: "default"
       out-publish-notification:
         destination: "{{felix_mq['channels']['publish_notification']}}"
+        group: "default"
+      send-job-manager:
+        destination: "{{felix_mq['channels']['send_job_manager']}}"
         group: "default"
 
   rabbitmq:

@@ -6,6 +6,7 @@ import org.json.simple.JSONObject;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Value
 public class KickTestSendRequest {
@@ -18,4 +19,6 @@ public class KickTestSendRequest {
     @NotNull
     JSONObject job;
     User user;
+    Object contents;
+    List<String> recipients;
 }

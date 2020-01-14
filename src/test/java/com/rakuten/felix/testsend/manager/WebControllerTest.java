@@ -66,7 +66,7 @@ class WebControllerTest {
         initMocks(this);
         val dataStore = new DataStoreService(repository, clock);
         val schedulerService = new CampaignSchedulerService(SCHEDULER_REGISTER_AND_GET_URL, restTemplate);
-        val processor = new Processor(dataStore, new MailContentBuilder(), null, schedulerService, new ObjectMapperWrapper(), null);
+        val processor = new Processor(dataStore, new MailContentBuilder(), null, schedulerService, new ObjectMapperWrapper(), null, null);
 
         controller = new WebController(dataStore, processor);
     }

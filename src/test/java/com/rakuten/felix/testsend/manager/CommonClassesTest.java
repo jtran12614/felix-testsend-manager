@@ -49,7 +49,7 @@ class CommonClassesTest {
     void setUp() {
         initMocks(this);
         val dataStore = new DataStoreService(repository, clock);
-        val processor = new Processor(dataStore, null, null, null, new ObjectMapperWrapper(), null);
+        val processor = new Processor(dataStore, null, null, null, new ObjectMapperWrapper(), null, null);
         controller = new WebController(dataStore, processor);
         versionInfo = new VersionInfo();
         authConfiguration = new AuthConfiguration(new AuthInterceptor("auth-key", true));

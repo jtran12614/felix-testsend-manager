@@ -17,4 +17,5 @@ public class Info {
     String errorMessage;
     User user;
     List<String> recipients;
+    Object contents;
 }

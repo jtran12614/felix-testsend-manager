@@ -7,6 +7,8 @@ import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.messaging.MessageSender;
 import com.rakuten.felix.testsend.manager.messaging.NotificationService;
 import com.rakuten.felix.testsend.manager.messaging.dto.Header;
+import com.rakuten.felix.testsend.manager.messaging.dto.JobStatus;
+import com.rakuten.felix.testsend.manager.messaging.dto.ReplyJobStatusPayload;
 import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
 import com.rakuten.felix.testsend.manager.validator.ValidationException;
 import com.rakuten.felix.testsend.manager.validator.Validator;
@@ -32,6 +34,7 @@ public class Processor {
     private final CampaignSchedulerService schedulerService;
     private final ObjectMapperWrapper objectMapperWrapper;
     private final MessageSender messageSender;
+    private final ReplyConfig replyConfig;
 
     /**
      * Initialize the service.
@@ -42,13 +45,15 @@ public class Processor {
      * @param schedulerService    Campaign scheduler service.
      * @param objectMapperWrapper Object mapper wrapper.
      * @param messageSender       Message sender.
+     * @param replyConfig         Reply config.
      */
     public Processor(DataStoreService dataStore,
                      MailContentBuilder mailContentBuilder,
                      NotificationService notificationService,
                      CampaignSchedulerService schedulerService,
                      ObjectMapperWrapper objectMapperWrapper,
-                     MessageSender messageSender) {
+                     MessageSender messageSender,
+                     ReplyConfig replyConfig) {
 
         this.dataStore = dataStore;
         this.mailContentBuilder = mailContentBuilder;
@@ -56,6 +61,7 @@ public class Processor {
         this.schedulerService = schedulerService;
         this.objectMapperWrapper = objectMapperWrapper;
         this.messageSender = messageSender;
+        this.replyConfig = replyConfig;
     }
 
     /**
@@ -79,16 +85,15 @@ public class Processor {
      *
      * @param request Kick mail test send request.
      */
-    public TestSendHistory processKickingTestSend(KickTestSendRequest request) throws IOException, ValidationException {
+    public void processKickingTestSend(KickTestSendRequest request) throws IOException, ValidationException {
         val lineJob = objectMapperWrapper.deserializeToObject(request.getJob().toJSONString(), LineJob.class);
         Validator.validate(lineJob);
 
-        // TODO: Get job id
-        val jobHeader = Header.buildNoReply(lineJob.getInfo().getLogId());
-        messageSender.sendJobManager(jobHeader, lineJob);
+        val info = Info.builder().user(request.getUser()).contents(request.getContents()).recipients(request.getRecipients()).build();
+        val history = dataStore.createHistory(request.getBundleId(), request.getBundleType(), null, info);
 
-        val info = Info.builder().user(request.getUser()).build();
-        return dataStore.createHistory(request.getBundleId(), request.getBundleType(), null, info);
+        val jobHeader = Header.buildWithContentType(lineJob.getInfo().getLogId(), history.getId(), replyConfig.getJobStatusHandlingChannel());
+        messageSender.sendJobManager(jobHeader, lineJob);
     }
 
     private Info buildInfo(MailJob mailJob, User user) {
@@ -160,6 +165,25 @@ public class Processor {
             log.warn("Could not update history on test sending error: jobId={}: {} :", jobId, e.getMessage());
         } catch (Exception e) {
             handleError("Test send error", jobId, e);
+        }
+    }
+
+    /**
+     * Handle reply message
+     *
+     * @param payload Payload.
+     * @param header  Header.
+     */
+    public void handleReplyMessage(Header header, byte[] payload) throws ValidationException {
+        val jobStatus = objectMapperWrapper.deserializeToObject(payload, ReplyJobStatusPayload.class);
+        Validator.validate(jobStatus);
+
+        if (jobStatus.getStatus() == JobStatus.FINISHED) {
+            log.info("Job finished:");
+            dataStore.updateStatusToFinishedByTestId(header.getTestId());
+        } else if (jobStatus.getStatus() == JobStatus.FAILED) {
+            log.info("Job failed:");
+            dataStore.updateErrorMessageAndStatusToErrorByTestId(header.getTestId(), jobStatus.getMessage());
         }
     }
 

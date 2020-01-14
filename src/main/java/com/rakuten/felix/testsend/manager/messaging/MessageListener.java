@@ -1,15 +1,19 @@
 package com.rakuten.felix.testsend.manager.messaging;
 
+import com.rakuten.felix.testsend.manager.LoggingHelper;
 import com.rakuten.felix.testsend.manager.errorhandler.ErrorHandler;
 import com.rakuten.felix.testsend.manager.messaging.dto.ErrorMessage;
 import com.rakuten.felix.testsend.manager.messaging.dto.FinishedMessage;
+import com.rakuten.felix.testsend.manager.messaging.dto.Header;
 import com.rakuten.felix.testsend.manager.processor.Processor;
 import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
+import com.rakuten.felix.testsend.manager.validator.ValidationException;
 import com.rakuten.felix.testsend.manager.validator.Validator;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -73,6 +77,16 @@ public class MessageListener {
         } catch (Exception e) {
             errorHandler.handleExceptionWithPayload(e, payload, InputChannels.IN_TEST_SEND_ERROR);
         }
+    }
+
+    @ServiceActivator(inputChannel = InputChannels.JOB_MANAGER_REPLY)
+    public void handleJobManagerReply(@Headers Header header, byte[] payload) throws ValidationException {
+        LoggingHelper.setLogId(header.getLogId());
+        log.info("Handle reply message started");
+        log.debug("Input info: header=[{}], payload=[{}]", header, new String(payload, StandardCharsets.UTF_8));
+        processor.handleReplyMessage(header, payload);
+        log.info("Handle reply message finished");
+        LoggingHelper.clear();
     }
 }
 
