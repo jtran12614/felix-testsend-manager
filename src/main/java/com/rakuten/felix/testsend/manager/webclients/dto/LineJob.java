@@ -9,6 +9,7 @@ import java.util.Map;
 @Value
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LineJob {
+    String namespace;
     Info info;
     Map<String, Object> replyHeader;
     String replyDestination;
