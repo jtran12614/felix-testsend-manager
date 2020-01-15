@@ -1,5 +1,6 @@
 package com.rakuten.felix.testsend.manager.messaging.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.rakuten.felix.testsend.manager.webclients.dto.Info;
 import lombok.Builder;
@@ -10,6 +11,7 @@ import javax.validation.constraints.NotNull;
 @Value
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ReplyJobStatusPayload {
 
     private Long id;
