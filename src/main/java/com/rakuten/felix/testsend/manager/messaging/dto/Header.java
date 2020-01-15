@@ -35,6 +35,7 @@ public class Header extends HashMap<String, Object> {
     }
 
     public static Header buildWithContentType(String logId, Integer testId, String replyDestination) {
+        log.debug("ReplyDestination: {}", replyDestination);
         val header = new Header();
         header.put(LOG_ID_KEY, logId);
         header.put(TEST_ID_KEY, testId);
