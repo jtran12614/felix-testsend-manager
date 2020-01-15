@@ -15,7 +15,7 @@ spring:
 
   cloud.stream:
     rabbit.bindings:
-      job-manager-reply:
+      in-job-manager-reply:
         consumer.prefix: "{{felix_mq['prefix']}}"
       in-test-send-finished:
         consumer.prefix: "{{felix_mq['prefix']}}"
@@ -29,8 +29,8 @@ spring:
         producer.prefix: "{{felix_mq['prefix']}}
 
     bindings:
-      job-manager-reply:
-        destination: "input-job-manager-reply-test"
+      in-job-manager-reply:
+        destination: "job-manager-reply-test"
         group: "default"
       in-test-send-finished:
         destination: "{{felix_mq['channels']['test_send_finished']}}"
