@@ -2,7 +2,7 @@ package com.rakuten.felix.testsend.manager.messaging;
 
 import com.rakuten.felix.testsend.manager.messaging.dto.Notification;
 import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
-import com.rakuten.felix.testsend.manager.webclients.dto.LineJob;
+import com.rakuten.felix.testsend.manager.webclients.dto.JobManagerPayload;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,12 +108,12 @@ public class MessageSender {
      * Request start directly to Job-Manager.
      *
      * @param header  Header to send
-     * @param lineJob Job start payload
+     * @param jobManagerPayload Job start payload
      * @throws IOException When can't serialize or send the kick message.
      */
-    public void sendJobManager(Map<String, Object> header, LineJob lineJob) throws IOException {
-        log.info("Send job manager lineTask: Started: CampaignId: {}", lineJob.getInfo().getCampaignId());
-        val payload = objectMapperWrapper.serializeToBytes(lineJob);
+    public void sendJobManager(Map<String, Object> header, JobManagerPayload jobManagerPayload) throws IOException {
+        log.info("Send job manager lineTask: Started: CampaignId: {}", jobManagerPayload.getInfo().getCampaignId());
+        val payload = objectMapperWrapper.serializeToBytes(jobManagerPayload);
         val message = MessageBuilder.withPayload(payload)
                                     .copyHeaders(header)
                                     .build();
