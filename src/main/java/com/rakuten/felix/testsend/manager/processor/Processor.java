@@ -92,7 +92,7 @@ public class Processor {
         val info = Info.builder().user(request.getUser()).contents(request.getContents()).recipients(request.getRecipients()).build();
         val history = dataStore.createHistory(request.getBundleId(), request.getBundleType(), null, info);
         val replyHeader = Header.buildWithContentType(jobManagerPayload.getInfo().getLogId(), history.getId(), replyConfig.getJobStatusHandlingChannel());
-        jobManagerPayload.toBuilder().replyHeader(replyHeader).replyDestination(replyConfig.getJobStatusHandlingChannel()).build();
+        jobManagerPayload.toBuilder().replyHeader(replyHeader).replyDestination(replyConfig.getJobStatusHandlingChannel());
         messageSender.sendJobManager(replyHeader, jobManagerPayload);
     }
 
