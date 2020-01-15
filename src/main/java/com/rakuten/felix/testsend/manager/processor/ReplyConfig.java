@@ -10,8 +10,8 @@ public class ReplyConfig {
     private final String jobStatusHandlingChannel;
 
     public ReplyConfig(
-            @Value("${spring.cloud.stream.rabbit.bindings.job-manager-reply.consumer.prefix}") String jobStatusReplyPrefix,
-            @Value("${spring.cloud.stream.bindings.job-manager-reply.destination}") String jobStatusReplyDestination) {
+            @Value("${spring.cloud.stream.rabbit.bindings.in-job-manager-reply.consumer.prefix}") String jobStatusReplyPrefix,
+            @Value("${spring.cloud.stream.bindings.in-job-manager-reply.destination}") String jobStatusReplyDestination) {
 
         this.jobStatusHandlingChannel = jobStatusReplyPrefix + jobStatusReplyDestination;
     }
