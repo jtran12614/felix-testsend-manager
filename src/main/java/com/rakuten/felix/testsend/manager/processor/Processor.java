@@ -85,7 +85,7 @@ public class Processor {
      *
      * @param request Kick mail test send request.
      */
-    public void processKickingTestSend(KickTestSendRequest request) throws IOException, ValidationException {
+    public TestSendHistory processKickingTestSend(KickTestSendRequest request) throws IOException, ValidationException {
         JobManagerPayload jobManagerPayload = objectMapperWrapper.deserializeToObject(request.getJob().toJSONString(), JobManagerPayload.class);
         Validator.validate(jobManagerPayload);
 
@@ -94,6 +94,7 @@ public class Processor {
         val replyHeader = Header.buildWithContentType(jobManagerPayload.getInfo().getLogId(), history.getId(), replyConfig.getJobStatusHandlingChannel());
         jobManagerPayload = jobManagerPayload.toBuilder().replyHeader(replyHeader).replyDestination(replyConfig.getJobStatusHandlingChannel()).build();
         messageSender.sendJobManager(replyHeader, jobManagerPayload);
+        return history;
     }
 
     private Info buildInfo(MailJob mailJob, User user) {
