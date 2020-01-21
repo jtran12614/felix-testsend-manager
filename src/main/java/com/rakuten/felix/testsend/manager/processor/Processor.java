@@ -182,7 +182,9 @@ public class Processor {
         if (jobStatus.getStatus() == JobStatus.FINISHED) {
             log.info("Job finished:");
             dataStore.updateStatusToFinishedByTestId(header.getTestId());
-        } else if (jobStatus.getStatus() == JobStatus.FAILED) {
+        } else if(jobStatus.getStatus() == JobStatus.PROCESSING) {
+            log.info("Job processing:");
+        } else {
             log.info("Job failed:");
             dataStore.updateErrorMessageAndStatusToErrorByTestId(header.getTestId(), jobStatus.getMessage());
         }
