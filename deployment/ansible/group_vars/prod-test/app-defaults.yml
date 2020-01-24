@@ -62,6 +62,7 @@ felix_mq:
     kick_test_send: "kick-test-send"
     error_channel: "error"
     publish_notification: "publish-notification"
+    send_job_manager: "job-manager-start"
 
 #----------------------------------------------------------------------------
 # Internal APIs' URLs.
