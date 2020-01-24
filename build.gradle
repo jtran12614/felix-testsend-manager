@@ -9,6 +9,25 @@ plugins {
     id 'jacoco'
 }
 
+def git_branch = System.getProperty("GIT_BRANCH", "")
+println("now building against GIT_BRANCH: ${git_branch}")
+def version_suffix = ""
+if (git_branch.startsWith("origin/feature")) {
+    version_suffix = "-alpha-SNAPSHOT"
+} else if (git_branch.startsWith("origin/develop")) {
+    version_suffix = "-beta-SNAPSHOT"
+} else if (git_branch.startsWith("origin/bugfix")) {
+    version_suffix = "-rc"
+} else if (git_branch.startsWith("origin/release")) {
+    version_suffix = ""
+} else if (git_branch.startsWith("origin/master")) {
+    version_suffix = ""
+}
+println("version_suffix=[${version_suffix}]")
+
+version = rootProject.file('version').text.trim() + version_suffix
+println("current version = [${version}]")
+
 ext {
     checkStyleVersion = '7.7'
     junitJupiterVersion = '5.+'
@@ -20,7 +39,6 @@ ext {
 }
 
 group = 'com.rakuten.felix'
-version = rootProject.file('version').text.trim()
 
 apply from: 'build-publish.gradle'
 apply from: 'build-version.gradle'

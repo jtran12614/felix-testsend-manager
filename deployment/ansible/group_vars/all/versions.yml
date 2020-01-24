@@ -7,6 +7,6 @@
 #----------------------------------------------------------------------------
 app_versions:
   deployed:
-    - "1.1.5"
-  running: "1.1.5"
+    - "1.1.5-alpha-SNAPSHOT"
+  running: "1.1.5-alpha-SNAPSHOT"
   instances: 1

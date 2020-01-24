@@ -1,0 +1,78 @@
+apply plugin: 'maven'
+
+version = rootProject.file('version').text.trim()
+def releaseUrl = "http://dev-qcmdaci101z.dev.jp.local:8082/repository/felix"
+def snapshotUrl = "http://dev-qcmdaci101z.dev.jp.local:8082/repository/felix-dev"
+def centralUrl = "http://dev-qcmdaci101z.dev.jp.local:8082/repository/maven-central"
+def jarGroup = "com.rakuten.felix"
+def jarFile = "${jarGroup}:felix-testsend-manager:${version}"
+
+def checkCredentials() {
+    if (this.username == null) {
+        throw new GradleException('Missing property MAVEN_REPO_DEPLOY_USERNAME')
+    }
+    if (this.password == null) {
+        throw new GradleException('Missing property MAVEN_REPO_DEPLOY_PASSWORD')
+    }
+}
+
+def getUsername() {
+    return project.hasProperty('MAVEN_REPO_DEPLOY_USERNAME') ? project.property('MAVEN_REPO_DEPLOY_USERNAME') : null
+}
+
+def getPassword() {
+    return project.hasProperty('MAVEN_REPO_DEPLOY_PASSWORD') ? project.property('MAVEN_REPO_DEPLOY_PASSWORD') : null
+}
+
+configurations {
+    targetJar {
+        repositories {
+            maven { url = snapshotUrl }
+            maven { url = 'https://repo.spring.io/libs-milestone'}
+        }
+    }
+    deployJar {
+        repositories {
+            maven { url = centralUrl }
+        }
+    }
+    resultArchives
+}
+
+dependencies {
+    targetJar (jarFile) { transitive = false }
+
+    deployJar "org.apache.maven.wagon:wagon-http:2.2"
+    deployJar "org.apache.maven.wagon:wagon-webdav:1.0-beta-2"
+}
+
+uploadResultArchives {
+    repositories.mavenDeployer {
+        configuration = configurations.deployJar
+        repository (url: releaseUrl) {
+            authentication(userName: this.username, password: this.password)
+        }
+        pom {
+            groupId = jarGroup
+        }
+    }
+}
+
+artifacts {
+    resultArchives configurations.targetJar.first()
+}
+
+tasks.withType(Upload) {
+    doFirst {
+        checkCredentials()
+        println "current branch: [${this.branchName}]"
+        def released = this.branchName.startsWith("origin/release/") || this.branchName.equalsIgnoreCase("origin/master")
+        if (!released) {
+            throw new GradleException('You can ONLY promote artifacts from /release or /master')
+        }
+    }
+}
+
+def getBranchName() {
+    return System.getProperty("GIT_BRANCH", "")
+}
