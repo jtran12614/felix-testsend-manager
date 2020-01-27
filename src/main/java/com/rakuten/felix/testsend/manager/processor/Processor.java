@@ -81,9 +81,9 @@ public class Processor {
     }
 
     /**
-     * Process for kicking line test send.
+     * Process for kicking test send.
      *
-     * @param request Kick mail test send request.
+     * @param request Kick test send request.
      */
     public TestSendHistory processKickingTestSend(KickTestSendRequest request) throws IOException, ValidationException {
         JobManagerPayload jobManagerPayload = objectMapperWrapper.deserializeToObject(request.getJob().toJSONString(), JobManagerPayload.class);

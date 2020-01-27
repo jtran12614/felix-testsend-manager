@@ -100,11 +100,11 @@ public class WebController {
      * @param request Request body.
      * @return Response.
      */
-    @PostMapping(value = "/kick-line-test-send")
+    @PostMapping(value = "/kick-test-send")
     public TestSendResponse kickLineTestSend(@RequestBody @Valid KickTestSendRequest request)
             throws IOException, ValidationException {
 
-        log.debug("Kick line test send request received: requestBody={}", request);
+        log.debug("Kick test send request received: requestBody={}", request);
         val history = processor.processKickingTestSend(request);
         return TestSendResponse.fromEntity(history);
     }
