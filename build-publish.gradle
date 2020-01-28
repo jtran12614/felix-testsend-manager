@@ -35,22 +35,20 @@ apply plugin: 'maven-publish'
 publishing {
     repositories {
         maven {
-            def branchName = System.getProperty('GIT_BRANCH', '')
-            def isSnapShotBranch =  branchName.startsWith('origin/develop') || branchName.startsWith('origin/feature')
-            def releasesRepoUrl = 'http://dev-qcmdaci101z.dev.jp.local:8082/repository/felix'
-            def snapshotsRepoUrl = 'http://dev-qcmdaci101z.dev.jp.local:8082/repository/felix-dev/'
-            url = isSnapShotBranch ? snapshotsRepoUrl : releasesRepoUrl
+            def releasesRepoUrl = "http://dev-qcmdaci101z.dev.jp.local:8082/repository/felix/"
+            def snapshotsRepoUrl = "http://dev-qcmdaci101z.dev.jp.local:8082/repository/felix-dev/"
+            url = project.hasProperty('release') ? releasesRepoUrl : snapshotsRepoUrl
             credentials {
-                username this.username
-                password this.password
+                username = this.username
+                password = this.password
             }
         }
     }
     publications {
         maven(MavenPublication) {
-            artifactId project.name
-            groupId project.group
-            version this.publishVersion
+            artifactId = project.name
+            groupId = project.group
+            version = project.version
             from components.java
         }
     }
@@ -59,33 +57,12 @@ publishing {
 tasks.withType(PublishToMavenRepository) {
     doFirst {
         if (this.username == null) {
-            throw new GradleException('You must set the property MAVEN_REPO_DEPLOY_USERNAME.\n\n' +
-                    'Provide it as environment valuables, this way is recommended:\n' +
-                    '$ export ORG_GRADLE_PROJECT_MAVEN_REPO_DEPLOY_USERNAME=<USERNAME>\n\n' +
-                    'Or you can provide it in command:\n' +
-                    '$ gradle publish -PMAVEN_REPO_DEPLOY_USERNAME=<USERNAME>')
+            throw new GradleException('Missing property MAVEN_REPO_DEPLOY_USERNAME')
         }
         if (this.password == null) {
-            throw new GradleException('You must set the property MAVEN_REPO_DEPLOY_PASSWORD.\n\n' +
-                    'Provide it as environment valuables, this way is recommended:\n' +
-                    '$ export ORG_GRADLE_PROJECT_MAVEN_REPO_DEPLOY_PASSWORD=<PASSWORD>\n\n' +
-                    'Or you can provide it in command:\n' +
-                    '$ gradle publish -PMAVEN_REPO_DEPLOY_PASSWORD=<PASSWORD>')
+            throw new GradleException('Missing property MAVEN_REPO_DEPLOY_PASSWORD')
         }
     }
-}
-
-static def getCommitCount() {
-    return 'git rev-list --count HEAD'.execute().text.trim()
-}
-
-static def getShortHash() {
-    return 'git rev-parse --short HEAD'.execute().text.trim()
-}
-
-static def getBuildNumber() {
-    def buildNumber = System.getenv('BUILD_NUMBER')
-    return buildNumber != null ? buildNumber : 'UNKNOWN'
 }
 
 def getUsername() {
@@ -95,9 +72,3 @@ def getUsername() {
 def getPassword() {
     return project.hasProperty('MAVEN_REPO_DEPLOY_PASSWORD') ? project.property('MAVEN_REPO_DEPLOY_PASSWORD') : null
 }
-
-def getPublishVersion() {
-    return "${version}"
-}
-
-project.ext.set("publishVersion", publishVersion)
