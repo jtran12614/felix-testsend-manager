@@ -58,13 +58,11 @@ spring:
     username: "{{felix_persistence['user']}}"
     password: "{{felix_persistence['password']}}"
     driver-class-name: "com.mysql.jdbc.Driver"
-    tomcat:
-      test-on-borrow: true
-      validation-query: "SELECT 1"
-      initial-size: 1
-      max-active: 3
-      max-idle: 3
-      min-idle: 1
+    hikari:
+      minimum-idle: 1
+      maximum-pool-size: 3
+      connection-test-query: "SELECT 1"
+      idle-timeout: 60000
 
   jpa:
     show-sql: "{{felix_persistence['show_jpa_query']}}"
