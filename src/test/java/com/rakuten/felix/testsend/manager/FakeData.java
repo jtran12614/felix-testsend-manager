@@ -3,9 +3,12 @@ package com.rakuten.felix.testsend.manager;
 import com.rakuten.felix.testsend.manager.datastore.entities.Info;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus;
+import com.rakuten.felix.testsend.manager.webclients.dto.Column;
+import com.rakuten.felix.testsend.manager.webclients.dto.Columns;
 import com.rakuten.felix.testsend.manager.webclients.dto.Content;
 import com.rakuten.felix.testsend.manager.webclients.dto.MailJob;
 import com.rakuten.felix.testsend.manager.webclients.dto.Pattern;
+import com.rakuten.felix.testsend.manager.webclients.dto.PersonalizerColumn;
 import com.rakuten.felix.testsend.manager.webclients.dto.Schedule;
 import com.rakuten.felix.testsend.manager.webclients.dto.Subject;
 import com.rakuten.felix.testsend.manager.webclients.dto.User;
@@ -58,13 +61,17 @@ class FakeData {
     MailJob getValidMailJob() {
         return new MailJob(
                 Collections.singletonList(
-                        new Schedule(ZonedDateTime.of(2015, 1, 1, 1, 1, 1, 1, ZoneId.systemDefault()),
+                        new Schedule(
+                                1,
+                                Collections.emptyList(),
+                                ZonedDateTime.of(2015, 1, 1, 1, 1, 1, 1, ZoneId.systemDefault()),
                                 getSubjectsWithSingleCondition(),
                                 getHtmlContentsWithSplit1Segment1()
                         )
                 ),
                 getParts(),
-                Collections.singletonList("Address"));
+                Collections.singletonList("Address"),
+                Columns.builder().build());
     }
 
 
@@ -72,6 +79,40 @@ class FakeData {
 
     List<String> getParts() {
         return Arrays.asList("Part0", "Part1", "Part2", "Part3", "Part4", "Part5", "Part6", "Part7");
+    }
+
+    List<String> getPartsWithMuAttributes() {
+        return Arrays.asList(
+                "Part0:###_ATTRIBUTE0_###",                     // No Match Replacement
+                "Part1:###_ATTRIBUTE1_###",                     // Email Column Attributes
+                "Part2:###_ATTRIBUTE2_###",                     // Name Column Attributes
+                "Part3:###_ATTRIBUTE3_######_ATTRIBUTE11_###",  // EasyId/Additional11 Column Attributes
+                "Part4:###_ATTRIBUTE4_###,###_ATTRIBUTE12_###", // UserId/Additional12 Column Attributes
+                "Part5:###_ATTRIBUTE11_###",                    // Additional11 Column Attributes
+                "Part6:###_ATTRIBUTE21_###",                    // Personalizer21 Column Attributes
+                "Part7:###_ATTRI###_ATTRIBUTE1_###BUTE22_###"   // Email Column Attributes
+        );
+    }
+
+    Columns getColumns() {
+        return Columns.builder()
+                      .email(Column.builder().attributeIndex(1).keyword("email").build())
+                      .name(Column.builder().attributeIndex(2).keyword("name").build())
+                      .easyId(Column.builder().attributeIndex(3).keyword("easyId").build())
+                      .userId(Column.builder().attributeIndex(4).keyword("userId").build())
+                      .additional(
+                              Arrays.asList(
+                                      Column.builder().attributeIndex(11).keyword("addA").build(),
+                                      Column.builder().attributeIndex(12).keyword("addB").build()
+                              )
+                      )
+                      .personalizer(
+                              Arrays.asList(
+                                      PersonalizerColumn.builder().attributeIndex(21).keyword("cms:test-attrA").build(),
+                                      PersonalizerColumn.builder().attributeIndex(22).keyword("cms:test-attrB").build()
+                              )
+                      )
+                      .build();
     }
 
     List<Subject> getSubjectsWithSingleCondition() {

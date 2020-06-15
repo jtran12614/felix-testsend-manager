@@ -3,6 +3,7 @@ package com.rakuten.felix.testsend.manager.processor;
 import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
 import com.rakuten.felix.testsend.manager.datastore.HistoryNotFoundException;
 import com.rakuten.felix.testsend.manager.datastore.entities.Info;
+import com.rakuten.felix.testsend.manager.datastore.entities.MailContent;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.messaging.MessageSender;
 import com.rakuten.felix.testsend.manager.messaging.NotificationService;
@@ -18,16 +19,20 @@ import com.rakuten.felix.testsend.manager.webclients.CampaignSchedulerService;
 import com.rakuten.felix.testsend.manager.webclients.dto.JobManagerPayload;
 import com.rakuten.felix.testsend.manager.webclients.dto.MailJob;
 import com.rakuten.felix.testsend.manager.webclients.dto.User;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class Processor {
+    private static final Integer BUNDLE_TYPE_MAIL = 1;
     private final DataStoreService dataStore;
     private final MailContentBuilder mailContentBuilder;
     private final NotificationService notificationService;
@@ -35,34 +40,6 @@ public class Processor {
     private final ObjectMapperWrapper objectMapperWrapper;
     private final MessageSender messageSender;
     private final ReplyConfig replyConfig;
-
-    /**
-     * Initialize the service.
-     *
-     * @param dataStore           Data store.
-     * @param mailContentBuilder  Mail content builder.
-     * @param notificationService Notification service.
-     * @param schedulerService    Campaign scheduler service.
-     * @param objectMapperWrapper Object mapper wrapper.
-     * @param messageSender       Message sender.
-     * @param replyConfig         Reply config.
-     */
-    public Processor(DataStoreService dataStore,
-                     MailContentBuilder mailContentBuilder,
-                     NotificationService notificationService,
-                     CampaignSchedulerService schedulerService,
-                     ObjectMapperWrapper objectMapperWrapper,
-                     MessageSender messageSender,
-                     ReplyConfig replyConfig) {
-
-        this.dataStore = dataStore;
-        this.mailContentBuilder = mailContentBuilder;
-        this.notificationService = notificationService;
-        this.schedulerService = schedulerService;
-        this.objectMapperWrapper = objectMapperWrapper;
-        this.messageSender = messageSender;
-        this.replyConfig = replyConfig;
-    }
 
     /**
      * Process for kicking mail test send.
@@ -75,8 +52,13 @@ public class Processor {
 
         val reserveDate = mailJob.getSchedules().get(0).getReserveDate();
         val schedulerResponse = schedulerService.registerSingle(reserveDate, request.getMailJob());
-
-        val info = buildInfo(mailJob, request.getUser());
+        final Info info;
+        if (BUNDLE_TYPE_MAIL.equals(request.getBundleType())) {
+            info = buildMailInfo(mailJob, request.getUser());
+        } else {
+            // For scenario mail testing
+            info = buildInfo(mailJob, request.getUser());
+        }
         return dataStore.createHistory(request.getBundleId(), request.getBundleType(), schedulerResponse.getJdkId(), info);
     }
 
@@ -99,11 +81,12 @@ public class Processor {
 
     private Info buildInfo(MailJob mailJob, User user) {
         val parts = mailJob.getParts();
+        val columns = mailJob.getColumns();
         val schedule = mailJob.getSchedules().get(0);
 
-        val subjects = mailContentBuilder.buildSubjectContents(schedule.getSubjects(), parts);
-        val htmlContents = mailContentBuilder.buildHtmlContents(schedule.getContents(), parts);
-        val textContents = mailContentBuilder.buildTextContents(schedule.getContents(), parts);
+        val subjects = mailContentBuilder.buildSubjectContents(schedule.getSubjects(), parts, columns);
+        val htmlContents = mailContentBuilder.buildHtmlContents(schedule.getContents(), parts, columns);
+        val textContents = mailContentBuilder.buildTextContents(schedule.getContents(), parts, columns);
 
         return Info.builder()
                    .user(user)
@@ -111,6 +94,26 @@ public class Processor {
                    .htmlContents(htmlContents)
                    .textContents(textContents)
                    .recipients(mailJob.getPrependAddresses())
+                   .build();
+    }
+
+    private Info buildMailInfo(MailJob mailJob, User user) {
+        val parts = mailJob.getParts();
+        val columns = mailJob.getColumns();
+        val contents = mailJob.getSchedules()
+                              .stream()
+                              .map(it -> {
+                                  val subjects = mailContentBuilder.buildSubjectContents(it.getSubjects(), parts, columns);
+                                  val html = mailContentBuilder.buildHtmlContents(it.getContents(), parts, columns);
+                                  val text = mailContentBuilder.buildTextContents(it.getContents(), parts, columns);
+                                  return new MailContent(it.getId(), it.getDeviceCodes(), subjects, text, html);
+                              })
+                              .collect(Collectors.toList());
+        return Info.builder()
+                   .user(user)
+                   .recipients(mailJob.getPrependAddresses())
+                   .contents(contents)
+                   .columns(mailJob.getColumns())
                    .build();
     }
 
@@ -157,7 +160,7 @@ public class Processor {
                                  .map(Info::getUser)
                                  .map(User::getUserId)
                                  .orElseGet(() -> {
-                                     log.warn("User id doesn't exist in info: Wil notify to userId=0", entity.getInfo());
+                                     log.warn("User id doesn't exist in info: Wil notify to userId=0, info={}", entity.getInfo());
                                      return 0;
                                  });
             notificationService.publishErrorNotification(bundleId, userId);

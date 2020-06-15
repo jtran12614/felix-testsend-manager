@@ -30,10 +30,8 @@ println("current version = [${version}]")
 
 ext {
     checkStyleVersion = '7.7'
-    junitJupiterVersion = '5.+'
     lombokVersion = '1.16.20'
     springBootAdminVersion = '2.1.6'
-    mockitoVersion = '2.1.0'
     jacksonVersion = '2.9.4'
     jsonVersion = '1.1.1'
 
@@ -73,10 +71,10 @@ dependencies {
         exclude module: 'junit'
     }
 
-    // JUnit and jmockit
-    testCompile "org.mockito:mockito-core:${mockitoVersion}"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+    // UT
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
 
     // Logback
     compile "net.logstash.logback:logstash-logback-encoder:${logbackLogstashVersion}"

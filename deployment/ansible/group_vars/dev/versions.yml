@@ -1,5 +1,5 @@
 app_versions:
   deployed:
-    - "1.1.5-beta-SNAPSHOT"
-  running: "1.1.5-beta-SNAPSHOT"
+    - "1.1.7-beta-SNAPSHOT"
+  running: "1.1.7-beta-SNAPSHOT"
   instances: 1

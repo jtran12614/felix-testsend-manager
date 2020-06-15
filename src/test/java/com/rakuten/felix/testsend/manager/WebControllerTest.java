@@ -3,10 +3,9 @@ package com.rakuten.felix.testsend.manager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
 import com.rakuten.felix.testsend.manager.datastore.TestSendHistoryRepository;
+import com.rakuten.felix.testsend.manager.datastore.entities.MailContent;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus;
-import com.rakuten.felix.testsend.manager.messaging.MessageSender;
-import com.rakuten.felix.testsend.manager.messaging.OutputChannels;
 import com.rakuten.felix.testsend.manager.processor.MailContentBuilder;
 import com.rakuten.felix.testsend.manager.processor.Processor;
 import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
@@ -28,12 +27,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.MessageChannel;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Clock;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -134,6 +133,56 @@ class WebControllerTest {
         // Setup
         val historyId = 12345;
         val bundleId = 1;
+        val bundleType = 0;
+        val jdkId = 123;
+        val mailJob = FakeData.getValidMailJob();
+        val mailJobJsonObj = mapper.readValue(mapper.writeValueAsString(mailJob), JSONObject.class);
+        val started = ZonedDateTime.now(ZoneId.systemDefault());
+        val user = new User(1, "name", "mail-address");
+        // Response
+        when(repository.saveAndFlush(any()))
+                .then(it -> {
+                    TestSendHistory entity = (TestSendHistory) it.getArguments()[0];
+                    entity.setId(historyId);
+                    return entity;
+                });
+
+        when(clock.instant())
+                .thenReturn(started.toInstant());
+        when(clock.getZone())
+                .thenReturn(started.getZone());
+        val listResponseType = new ParameterizedTypeReference<List<RegisterCampaignResponse>>() {
+        };
+        when(restTemplate.exchange(eq(SCHEDULER_REGISTER_AND_GET_URL), eq(HttpMethod.POST), any(), eq(listResponseType)))
+                .thenReturn(new ResponseEntity(Collections.singletonList(new RegisterCampaignResponse(jdkId)), HttpStatus.OK));
+        // Execution
+        val response = controller.kickTestSend(new KickMailTestSendRequest(bundleId, bundleType, mailJobJsonObj, user));
+        // Verification
+        assertNotNull(response);
+
+        // verify database
+        val capturedEntity = ArgumentCaptor.forClass(TestSendHistory.class);
+        verify(repository, times(1)).saveAndFlush(capturedEntity.capture());
+        val actualEntity = capturedEntity.getValue();
+        assertEquals(TestSendStatus.NEW, actualEntity.getStatus());
+        assertEquals(TestSendStatus.NEW, TestSendStatus.fromNumber(actualEntity.getStatus().toNumber()));
+        assertEquals(user, actualEntity.getInfo().getUser());
+        assertEquals(Integer.valueOf(bundleId), actualEntity.getBundleId());
+        assertEquals(Integer.valueOf(bundleType), actualEntity.getBundleType());
+        assertEquals(Integer.valueOf(jdkId), actualEntity.getJobId());
+        assertEquals(started, actualEntity.getStarted());
+        assertEquals(user, actualEntity.getInfo().getUser());
+        assertEquals(actualEntity.getInfo().getSubjects(), Arrays.asList("Part0", "Part1", "Part2"));
+        assertEquals(actualEntity.getInfo().getHtmlContents(), Collections.singletonList("Part0Part1Part2"));
+        assertTrue(actualEntity.getInfo().getTextContents().isEmpty());
+        assertEquals(actualEntity.getInfo().getRecipients(), mailJob.getPrependAddresses());
+    }
+
+    @Test
+    void kickMailTestSendOnMailBundleType() throws Exception {
+        // Setup
+        val historyId = 12345;
+        val bundleId = 1;
         val bundleType = 1;
         val jdkId = 123;
         val mailJob = FakeData.getValidMailJob();
@@ -173,9 +222,13 @@ class WebControllerTest {
         assertEquals(Integer.valueOf(jdkId), actualEntity.getJobId());
         assertEquals(started, actualEntity.getStarted());
         assertEquals(user, actualEntity.getInfo().getUser());
-        assertEquals(actualEntity.getInfo().getSubjects(), Collections.singletonList("Part0Part1Part2"));
-        assertEquals(actualEntity.getInfo().getHtmlContents(), Collections.singletonList("Part0Part1Part2"));
-        assertTrue(actualEntity.getInfo().getTextContents().isEmpty());
+        assertTrue(actualEntity.getInfo().getContents() instanceof List<?>);
+        val mailContents = (List<?>) actualEntity.getInfo().getContents();
+        assertTrue(mailContents.get(0) instanceof MailContent);
+        val mailContent = (MailContent) mailContents.get(0);
+        assertEquals(mailContent.getSubjects(), Arrays.asList("Part0", "Part1", "Part2"));
+        assertEquals(mailContent.getHtml(), Collections.singletonList("Part0Part1Part2"));
+        assertTrue(mailContent.getText().isEmpty());
         assertEquals(actualEntity.getInfo().getRecipients(), mailJob.getPrependAddresses());
     }
 

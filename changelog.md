@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 1.1.7
 ### Added
 - Logback-spring
+- Fix for mail channel test sending
 
 ## 1.1.6 - 2020-05-12
 ### Added

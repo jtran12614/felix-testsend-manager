@@ -18,4 +18,5 @@ public class MailJob {
     List<String> parts;
     @NotNull
     List<String> prependAddresses;
+    Columns columns;
 }

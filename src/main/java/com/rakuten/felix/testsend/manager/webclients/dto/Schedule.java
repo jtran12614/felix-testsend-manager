@@ -14,6 +14,8 @@ import java.util.List;
 @Value
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Schedule {
+    Integer id;
+    List<Integer> deviceCodes;
     @JsonDeserialize(using = UnixTimeStampDeserializer.class)
     @JsonSerialize(using = UnixTimeStampSerializer.class)
     @NotNull
