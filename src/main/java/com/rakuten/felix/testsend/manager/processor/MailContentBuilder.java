@@ -4,6 +4,7 @@ import com.rakuten.felix.testsend.manager.webclients.dto.Column;
 import com.rakuten.felix.testsend.manager.webclients.dto.Columns;
 import com.rakuten.felix.testsend.manager.webclients.dto.Content;
 import com.rakuten.felix.testsend.manager.webclients.dto.Pattern;
+import com.rakuten.felix.testsend.manager.webclients.dto.PermissionType;
 import com.rakuten.felix.testsend.manager.webclients.dto.PersonalizerColumn;
 import com.rakuten.felix.testsend.manager.webclients.dto.Subject;
 import lombok.val;
@@ -20,6 +21,13 @@ import java.util.stream.Collectors;
 
 @Service
 public class MailContentBuilder {
+    private static final Integer MU_ATTRIBUTE_INDEX_LINE_NUMBER = 1;
+    private static final Integer MU_ATTRIBUTE_INDEX_UNSUBSCRIBE = 6;
+    private static final Integer MU_ATTRIBUTE_INDEX_IDENTIFIER  = 7;
+    private static final String MU_ATTRIBUTE_LINE_NUMBER_TAG = "\\$\\{line_number}";
+    private static final String MU_ATTRIBUTE_EMAGAZINE_UNSUBSCRIBE_TAG = "%%emagazine_unsubscribe_url%%";
+    private static final String MU_ATTRIBUTE_RMAIL_UNSUBSCRIBE_TAG = "%%rmail_unsubscribe_url%%";
+    private static final String MU_ATTRIBUTE_IDENTIFIER_TAG = "\\$\\{identifier}";
     private static final java.util.regex.Pattern MU_ATTRIBUTE = java.util.regex.Pattern.compile("###_ATTRIBUTE(\\d+)_###");
 
 
@@ -30,8 +38,7 @@ public class MailContentBuilder {
      * @param parts    Parts.
      * @return Contents of string
      */
-    public List<String> buildSubjectContents(List<Subject> subjects, List<String> parts, Columns columns) {
-        val replacements = buildReplacements(columns);
+    public List<String> buildSubjectContents(List<Subject> subjects, List<String> parts, Map<Integer, String> replacements) {
         return subjects.stream()
                        .map(Subject::getPartIds)
                        .flatMap(partIds -> partIds.stream().map(parts::get))
@@ -46,8 +53,7 @@ public class MailContentBuilder {
      * @param parts    Parts.
      * @return Contents of string
      */
-    public List<String> buildHtmlContents(List<Content> contents, List<String> parts, Columns columns) {
-        val replacements = buildReplacements(columns);
+    public List<String> buildHtmlContents(List<Content> contents, List<String> parts, Map<Integer, String> replacements) {
         return contents.stream()
                        .filter(Content::getHtml)
                        .findFirst()
@@ -64,8 +70,7 @@ public class MailContentBuilder {
      * @param parts    Parts.
      * @return Contents of string
      */
-    public List<String> buildTextContents(List<Content> contents, List<String> parts, Columns columns) {
-        val replacements = buildReplacements(columns);
+    public List<String> buildTextContents(List<Content> contents, List<String> parts, Map<Integer, String> replacements) {
         return contents.stream()
                        .filter(it -> !it.getHtml())
                        .findFirst()
@@ -88,7 +93,7 @@ public class MailContentBuilder {
                                  .collect(Collectors.joining(""));
     }
 
-    private Map<Integer, String> buildReplacements(Columns columns) {
+    public Map<Integer, String> buildReplacements(Columns columns, PermissionType permissionType) {
         val replacements = new HashMap<Integer, String>();
         Optional.ofNullable(columns.getEmail()).ifPresent(putAttributes(replacements));
         Optional.ofNullable(columns.getEasyId()).ifPresent(putAttributes(replacements));
@@ -96,6 +101,19 @@ public class MailContentBuilder {
         Optional.ofNullable(columns.getUserId()).ifPresent(putAttributes(replacements));
         Optional.ofNullable(columns.getAdditional()).ifPresent(it -> it.forEach(putAttributes(replacements)));
         Optional.ofNullable(columns.getPersonalizer()).ifPresent(it -> it.forEach(putPersonalizeAttributes(replacements)));
+        replacements.putIfAbsent(MU_ATTRIBUTE_INDEX_LINE_NUMBER, MU_ATTRIBUTE_LINE_NUMBER_TAG);
+        replacements.putIfAbsent(MU_ATTRIBUTE_INDEX_IDENTIFIER, MU_ATTRIBUTE_IDENTIFIER_TAG);
+        switch (permissionType) {
+            case EMAGAZINE:
+                replacements.putIfAbsent(MU_ATTRIBUTE_INDEX_UNSUBSCRIBE, MU_ATTRIBUTE_EMAGAZINE_UNSUBSCRIBE_TAG);
+                break;
+            case RMAIL:
+                replacements.putIfAbsent(MU_ATTRIBUTE_INDEX_UNSUBSCRIBE, MU_ATTRIBUTE_RMAIL_UNSUBSCRIBE_TAG);
+                break;
+            default:
+                // NO replacement
+                break;
+        }
         return replacements;
     }
 

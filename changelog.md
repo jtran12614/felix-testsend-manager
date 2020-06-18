@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Logback-spring
 - Fix for mail channel test sending
+- Revert MU attribute tag to original one 
 
 ## 1.1.6 - 2020-05-12
 ### Added

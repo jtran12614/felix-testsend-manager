@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Objects;
 
 @Value
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -19,4 +20,16 @@ public class MailJob {
     @NotNull
     List<String> prependAddresses;
     Columns columns;
+    Integer shopId;
+    Integer newsId;
+
+    public PermissionType getPermissionType() {
+        if (Objects.nonNull(newsId)) {
+            return PermissionType.EMAGAZINE;
+        } else if (Objects.nonNull(shopId)) {
+            return PermissionType.RMAIL;
+        } else {
+            return PermissionType.NONE;
+        }
+    }
 }

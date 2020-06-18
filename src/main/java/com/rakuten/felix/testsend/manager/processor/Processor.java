@@ -84,9 +84,10 @@ public class Processor {
         val columns = mailJob.getColumns();
         val schedule = mailJob.getSchedules().get(0);
 
-        val subjects = mailContentBuilder.buildSubjectContents(schedule.getSubjects(), parts, columns);
-        val htmlContents = mailContentBuilder.buildHtmlContents(schedule.getContents(), parts, columns);
-        val textContents = mailContentBuilder.buildTextContents(schedule.getContents(), parts, columns);
+        val replacements = mailContentBuilder.buildReplacements(columns, mailJob.getPermissionType());
+        val subjects = mailContentBuilder.buildSubjectContents(schedule.getSubjects(), parts, replacements);
+        val htmlContents = mailContentBuilder.buildHtmlContents(schedule.getContents(), parts, replacements);
+        val textContents = mailContentBuilder.buildTextContents(schedule.getContents(), parts, replacements);
 
         return Info.builder()
                    .user(user)
@@ -100,12 +101,13 @@ public class Processor {
     private Info buildMailInfo(MailJob mailJob, User user) {
         val parts = mailJob.getParts();
         val columns = mailJob.getColumns();
+        val replacements = mailContentBuilder.buildReplacements(columns, mailJob.getPermissionType());
         val contents = mailJob.getSchedules()
                               .stream()
                               .map(it -> {
-                                  val subjects = mailContentBuilder.buildSubjectContents(it.getSubjects(), parts, columns);
-                                  val html = mailContentBuilder.buildHtmlContents(it.getContents(), parts, columns);
-                                  val text = mailContentBuilder.buildTextContents(it.getContents(), parts, columns);
+                                  val subjects = mailContentBuilder.buildSubjectContents(it.getSubjects(), parts, replacements);
+                                  val html = mailContentBuilder.buildHtmlContents(it.getContents(), parts, replacements);
+                                  val text = mailContentBuilder.buildTextContents(it.getContents(), parts, replacements);
                                   return new MailContent(it.getId(), it.getDeviceCodes(), subjects, text, html);
                               })
                               .collect(Collectors.toList());

@@ -71,7 +71,10 @@ class FakeData {
                 ),
                 getParts(),
                 Collections.singletonList("Address"),
-                Columns.builder().build());
+                Columns.builder().build(),
+                null,
+                null
+        );
     }
 
 
@@ -83,23 +86,23 @@ class FakeData {
 
     List<String> getPartsWithMuAttributes() {
         return Arrays.asList(
-                "Part0:###_ATTRIBUTE0_###",                     // No Match Replacement
-                "Part1:###_ATTRIBUTE1_###",                     // Email Column Attributes
-                "Part2:###_ATTRIBUTE2_###",                     // Name Column Attributes
-                "Part3:###_ATTRIBUTE3_######_ATTRIBUTE11_###",  // EasyId/Additional11 Column Attributes
-                "Part4:###_ATTRIBUTE4_###,###_ATTRIBUTE12_###", // UserId/Additional12 Column Attributes
-                "Part5:###_ATTRIBUTE11_###",                    // Additional11 Column Attributes
-                "Part6:###_ATTRIBUTE21_###",                    // Personalizer21 Column Attributes
-                "Part7:###_ATTRI###_ATTRIBUTE1_###BUTE22_###"   // Email Column Attributes
+                "Part0:###_ATTRIBUTE0_###",                      // No Match Replacement
+                "Part1:###_ATTRIBUTE2_###",                      // Email Column Attributes
+                "Part2:###_ATTRIBUTE3_######_ATTRIBUTE1_###",    // Name Column Attributes
+                "Part3:###_ATTRIBUTE4_###,###_ATTRIBUTE6_###",   // EasyId/Identifier Column Attributes
+                "Part4:###_ATTRIBUTE8_###,###_ATTRIBUTE7_###",   // UserId/UnsubscribeLink Column Attributes
+                "Part5:###_ATTRIBUTE11_###,###_ATTRIBUTE12_###", // Additional11/12 Column Attributes
+                "Part6:###_ATTRIBUTE21_###,###_ATTRIBUTE22_###", // Personalizer21/22 Column Attributes
+                "Part7:###_ATTRI###_ATTRIBUTE2_###BUTE22_###"    // Email Column Attributes
         );
     }
 
     Columns getColumns() {
         return Columns.builder()
-                      .email(Column.builder().attributeIndex(1).keyword("email").build())
-                      .name(Column.builder().attributeIndex(2).keyword("name").build())
-                      .easyId(Column.builder().attributeIndex(3).keyword("easyId").build())
-                      .userId(Column.builder().attributeIndex(4).keyword("userId").build())
+                      .email(Column.builder().attributeIndex(2).keyword("email").build())
+                      .name(Column.builder().attributeIndex(3).keyword("name").build())
+                      .easyId(Column.builder().attributeIndex(4).keyword("easyId").build())
+                      .userId(Column.builder().attributeIndex(8).keyword("userId").build())
                       .additional(
                               Arrays.asList(
                                       Column.builder().attributeIndex(11).keyword("addA").build(),
