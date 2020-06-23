@@ -70,7 +70,7 @@ class FakeData {
                         )
                 ),
                 getParts(),
-                Collections.singletonList("Address"),
+                Arrays.asList("test-address1@rakuten.com", "test-address2@rakuten.com", "test-address1@rakuten.com", "test-address2@rakuten.com"),
                 Columns.builder().build(),
                 null,
                 null
