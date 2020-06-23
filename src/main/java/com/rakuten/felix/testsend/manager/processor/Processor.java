@@ -25,6 +25,7 @@ import lombok.val;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -111,9 +112,12 @@ public class Processor {
                                   return new MailContent(it.getId(), it.getDeviceCodes(), subjects, text, html);
                               })
                               .collect(Collectors.toList());
+        val recipients = Optional.ofNullable(mailJob.getPrependAddresses())
+                                 .map(it -> it.stream().distinct().collect(Collectors.toList()))
+                                 .orElse(Collections.emptyList());
         return Info.builder()
                    .user(user)
-                   .recipients(mailJob.getPrependAddresses())
+                   .recipients(recipients)
                    .contents(contents)
                    .columns(mailJob.getColumns())
                    .build();

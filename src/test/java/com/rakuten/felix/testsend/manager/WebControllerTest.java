@@ -229,7 +229,7 @@ class WebControllerTest {
         assertEquals(mailContent.getSubjects(), Arrays.asList("Part0", "Part1", "Part2"));
         assertEquals(mailContent.getHtml(), Collections.singletonList("Part0Part1Part2"));
         assertTrue(mailContent.getText().isEmpty());
-        assertEquals(actualEntity.getInfo().getRecipients(), mailJob.getPrependAddresses());
+        assertEquals(actualEntity.getInfo().getRecipients(), Arrays.asList("test-address1@rakuten.com", "test-address2@rakuten.com"));
     }
 
     @Test
