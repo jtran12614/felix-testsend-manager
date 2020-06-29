@@ -4,12 +4,13 @@ import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.processor.Processor;
 import com.rakuten.felix.testsend.manager.validator.ValidationException;
+import com.rakuten.felix.testsend.manager.web.dto.HistoryDto;
 import com.rakuten.felix.testsend.manager.web.dto.KickMailTestSendRequest;
 import com.rakuten.felix.testsend.manager.web.dto.KickTestSendRequest;
 import com.rakuten.felix.testsend.manager.web.dto.TestSendResponse;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -28,27 +29,18 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/testsend-manager")
 @CrossOrigin(origins = "*")
+@AllArgsConstructor
 public class WebController {
     private final DataStoreService dataStore;
     private final Processor processor;
 
     /**
-     * Initialize the controller.
-     *
-     * @param dataStore Data store.
-     * @param processor Processor.
-     */
-    @Autowired
-    public WebController(DataStoreService dataStore, Processor processor) {
-        this.dataStore = dataStore;
-        this.processor = processor;
-    }
-
-    /**
      * Handle request for getting a history.
      *
+     * @deprecated Use /history/{id} instead.
      * @return Response.
      */
+    @Deprecated
     @GetMapping(value = "/get/{id}")
     public TestSendHistory get(@PathVariable("id") Integer id) {
         log.debug("Get history by id={}", id);
@@ -69,8 +61,10 @@ public class WebController {
     /**
      * Handle request for getting histories.
      *
+     * @deprecated Please use /histories instead. This list includes info column.
      * @return Response.
      */
+    @Deprecated
     @GetMapping(value = "/get-all")
     public Page<TestSendHistory> getAll(@RequestParam(value = "bundleId") Integer bundleId,
                                         @RequestParam(value = "bundleType") Integer bundleType,
@@ -89,8 +83,10 @@ public class WebController {
     public TestSendResponse kickTestSend(@RequestBody @Valid KickMailTestSendRequest request)
             throws ValidationException {
 
-        log.debug("Kick mail test send request received: requestBody={}", request);
+        log.info("Kick test MAIL send started: bundleId={}, bundleType={}", request.getBundleId(), request.getBundleType());
+        log.debug("RequestBody={}", request);
         val history = processor.processKickingTestSend(request);
+        log.info("Kick test MAIL send finished: bundleId={}, bundleType={}", request.getBundleId(), request.getBundleType());
         return TestSendResponse.fromEntity(history);
     }
 
@@ -104,8 +100,40 @@ public class WebController {
     public TestSendResponse kickLineTestSend(@RequestBody @Valid KickTestSendRequest request)
             throws IOException, ValidationException {
 
-        log.debug("Kick test send request received: requestBody={}", request);
+        log.info("Kick test send started: bundleId={}, bundleType={}", request.getBundleId(), request.getBundleType());
+        log.debug("RequestBody={}", request);
         val history = processor.processKickingTestSend(request);
+        log.info("Kick test send finished: bundleId={}, bundleType={}", request.getBundleId(), request.getBundleType());
         return TestSendResponse.fromEntity(history);
+    }
+
+    /**
+     * Handle request for getting histories.
+     * This response does not include info column.
+     *
+     * @return Response.
+     */
+    @GetMapping(value = "/histories")
+    public Page<HistoryDto> getHistories(@RequestParam(value = "bundleId") Integer bundleId,
+                                         @RequestParam(value = "bundleType") Integer bundleType,
+                                         Pageable pageable) {
+        log.info("Get histories started: bundleId={}, bundleType={}, pageInfo={}", bundleId, bundleType, pageable);
+        val response = dataStore.getHistoriesByBundleIdAndType(bundleId, bundleType, pageable)
+                                .map(HistoryDto::buildFromEntity);
+        log.info("Get histories finished: bundleId={}, bundleType={}, total={}", bundleId, bundleType, response.getSize());
+        return response;
+    }
+
+    /**
+     * Handle request for getting a history.
+     *
+     * @return Response.
+     */
+    @GetMapping(value = "/histories/{id}")
+    public TestSendHistory getHistory(@PathVariable("id") Integer id) {
+        log.info("Get history started: id={}", id);
+        val response = dataStore.getHistoryById(id);
+        log.info("Get history finished: id={}", id);
+        return response;
     }
 }

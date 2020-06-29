@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 1.2.0
+### Added
+- Endpoints:
+  - Get histories by bundle_id, bundle_type (info is not included)
+  - Get history detail by history_id.
+
 ## 1.1.8
 ### Fixed
 - Unique mail recipients addresses in info for mail bundle type. 

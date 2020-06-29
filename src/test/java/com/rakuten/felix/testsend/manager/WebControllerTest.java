@@ -11,6 +11,7 @@ import com.rakuten.felix.testsend.manager.processor.Processor;
 import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
 import com.rakuten.felix.testsend.manager.validator.ValidationException;
 import com.rakuten.felix.testsend.manager.web.WebController;
+import com.rakuten.felix.testsend.manager.web.dto.HistoryDto;
 import com.rakuten.felix.testsend.manager.web.dto.KickMailTestSendRequest;
 import com.rakuten.felix.testsend.manager.webclients.CampaignSchedulerService;
 import com.rakuten.felix.testsend.manager.webclients.dto.RegisterCampaignResponse;
@@ -77,6 +78,14 @@ class WebControllerTest {
         assertEquals(mockedHistory.getJobId(), result.getJobId());
         assertEquals(mockedHistory.getStatus(), result.getStatus());
         assertEquals(mockedHistory.getInfo(), result.getInfo());
+    }
+
+    private void assertHistory(TestSendHistory mockedHistory, HistoryDto result) {
+        assertEquals(mockedHistory.getId(), result.getId());
+        assertEquals(mockedHistory.getBundleId(), result.getBundleId());
+        assertEquals(mockedHistory.getBundleType(), result.getBundleType());
+        assertEquals(mockedHistory.getJobId(), result.getJobId());
+        assertEquals(mockedHistory.getStatus(), result.getStatus());
     }
 
     @Test
@@ -256,5 +265,39 @@ class WebControllerTest {
         // verify database
         verify(repository, times(0)).saveAndFlush(any());
 
+    }
+
+    @Test
+    void getHistoriesByBundleIdAndBundleTypeOnSuccess() {
+        // Setup
+        val bundleId = 1;
+        val bundleType = 1;
+        val page = PageRequest.of(1, 2);
+        // Response
+        val mockedHistories = FakeData.getHistories();
+        when(repository.findByBundleIdAndBundleType(bundleId, bundleType, page))
+                .thenReturn(new PageImpl<>(mockedHistories));
+        // Execution
+        val response = controller.getHistories(bundleId, bundleType, page);
+        // Verification
+        assertNotNull(response);
+        for (int i = 0; i < response.getContent().size(); i++) {
+            assertHistory(mockedHistories.get(i), response.getContent().get(i));
+        }
+    }
+
+    @Test
+    void getHistoryOnSuccess() {
+        // Setup
+        val historyId = 1;
+        // Response
+        val mockedHistory = FakeData.getHistory();
+        when(repository.findById(historyId))
+                .thenReturn(Optional.of(mockedHistory));
+        // Execution
+        val response = controller.getHistory(historyId);
+        // Verification
+        assertNotNull(response);
+        assertHistory(mockedHistory, response);
     }
 }
