@@ -85,10 +85,10 @@ public class Processor {
         val columns = mailJob.getColumns();
         val schedule = mailJob.getSchedules().get(0);
 
-        val replacements = mailContentBuilder.buildReplacements(columns, mailJob.getPermissionType());
-        val subjects = mailContentBuilder.buildSubjectContents(schedule.getSubjects(), parts, replacements);
-        val htmlContents = mailContentBuilder.buildHtmlContents(schedule.getContents(), parts, replacements);
-        val textContents = mailContentBuilder.buildTextContents(schedule.getContents(), parts, replacements);
+        val replacements = mailContentBuilder.buildReplacements(columns);
+        val subjects = mailContentBuilder.buildSubjectContents(schedule.getSubjects(), parts, replacements, mailJob.getPermissionType());
+        val htmlContents = mailContentBuilder.buildHtmlContents(schedule.getContents(), parts, replacements, mailJob.getPermissionType());
+        val textContents = mailContentBuilder.buildTextContents(schedule.getContents(), parts, replacements, mailJob.getPermissionType());
 
         return Info.builder()
                    .user(user)
@@ -102,13 +102,13 @@ public class Processor {
     private Info buildMailInfo(MailJob mailJob, User user) {
         val parts = mailJob.getParts();
         val columns = mailJob.getColumns();
-        val replacements = mailContentBuilder.buildReplacements(columns, mailJob.getPermissionType());
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = mailJob.getSchedules()
                               .stream()
                               .map(it -> {
-                                  val subjects = mailContentBuilder.buildSubjectContents(it.getSubjects(), parts, replacements);
-                                  val html = mailContentBuilder.buildHtmlContents(it.getContents(), parts, replacements);
-                                  val text = mailContentBuilder.buildTextContents(it.getContents(), parts, replacements);
+                                  val subjects = mailContentBuilder.buildSubjectContents(it.getSubjects(), parts, replacements, mailJob.getPermissionType());
+                                  val html = mailContentBuilder.buildHtmlContents(it.getContents(), parts, replacements, mailJob.getPermissionType());
+                                  val text = mailContentBuilder.buildTextContents(it.getContents(), parts, replacements, mailJob.getPermissionType());
                                   return new MailContent(it.getId(), it.getDeviceCodes(), subjects, text, html);
                               })
                               .collect(Collectors.toList());

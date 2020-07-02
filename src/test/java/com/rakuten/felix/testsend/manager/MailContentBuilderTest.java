@@ -33,9 +33,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getMultipartContentsWithSplit1Segment1();
-        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements, permission);
         val expected = Collections.singletonList("Part0Part1Part2");
         assertResult(expected, result);
     }
@@ -45,9 +45,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getMultipartContentsWithSplit1Segment2();
-        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements, permission);
         val expected = Arrays.asList("Part0Part1", "Part2Part3");
         assertResult(expected, result);
     }
@@ -57,9 +57,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getMultipartContentsWithSplit2Segment1();
-        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements, permission);
         val expected = Arrays.asList("Part0Part1", "Part2Part3");
         assertResult(expected, result);
     }
@@ -69,9 +69,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getMultipartContentsWithSplit2Segment2();
-        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements, permission);
         val expected = Arrays.asList("Part0", "Part1", "Part2", "Part3");
         assertResult(expected, result);
     }
@@ -81,9 +81,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getTextContentsWithSplit1Segment1();
-        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements, permission);
         val expected = new ArrayList<String>();
         assertResult(expected, result);
     }
@@ -93,9 +93,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getTextContentsWithSplit1Segment2();
-        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements, permission);
         val expected = new ArrayList<String>();
         assertResult(expected, result);
     }
@@ -105,9 +105,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getTextContentsWithSplit2Segment1();
-        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements, permission);
         val expected = new ArrayList<String>();
         assertResult(expected, result);
     }
@@ -117,9 +117,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getTextContentsWithSplit2Segment2();
-        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements, permission);
         val expected = new ArrayList<String>();
         assertResult(expected, result);
     }
@@ -129,9 +129,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getHtmlContentsWithSplit1Segment1();
-        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements, permission);
         val expected = Collections.singletonList("Part0Part1Part2");
         assertResult(expected, result);
     }
@@ -141,9 +141,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getHtmlContentsWithSplit1Segment2();
-        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements, permission);
         val expected = Arrays.asList("Part0Part1", "Part2Part3");
         assertResult(expected, result);
     }
@@ -153,9 +153,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getHtmlContentsWithSplit2Segment1();
-        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements, permission);
         val expected = Arrays.asList("Part0Part1", "Part2Part3");
         assertResult(expected, result);
     }
@@ -165,9 +165,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getHtmlContentsWithSplit2Segment2();
-        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements, permission);
         val expected = Arrays.asList("Part0", "Part1", "Part2", "Part3");
         assertResult(expected, result);
     }
@@ -177,9 +177,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getMultipartContentsWithSplit1Segment1();
-        val result = mailContentBuilder.buildTextContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildTextContents(contents, parts, replacements, permission);
         val expected = Collections.singletonList("Part3Part4Part5");
         assertResult(expected, result);
     }
@@ -189,9 +189,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getMultipartContentsWithSplit1Segment2();
-        val result = mailContentBuilder.buildTextContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildTextContents(contents, parts, replacements, permission);
         val expected = Arrays.asList("Part4Part5", "Part6Part7");
         assertResult(expected, result);
     }
@@ -201,9 +201,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getMultipartContentsWithSplit2Segment1();
-        val result = mailContentBuilder.buildTextContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildTextContents(contents, parts, replacements, permission);
         val expected = Arrays.asList("Part4Part5", "Part6Part7");
         assertResult(expected, result);
     }
@@ -213,9 +213,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getMultipartContentsWithSplit2Segment2();
-        val result = mailContentBuilder.buildTextContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildTextContents(contents, parts, replacements, permission);
         val expected = Arrays.asList("Part4", "Part5", "Part6", "Part7");
         assertResult(expected, result);
     }
@@ -225,9 +225,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getTextContentsWithSplit1Segment1();
-        val result = mailContentBuilder.buildTextContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildTextContents(contents, parts, replacements, permission);
         val expected = Collections.singletonList("Part3Part4Part5");
         assertResult(expected, result);
     }
@@ -237,9 +237,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getTextContentsWithSplit1Segment2();
-        val result = mailContentBuilder.buildTextContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildTextContents(contents, parts, replacements, permission);
         val expected = Arrays.asList("Part4Part5", "Part6Part7");
         assertResult(expected, result);
     }
@@ -249,9 +249,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getTextContentsWithSplit2Segment1();
-        val result = mailContentBuilder.buildTextContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildTextContents(contents, parts, replacements, permission);
         val expected = Arrays.asList("Part4Part5", "Part6Part7");
         assertResult(expected, result);
     }
@@ -261,9 +261,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getTextContentsWithSplit2Segment2();
-        val result = mailContentBuilder.buildTextContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildTextContents(contents, parts, replacements, permission);
         val expected = Arrays.asList("Part4", "Part5", "Part6", "Part7");
         assertResult(expected, result);
     }
@@ -273,9 +273,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getHtmlContentsWithSplit1Segment1();
-        val result = mailContentBuilder.buildTextContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildTextContents(contents, parts, replacements, permission);
         val expected = new ArrayList<String>();
         assertResult(expected, result);
     }
@@ -285,9 +285,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getHtmlContentsWithSplit1Segment2();
-        val result = mailContentBuilder.buildTextContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildTextContents(contents, parts, replacements, permission);
         val expected = new ArrayList<String>();
         assertResult(expected, result);
     }
@@ -297,9 +297,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getHtmlContentsWithSplit2Segment1();
-        val result = mailContentBuilder.buildTextContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildTextContents(contents, parts, replacements, permission);
         val expected = new ArrayList<String>();
         assertResult(expected, result);
     }
@@ -309,9 +309,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getHtmlContentsWithSplit2Segment2();
-        val result = mailContentBuilder.buildTextContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildTextContents(contents, parts, replacements, permission);
         val expected = new ArrayList<String>();
         assertResult(expected, result);
     }
@@ -321,9 +321,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val subjects = FakeData.getSubjectsWithSingleCondition();
-        val result = mailContentBuilder.buildSubjectContents(subjects, parts, replacements);
+        val result = mailContentBuilder.buildSubjectContents(subjects, parts, replacements, permission);
         val expected = Arrays.asList("Part0", "Part1", "Part2");
         assertResult(expected, result);
     }
@@ -333,9 +333,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getParts();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val subjects = FakeData.getSubjectsWithMultiCondition();
-        val result = mailContentBuilder.buildSubjectContents(subjects, parts, replacements);
+        val result = mailContentBuilder.buildSubjectContents(subjects, parts, replacements, permission);
         val expected = Arrays.asList("Part0", "Part1", "Part2", "Part3", "Part4", "Part5");
         assertResult(expected, result);
     }
@@ -345,10 +345,10 @@ class MailContentBuilderTest {
         val parts = FakeData.getPartsWithMuAttributes();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getHtmlContentsWithSplit2Segment2();
-        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements);
-        val expected = Arrays.asList("Part0:###_ATTRIBUTE0_###", "Part1:%%email%%", "Part2:%%name%%${line_number}", "Part3:%%easyId%%,%%emagazine_unsubscribe_url%%");
+        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements, permission);
+        val expected = Arrays.asList("Part0:###_ATTRIBUTE0_###", "Part1:%%email%%", "Part2:%%name%%${line_number}", "Part3:%%easyId%%,'%%emagazine_unsubscribe_url%%','https://emagazine.rakuten.co.jp/q?u=rakuetn24&k=###_ATTRIBUTE6_###&scid=rm_1234567'");
         assertResult(expected, result);
     }
 
@@ -357,9 +357,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getPartsWithMuAttributes();
         val columns = FakeData.getColumns();
         val permission = PermissionType.EMAGAZINE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getTextContentsWithSplit2Segment2();
-        val result = mailContentBuilder.buildTextContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildTextContents(contents, parts, replacements, permission);
         val expected = Arrays.asList("Part4:%%userId%%,${identifier}", "Part5:%%addA%%,%%addB%%", "Part6:%%cms:test-attrA%%,%%cms:test-attrB%%", "Part7:###_ATTRI%%email%%BUTE22_###");
         assertResult(expected, result);
     }
@@ -369,9 +369,9 @@ class MailContentBuilderTest {
         val parts = FakeData.getPartsWithMuAttributes();
         val columns = FakeData.getColumns();
         val permission = PermissionType.NONE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getMultipartContentsWithSplit1Segment1();
-        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements);
+        val result = mailContentBuilder.buildHtmlContents(contents, parts, replacements, permission);
         val expected = Collections.singletonList("Part0:###_ATTRIBUTE0_###Part1:%%email%%Part2:%%name%%${line_number}");
         assertResult(expected, result);
     }
@@ -381,10 +381,10 @@ class MailContentBuilderTest {
         val parts = FakeData.getPartsWithMuAttributes();
         val columns = FakeData.getColumns();
         val permission = PermissionType.NONE;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val contents = FakeData.getMultipartContentsWithSplit1Segment1();
-        val result = mailContentBuilder.buildTextContents(contents, parts, replacements);
-        val expected = Collections.singletonList("Part3:%%easyId%%,###_ATTRIBUTE6_###Part4:%%userId%%,${identifier}Part5:%%addA%%,%%addB%%");
+        val result = mailContentBuilder.buildTextContents(contents, parts, replacements, permission);
+        val expected = Collections.singletonList("Part3:%%easyId%%,'https://emagazine.rakuten.co.jp/nq?k=###_ATTRIBUTE6_###','https://emagazine.rakuten.co.jp/q?u=rakuetn24&k=###_ATTRIBUTE6_###&scid=rm_1234567'Part4:%%userId%%,${identifier}Part5:%%addA%%,%%addB%%");
         assertResult(expected, result);
     }
 
@@ -393,10 +393,10 @@ class MailContentBuilderTest {
         val parts = FakeData.getPartsWithMuAttributes();
         val columns = FakeData.getColumns();
         val permission = PermissionType.RMAIL;
-        val replacements = mailContentBuilder.buildReplacements(columns, permission);
+        val replacements = mailContentBuilder.buildReplacements(columns);
         val subjects = FakeData.getSubjectsWithMultiCondition();
-        val result = mailContentBuilder.buildSubjectContents(subjects, parts, replacements);
-        val expected = Arrays.asList("Part0:###_ATTRIBUTE0_###", "Part1:%%email%%", "Part2:%%name%%${line_number}", "Part3:%%easyId%%,%%rmail_unsubscribe_url%%", "Part4:%%userId%%,${identifier}", "Part5:%%addA%%,%%addB%%");
+        val result = mailContentBuilder.buildSubjectContents(subjects, parts, replacements, permission);
+        val expected = Arrays.asList("Part0:###_ATTRIBUTE0_###", "Part1:%%email%%", "Part2:%%name%%${line_number}", "Part3:%%easyId%%,'https://emagazine.rakuten.co.jp/nq?k=###_ATTRIBUTE6_###','%%rmail_unsubscribe_url%%'", "Part4:%%userId%%,${identifier}", "Part5:%%addA%%,%%addB%%");
         assertResult(expected, result);
     }
 }

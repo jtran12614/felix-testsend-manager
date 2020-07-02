@@ -89,8 +89,8 @@ class FakeData {
                 "Part0:###_ATTRIBUTE0_###",                      // No Match Replacement
                 "Part1:###_ATTRIBUTE2_###",                      // Email Column Attributes
                 "Part2:###_ATTRIBUTE3_######_ATTRIBUTE1_###",    // Name Column Attributes
-                "Part3:###_ATTRIBUTE4_###,###_ATTRIBUTE6_###",   // EasyId/Identifier Column Attributes
-                "Part4:###_ATTRIBUTE8_###,###_ATTRIBUTE7_###",   // UserId/UnsubscribeLink Column Attributes
+                "Part3:###_ATTRIBUTE4_###,'https://emagazine.rakuten.co.jp/nq?k=###_ATTRIBUTE6_###','https://emagazine.rakuten.co.jp/q?u=rakuetn24&k=###_ATTRIBUTE6_###&scid=rm_1234567'",   // EasyId/Unsubscribe Column Attributes
+                "Part4:###_ATTRIBUTE8_###,###_ATTRIBUTE7_###",   // UserId/Identifier Column Attributes
                 "Part5:###_ATTRIBUTE11_###,###_ATTRIBUTE12_###", // Additional11/12 Column Attributes
                 "Part6:###_ATTRIBUTE21_###,###_ATTRIBUTE22_###", // Personalizer21/22 Column Attributes
                 "Part7:###_ATTRI###_ATTRIBUTE2_###BUTE22_###"    // Email Column Attributes

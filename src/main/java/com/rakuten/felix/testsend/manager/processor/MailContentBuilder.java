@@ -20,13 +20,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
+// Will be removed when migrating JP -> JM. Job builder will provide these content.
 public class MailContentBuilder {
     private static final Integer MU_ATTRIBUTE_INDEX_LINE_NUMBER = 1;
-    private static final Integer MU_ATTRIBUTE_INDEX_UNSUBSCRIBE = 6;
     private static final Integer MU_ATTRIBUTE_INDEX_IDENTIFIER  = 7;
     private static final String MU_ATTRIBUTE_LINE_NUMBER_TAG = "\\$\\{line_number}";
-    private static final String MU_ATTRIBUTE_EMAGAZINE_UNSUBSCRIBE_TAG = "%%emagazine_unsubscribe_url%%";
-    private static final String MU_ATTRIBUTE_RMAIL_UNSUBSCRIBE_TAG = "%%rmail_unsubscribe_url%%";
+    private static final String EMAGAZINE_UNSUBSCRIBE_TAG = "%%emagazine_unsubscribe_url%%";
+    private static final String RMAIL_UNSUBSCRIBE_TAG = "%%rmail_unsubscribe_url%%";
+    private static final String EMAGAZINE_UNSUBSCRIBE_URL = "https://emagazine\\.rakuten\\.co\\.jp/nq\\?k=###_ATTRIBUTE6_###";
+    private static final String RMAIL_UNSUBSCRIBE_URL = "https://emagazine\\.rakuten\\.co\\.jp/q\\?u=(\\d|\\w){1,20}&k=###_ATTRIBUTE6_###&scid=rm_\\d{1,20}";
     private static final String MU_ATTRIBUTE_IDENTIFIER_TAG = "\\$\\{identifier}";
     private static final java.util.regex.Pattern MU_ATTRIBUTE = java.util.regex.Pattern.compile("###_ATTRIBUTE(\\d+)_###");
 
@@ -38,10 +40,11 @@ public class MailContentBuilder {
      * @param parts    Parts.
      * @return Contents of string
      */
-    public List<String> buildSubjectContents(List<Subject> subjects, List<String> parts, Map<Integer, String> replacements) {
+    public List<String> buildSubjectContents(List<Subject> subjects, List<String> parts, Map<Integer, String> replacements, PermissionType permissionType) {
         return subjects.stream()
                        .map(Subject::getPartIds)
                        .flatMap(partIds -> partIds.stream().map(parts::get))
+                       .map(revertUnsubscribeTag(permissionType))
                        .map(revertMuAttribute(replacements))
                        .collect(Collectors.toList());
     }
@@ -53,13 +56,13 @@ public class MailContentBuilder {
      * @param parts    Parts.
      * @return Contents of string
      */
-    public List<String> buildHtmlContents(List<Content> contents, List<String> parts, Map<Integer, String> replacements) {
+    public List<String> buildHtmlContents(List<Content> contents, List<String> parts, Map<Integer, String> replacements, PermissionType permissionType) {
         return contents.stream()
                        .filter(Content::getHtml)
                        .findFirst()
                        .map(Content::getPatterns)
                        .map(mapToMergedContents(parts))
-                       .map(revertMuAttributes(replacements))
+                       .map(revertMuAttributesAndUnsubscribeTag(replacements, permissionType))
                        .orElse(Collections.emptyList());
     }
 
@@ -70,13 +73,13 @@ public class MailContentBuilder {
      * @param parts    Parts.
      * @return Contents of string
      */
-    public List<String> buildTextContents(List<Content> contents, List<String> parts, Map<Integer, String> replacements) {
+    public List<String> buildTextContents(List<Content> contents, List<String> parts, Map<Integer, String> replacements, PermissionType permissionType) {
         return contents.stream()
                        .filter(it -> !it.getHtml())
                        .findFirst()
                        .map(Content::getPatterns)
                        .map(mapToMergedContents(parts))
-                       .map(revertMuAttributes(replacements))
+                       .map(revertMuAttributesAndUnsubscribeTag(replacements, permissionType))
                        .orElse(Collections.emptyList());
     }
 
@@ -93,7 +96,7 @@ public class MailContentBuilder {
                                  .collect(Collectors.joining(""));
     }
 
-    public Map<Integer, String> buildReplacements(Columns columns, PermissionType permissionType) {
+    public Map<Integer, String> buildReplacements(Columns columns) {
         val replacements = new HashMap<Integer, String>();
         Optional.ofNullable(columns.getEmail()).ifPresent(putAttributes(replacements));
         Optional.ofNullable(columns.getEasyId()).ifPresent(putAttributes(replacements));
@@ -103,17 +106,6 @@ public class MailContentBuilder {
         Optional.ofNullable(columns.getPersonalizer()).ifPresent(it -> it.forEach(putPersonalizeAttributes(replacements)));
         replacements.putIfAbsent(MU_ATTRIBUTE_INDEX_LINE_NUMBER, MU_ATTRIBUTE_LINE_NUMBER_TAG);
         replacements.putIfAbsent(MU_ATTRIBUTE_INDEX_IDENTIFIER, MU_ATTRIBUTE_IDENTIFIER_TAG);
-        switch (permissionType) {
-            case EMAGAZINE:
-                replacements.putIfAbsent(MU_ATTRIBUTE_INDEX_UNSUBSCRIBE, MU_ATTRIBUTE_EMAGAZINE_UNSUBSCRIBE_TAG);
-                break;
-            case RMAIL:
-                replacements.putIfAbsent(MU_ATTRIBUTE_INDEX_UNSUBSCRIBE, MU_ATTRIBUTE_RMAIL_UNSUBSCRIBE_TAG);
-                break;
-            default:
-                // NO replacement
-                break;
-        }
         return replacements;
     }
 
@@ -125,8 +117,9 @@ public class MailContentBuilder {
         return it -> replacements.putIfAbsent(it.getAttributeIndex(), "%%" + it.getKeyword() + "%%");
     }
 
-    private Function<List<String>, List<String>> revertMuAttributes(Map<Integer, String> replacements) {
+    private Function<List<String>, List<String>> revertMuAttributesAndUnsubscribeTag(Map<Integer, String> replacements, PermissionType permissionType) {
         return values -> values.stream()
+                               .map(revertUnsubscribeTag(permissionType))
                                .map(revertMuAttribute(replacements))
                                .collect(Collectors.toList());
     }
@@ -141,6 +134,19 @@ public class MailContentBuilder {
             }
             matcher.appendTail(output);
             return output.toString();
+        };
+    }
+
+    private Function<String, String> revertUnsubscribeTag(PermissionType permissionType) {
+        return input -> {
+            switch (permissionType) {
+                case EMAGAZINE:
+                    return input.replaceAll(EMAGAZINE_UNSUBSCRIBE_URL, EMAGAZINE_UNSUBSCRIBE_TAG);
+                case RMAIL:
+                    return input.replaceAll(RMAIL_UNSUBSCRIBE_URL, RMAIL_UNSUBSCRIBE_TAG);
+                default:
+                    return input;
+            }
         };
     }
 }
