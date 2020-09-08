@@ -12,7 +12,7 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class JobManagerPayload {
     String namespace;
-    Info info;
+    Map<String, Object> info;
     Map<String, Object> replyHeader;
     String replyDestination;
     List<Object> workflow;

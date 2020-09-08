@@ -42,6 +42,8 @@ public class Processor {
     private final MessageSender messageSender;
     private final ReplyConfig replyConfig;
 
+    private static final String LOG_ID = "logId";
+
     /**
      * Process for kicking mail test send.
      *
@@ -71,10 +73,10 @@ public class Processor {
     public TestSendHistory processKickingTestSend(KickTestSendRequest request) throws IOException, ValidationException {
         JobManagerPayload jobManagerPayload = objectMapperWrapper.deserializeToObject(request.getJob().toJSONString(), JobManagerPayload.class);
         Validator.validate(jobManagerPayload);
-
         val info = Info.builder().user(request.getUser()).contents(request.getContents()).recipients(request.getRecipients()).build();
         val history = dataStore.createHistory(request.getBundleId(), request.getBundleType(), null, info);
-        val replyHeader = Header.buildWithContentType(jobManagerPayload.getInfo().getLogId(), history.getId(), replyConfig.getJobStatusHandlingChannel());
+        val logId = Optional.ofNullable(jobManagerPayload.getInfo().get(LOG_ID)).map(Object::toString).orElse(null);
+        val replyHeader = Header.buildWithContentType(logId, history.getId(), replyConfig.getJobStatusHandlingChannel());
         jobManagerPayload = jobManagerPayload.toBuilder().replyHeader(replyHeader).replyDestination(replyConfig.getJobStatusHandlingChannel()).build();
         messageSender.sendJobManager(replyHeader, jobManagerPayload);
         return history;

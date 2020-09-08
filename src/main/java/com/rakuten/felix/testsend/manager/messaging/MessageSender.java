@@ -28,6 +28,8 @@ public class MessageSender {
     private final ObjectMapperWrapper objectMapperWrapper;
     private final Clock clock;
 
+    private static final String CAMPAIGN_ID = "campaignId";
+
     /**
      * Initialize service.
      *
@@ -107,16 +109,16 @@ public class MessageSender {
     /**
      * Request start directly to Job-Manager.
      *
-     * @param header  Header to send
+     * @param header            Header to send
      * @param jobManagerPayload Job start payload
-     * @throws IOException When can't serialize or send the kick message.
      */
-    public void sendJobManager(Map<String, Object> header, JobManagerPayload jobManagerPayload) throws IOException {
-        log.info("Send job manager lineTask: Started: CampaignId: {}", jobManagerPayload.getInfo().getCampaignId());
+    public void sendJobManager(Map<String, Object> header, JobManagerPayload jobManagerPayload) {
+        val campaignId = Optional.ofNullable(jobManagerPayload.getInfo().get(CAMPAIGN_ID)).map(Object::toString).orElse(null);
+        log.info("Send job manager: Started: CampaignId: {}", campaignId);
         val payload = objectMapperWrapper.serializeToBytes(jobManagerPayload);
         val message = MessageBuilder.withPayload(payload)
                                     .copyHeaders(header)
                                     .build();
-        sendMessage(outputChannels.sendJobManager(), message, "Could not send line job");
+        sendMessage(outputChannels.sendJobManager(), message, "Could not send job");
     }
 }

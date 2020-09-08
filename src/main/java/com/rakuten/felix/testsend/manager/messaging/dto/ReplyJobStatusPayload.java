@@ -2,11 +2,11 @@ package com.rakuten.felix.testsend.manager.messaging.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.rakuten.felix.testsend.manager.webclients.dto.Info;
 import lombok.Builder;
 import lombok.Value;
 
 import javax.validation.constraints.NotNull;
+import java.util.Map;
 
 @Value
 @Builder
@@ -17,7 +17,7 @@ public class ReplyJobStatusPayload {
     private Long id;
 
     @NotNull
-    private Info info;
+    private Map<String, Object> info;
 
     @NotNull
     private JobStatus status;
