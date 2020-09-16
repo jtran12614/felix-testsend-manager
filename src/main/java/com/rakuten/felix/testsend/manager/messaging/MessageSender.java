@@ -1,8 +1,8 @@
 package com.rakuten.felix.testsend.manager.messaging;
 
+import com.rakuten.felix.jobmanager.dto.core.JobStartPayload;
 import com.rakuten.felix.testsend.manager.messaging.dto.Notification;
 import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
-import com.rakuten.felix.testsend.manager.webclients.dto.JobManagerPayload;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,6 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -112,7 +111,7 @@ public class MessageSender {
      * @param header            Header to send
      * @param jobManagerPayload Job start payload
      */
-    public void sendJobManager(Map<String, Object> header, JobManagerPayload jobManagerPayload) {
+    public void sendJobManager(Map<String, Object> header, JobStartPayload jobManagerPayload) {
         val campaignId = Optional.ofNullable(jobManagerPayload.getInfo().get(CAMPAIGN_ID)).map(Object::toString).orElse(null);
         log.info("Send job manager: Started: CampaignId: {}", campaignId);
         val payload = objectMapperWrapper.serializeToBytes(jobManagerPayload);

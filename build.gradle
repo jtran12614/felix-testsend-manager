@@ -38,6 +38,7 @@ ext {
     //Logback
     logbackLogstashVersion = '5.3'
     logbackClassicVersion = '1.2.3'
+    jobManagerDtoVersion = '1.0.1'
 }
 
 group = 'com.rakuten.felix'
@@ -57,6 +58,7 @@ lombok {
 repositories {
     mavenCentral()
     maven { url = 'https://repo.spring.io/libs-milestone' }
+    maven { url = 'http://dev-qcmdaci101z.dev.jp.local:8082/repository/felix/' }
 }
 
 dependencies {
@@ -79,6 +81,9 @@ dependencies {
     // Logback
     compile "net.logstash.logback:logstash-logback-encoder:${logbackLogstashVersion}"
     compile "ch.qos.logback:logback-classic:${logbackClassicVersion}"
+
+    // job-manager dto
+    compile "com.rakuten.felix:felix-job-manager-dto:${jobManagerDtoVersion}"
 }
 
 dependencyManagement {

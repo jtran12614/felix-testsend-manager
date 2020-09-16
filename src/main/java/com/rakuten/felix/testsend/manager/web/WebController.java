@@ -82,6 +82,7 @@ public class WebController {
     @PostMapping(value = "/kick-mail-test-send")
     public TestSendResponse kickTestSend(@RequestBody @Valid KickMailTestSendRequest request)
             throws ValidationException {
+
         log.info("Kick test MAIL send started: bundleId={}, bundleType={}", request.getBundleId(), request.getBundleType());
         log.debug("RequestBody={}", request);
         val history = processor.processKickingTestSend(request);

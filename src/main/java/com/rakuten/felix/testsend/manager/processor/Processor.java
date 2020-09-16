@@ -1,5 +1,8 @@
 package com.rakuten.felix.testsend.manager.processor;
 
+import com.rakuten.felix.jobmanager.dto.core.JobStartPayload;
+import com.rakuten.felix.jobmanager.dto.core.JobStatus;
+import com.rakuten.felix.jobmanager.dto.core.ReplyJobInfoPayload;
 import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
 import com.rakuten.felix.testsend.manager.datastore.HistoryNotFoundException;
 import com.rakuten.felix.testsend.manager.datastore.entities.Info;
@@ -8,15 +11,12 @@ import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.messaging.MessageSender;
 import com.rakuten.felix.testsend.manager.messaging.NotificationService;
 import com.rakuten.felix.testsend.manager.messaging.dto.Header;
-import com.rakuten.felix.testsend.manager.messaging.dto.JobStatus;
-import com.rakuten.felix.testsend.manager.messaging.dto.ReplyJobStatusPayload;
 import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
 import com.rakuten.felix.testsend.manager.validator.ValidationException;
 import com.rakuten.felix.testsend.manager.validator.Validator;
 import com.rakuten.felix.testsend.manager.web.dto.KickMailTestSendRequest;
 import com.rakuten.felix.testsend.manager.web.dto.KickTestSendRequest;
 import com.rakuten.felix.testsend.manager.webclients.CampaignSchedulerService;
-import com.rakuten.felix.testsend.manager.webclients.dto.JobManagerPayload;
 import com.rakuten.felix.testsend.manager.webclients.dto.MailJob;
 import com.rakuten.felix.testsend.manager.webclients.dto.User;
 import lombok.AllArgsConstructor;
@@ -71,7 +71,7 @@ public class Processor {
      * @param request Kick test send request.
      */
     public TestSendHistory processKickingTestSend(KickTestSendRequest request) throws IOException, ValidationException {
-        JobManagerPayload jobManagerPayload = objectMapperWrapper.deserializeToObject(request.getJob().toJSONString(), JobManagerPayload.class);
+        JobStartPayload jobManagerPayload = objectMapperWrapper.deserializeToObject(request.getJob().toJSONString(), JobStartPayload.class);
         Validator.validate(jobManagerPayload);
         val info = Info.builder().user(request.getUser()).contents(request.getContents()).recipients(request.getRecipients()).build();
         val history = dataStore.createHistory(request.getBundleId(), request.getBundleType(), null, info);
@@ -187,13 +187,12 @@ public class Processor {
      * @param header  Header.
      */
     public void handleReplyMessage(Header header, byte[] payload) throws ValidationException {
-        val jobStatus = objectMapperWrapper.deserializeToObject(payload, ReplyJobStatusPayload.class);
+        val jobStatus = objectMapperWrapper.deserializeToObject(payload, ReplyJobInfoPayload.class);
         Validator.validate(jobStatus);
-
         if (jobStatus.getStatus() == JobStatus.FINISHED) {
             log.info("Job finished:");
             dataStore.updateStatusToFinishedByTestId(header.getTestId());
-        } else if(jobStatus.getStatus() == JobStatus.PROCESSING) {
+        } else if (jobStatus.getStatus() == JobStatus.PROCESSING) {
             log.info("Job processing:");
         } else {
             log.info("Job failed:");
