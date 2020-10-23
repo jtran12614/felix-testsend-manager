@@ -6,7 +6,7 @@ ansible_python_interpreter: "/usr/bin/python"
 #----------------------------------------------------------------------------
 # Common Bitbucket Felix Project SSH URL
 #----------------------------------------------------------------------------
-felix_git_root: "ssh://git@git.dev.db.rakuten.co.jp:7999/felix"
+felix_git_root: "ssh://git@git.rakuten-it.com:7999/felix"
 
 #----------------------------------------------------------------------------
 # Repository for Ansible Common
