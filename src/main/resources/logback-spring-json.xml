@@ -22,7 +22,8 @@
                         "level": "%level",
                         "thread": "%thread",
                         "logger": "%logger",
-                        "message": "%message"
+                        "message": "%message",
+                        "exception": "%exception"
                         }
                     </pattern>
                 </pattern>
