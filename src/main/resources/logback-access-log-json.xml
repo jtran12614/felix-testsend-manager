@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<included>
+    <appender name="ACCESS_LOG_JSON_MONITORING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}.access-log.json</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>${LOG_FILE}.access-log.json.%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- each file should be at most 10MB, keep 3 days worth of history, but at most 200MB -->
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>3</maxHistory>
+            <totalSizeCap>200MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <pattern>
+                    <pattern>
+                        {
+                        "level": "%level",
+                        "thread": "%thread",
+                        "logger": "%logger",
+                        "message": "%message",
+                        "exception": "%exception"
+                        }
+                    </pattern>
+                </pattern>
+                <timestamp/>
+            </providers>
+        </encoder>
+    </appender>
+
+    <appender name="ASYNC_ACCESS_LOG_MONITORING" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+        <!-- Wait strategy: https://github.com/logstash/logstash-logback-encoder#wait-strategy -->
+        <waitStrategyType>sleeping</waitStrategyType>
+        <appender-ref ref="ACCESS_LOG_JSON_MONITORING" />
+    </appender>
+
+</included>

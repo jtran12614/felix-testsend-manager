@@ -5,10 +5,12 @@ server:
     protocol-header: "x-forwarded-proto"
 
 logging:
-  file: "{{app_log_file}}"
+  file.name: "{{app_log_file}}"
   level.com.rakuten.felix: "{{app_log_level}}"
 
 spring:
+  profiles:
+    active: "{{env}}"
   pid:
     file: "app.pid"
     fail-on-write-error: true
@@ -57,7 +59,7 @@ spring:
     url: "{{felix_persistence['url']}}"
     username: "{{felix_persistence['user']}}"
     password: "{{felix_persistence['password']}}"
-    driver-class-name: "com.mysql.jdbc.Driver"
+    driver-class-name: "com.mysql.cj.jdbc.Driver"
     hikari:
       minimum-idle: 1
       maximum-pool-size: 3
@@ -66,6 +68,7 @@ spring:
 
   jpa:
     show-sql: "{{felix_persistence['show_jpa_query']}}"
+    database-platform: "org.hibernate.dialect.MySQL5Dialect"
 
   boot.admin.client:
     enabled: true
@@ -74,13 +77,28 @@ spring:
     password: "{{spring_admin['password']}}"
 
 management:
-  metrics.export.prometheus.enabled: true
-  endpoint.health.show-details: "ALWAYS"
+  trace.http.include: "request-headers,authorization-header,remote-address"
+  security.enabled: false
+  metrics:
+    export.prometheus.enabled: true
+    tags:
+      application: "${spring.application.name}"
+      group: "{{env}}"
+
+  endpoint:
+    health.show-details: "ALWAYS"
+    logfile.external-file: {{app_log_file}}
   endpoints.web:
     exposure.include: "*"
     base-path: "/"
+    path-mapping.httptrace: trace
+    path-mapping.threaddump: dump
 
 com.rakuten.felix.testsend-manager:
+  actuator.trace:
+    capacity: 200
+    apis:
+      - /testsend-manager
   proxy:
     host: "{{felix_proxy['default']['host']}}"
     port: "{{felix_proxy['default']['port']}}"

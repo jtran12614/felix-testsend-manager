@@ -1,7 +1,5 @@
 package com.rakuten.felix.testsend.manager;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
 import com.rakuten.felix.testsend.manager.datastore.TestSendHistoryRepository;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
@@ -17,7 +15,10 @@ import com.rakuten.felix.testsend.manager.messaging.dto.KickedMessage;
 import com.rakuten.felix.testsend.manager.messaging.dto.Notification;
 import com.rakuten.felix.testsend.manager.processor.MailContentBuilder;
 import com.rakuten.felix.testsend.manager.processor.Processor;
-import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.web.client.RestTemplate;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.util.Optional;
 
@@ -70,6 +72,8 @@ class MessageListenerTest {
     @Mock
     private RestTemplate restTemplate;
 
+    private final ObjectMapper mapper = new ObjectMapper();
+
 
     @BeforeEach
     void setUp() {
@@ -91,7 +95,7 @@ class MessageListenerTest {
                 return sendJobManager;
             }
         };
-        val messageSender = new MessageSender(outputChannels, new ObjectMapperWrapper(), clock);
+        val messageSender = new MessageSender(outputChannels, mapper, clock);
         val errorHandler = new ErrorHandler(messageSender);
         val notificationService = new NotificationService(NOTIFICATION_URL,
                 NOTIFICATION_SUCCESS_TITLE,
@@ -99,8 +103,8 @@ class MessageListenerTest {
                 NOTIFICATION_ERROR_TITLE,
                 NOTIFICATION_ERROR_MESSAGE,
                 messageSender);
-        val processor = new Processor(dataStore, new MailContentBuilder(), notificationService, null, new ObjectMapperWrapper(), messageSender, null);
-        messageListener = new MessageListener(new ObjectMapperWrapper(), errorHandler, processor);
+        val processor = new Processor(dataStore, new MailContentBuilder(), notificationService, null, mapper, messageSender, null);
+        messageListener = new MessageListener(mapper, errorHandler, processor);
     }
 
     @Test
@@ -267,8 +271,7 @@ class MessageListenerTest {
 
     @Test
     void deserializeToObject_Exception() {
-        ObjectMapperWrapper objectMapperWrapper = new ObjectMapperWrapper();
-        val mailTestSendPayload = objectMapperWrapper.serializeToBytes(new TestSendHistory().toString());
-        assertThrows(IllegalArgumentException.class, () -> objectMapperWrapper.deserializeToObject(mailTestSendPayload, KickedMessage.class));
+        val mailTestSendPayload = new TestSendHistory().toString().getBytes(StandardCharsets.UTF_8);
+        assertThrows(JsonParseException.class, () -> mapper.readValue(mailTestSendPayload, KickedMessage.class));
     }
 }

@@ -1,14 +1,15 @@
 package com.rakuten.felix.testsend.manager.webclients.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.rakuten.felix.testsend.manager.serde.UnixTimeStampDeserializer;
 import com.rakuten.felix.testsend.manager.serde.UnixTimeStampSerializer;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Value;
-import org.json.simple.JSONObject;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Value
 public class RegisterCampaignRequest {
@@ -16,5 +17,5 @@ public class RegisterCampaignRequest {
     @JsonSerialize(contentUsing = UnixTimeStampSerializer.class)
     List<ZonedDateTime> scheduleDates;
 
-    JSONObject mailJob;
+    Map<String, Object> mailJob;
 }

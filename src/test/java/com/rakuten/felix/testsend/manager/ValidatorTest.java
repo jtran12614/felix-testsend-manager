@@ -4,8 +4,9 @@ import com.rakuten.felix.testsend.manager.validator.ValidationException;
 import com.rakuten.felix.testsend.manager.validator.Validator;
 import com.rakuten.felix.testsend.manager.web.dto.KickMailTestSendRequest;
 import lombok.val;
-import org.json.simple.JSONObject;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -19,7 +20,7 @@ class ValidatorTest {
 
     @Test
     void testValidateMin() {
-        val objToValidate = new KickMailTestSendRequest(-1, 1, new JSONObject(), null);
+        val objToValidate = new KickMailTestSendRequest(-1, 1, new HashMap<>(), null);
         assertThrows(ValidationException.class, () -> Validator.validate(objToValidate));
     }
 }

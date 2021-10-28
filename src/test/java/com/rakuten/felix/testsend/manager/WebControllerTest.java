@@ -1,6 +1,5 @@
 package com.rakuten.felix.testsend.manager;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
 import com.rakuten.felix.testsend.manager.datastore.TestSendHistoryRepository;
 import com.rakuten.felix.testsend.manager.datastore.entities.MailContent;
@@ -8,7 +7,6 @@ import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus;
 import com.rakuten.felix.testsend.manager.processor.MailContentBuilder;
 import com.rakuten.felix.testsend.manager.processor.Processor;
-import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
 import com.rakuten.felix.testsend.manager.validator.ValidationException;
 import com.rakuten.felix.testsend.manager.web.WebController;
 import com.rakuten.felix.testsend.manager.web.dto.HistoryDto;
@@ -16,8 +14,9 @@ import com.rakuten.felix.testsend.manager.web.dto.KickMailTestSendRequest;
 import com.rakuten.felix.testsend.manager.webclients.CampaignSchedulerService;
 import com.rakuten.felix.testsend.manager.webclients.dto.RegisterCampaignResponse;
 import com.rakuten.felix.testsend.manager.webclients.dto.User;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
-import org.json.simple.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -36,6 +35,7 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -66,7 +66,7 @@ class WebControllerTest {
         initMocks(this);
         val dataStore = new DataStoreService(repository, clock);
         val schedulerService = new CampaignSchedulerService(SCHEDULER_REGISTER_AND_GET_URL, restTemplate);
-        val processor = new Processor(dataStore, new MailContentBuilder(), null, schedulerService, new ObjectMapperWrapper(), null, null);
+        val processor = new Processor(dataStore, new MailContentBuilder(), null, schedulerService, mapper, null, null);
 
         controller = new WebController(dataStore, processor);
     }
@@ -145,7 +145,7 @@ class WebControllerTest {
         val bundleType = 0;
         val jdkId = 123;
         val mailJob = FakeData.getValidMailJob();
-        val mailJobJsonObj = mapper.readValue(mapper.writeValueAsString(mailJob), JSONObject.class);
+        Map<String, Object> mailJobJsonObj = mapper.readValue(mapper.writeValueAsString(mailJob), Map.class);
         val started = ZonedDateTime.now(ZoneId.systemDefault());
         val user = new User(1, "name", "mail-address");
         // Response
@@ -195,7 +195,7 @@ class WebControllerTest {
         val bundleType = 1;
         val jdkId = 123;
         val mailJob = FakeData.getValidMailJob();
-        val mailJobJsonObj = mapper.readValue(mapper.writeValueAsString(mailJob), JSONObject.class);
+        Map<String, Object> mailJobJsonObj = mapper.readValue(mapper.writeValueAsString(mailJob), Map.class);
         val started = ZonedDateTime.now(ZoneId.systemDefault());
         val user = new User(1, "name", "mail-address");
         // Response
@@ -245,7 +245,7 @@ class WebControllerTest {
     void kickMailTestSend_registerResponseValidationFailed() throws Exception {
         // Setup
         val mailJob = FakeData.getValidMailJob();
-        val mailJobJsonObj = mapper.readValue(mapper.writeValueAsString(mailJob), JSONObject.class);
+        Map<String, Object> mailJobJsonObj = mapper.readValue(mapper.writeValueAsString(mailJob), Map.class);
         val started = ZonedDateTime.now(ZoneId.systemDefault());
         val user = new User(1, "name", "mail-address");
         // Response

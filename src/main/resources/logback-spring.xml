@@ -5,10 +5,16 @@
 
     <!-- Json -->
     <include resource="logback-spring-json.xml" />
+    <include resource="logback-access-log-json.xml" />
 
     <root level="INFO">
         <appender-ref ref="JSON_MONITORING" />
     </root>
+
+    <logger name="com.rakuten.felix.common.actuator" additivity="false">
+        <level value="info"/>
+        <appender-ref ref="ASYNC_ACCESS_LOG_MONITORING"/>
+    </logger>
 
     <jmxConfigurator/>
 </configuration>

@@ -6,9 +6,11 @@ import com.rakuten.felix.testsend.manager.messaging.dto.ErrorMessage;
 import com.rakuten.felix.testsend.manager.messaging.dto.FinishedMessage;
 import com.rakuten.felix.testsend.manager.messaging.dto.Header;
 import com.rakuten.felix.testsend.manager.processor.Processor;
-import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
 import com.rakuten.felix.testsend.manager.validator.ValidationException;
 import com.rakuten.felix.testsend.manager.validator.Validator;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.cloud.stream.annotation.EnableBinding;
@@ -21,25 +23,12 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 @Service
 @EnableBinding(InputChannels.class)
+@RequiredArgsConstructor
 public class MessageListener {
-    private final ErrorHandler errorHandler;
-    private final ObjectMapperWrapper objectMapper;
-    private final Processor processor;
 
-    /**
-     * Initialize the service.
-     *
-     * @param objectMapper Object mapper
-     * @param errorHandler Error handler.
-     * @param processor    Processor.
-     */
-    public MessageListener(ObjectMapperWrapper objectMapper,
-                           ErrorHandler errorHandler,
-                           Processor processor) {
-        this.objectMapper = objectMapper;
-        this.errorHandler = errorHandler;
-        this.processor = processor;
-    }
+    private final ObjectMapper objectMapper;
+    private final ErrorHandler errorHandler;
+    private final Processor    processor;
 
     private void logDebug(String inputChannelName, byte[] payload) {
         log.debug("[{}]: Message received: payload={}", inputChannelName, new String(payload, StandardCharsets.UTF_8));
@@ -54,7 +43,7 @@ public class MessageListener {
     public void testSendFinished(byte[] payload) {
         try {
             logDebug(InputChannels.IN_TEST_SEND_FINISHED, payload);
-            val message = objectMapper.deserializeToObject(payload, FinishedMessage.class);
+            val message = objectMapper.readValue(payload, FinishedMessage.class);
             Validator.validate(message);
             processor.processMailTestSendFinished(message.getJobId());
         } catch (Exception e) {
@@ -71,7 +60,7 @@ public class MessageListener {
     public void testSendError(byte[] payload) {
         try {
             logDebug(InputChannels.IN_TEST_SEND_ERROR, payload);
-            val message = objectMapper.deserializeToObject(payload, ErrorMessage.class);
+            val message = objectMapper.readValue(payload, ErrorMessage.class);
             Validator.validate(message);
             processor.processTestSendError(message.getJobId(), message.getErrorMessage());
         } catch (Exception e) {

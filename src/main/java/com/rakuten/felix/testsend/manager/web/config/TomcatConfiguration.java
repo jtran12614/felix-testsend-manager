@@ -1,6 +1,7 @@
 package com.rakuten.felix.testsend.manager.web.config;
 
 import org.apache.catalina.connector.Connector;
+import org.apache.coyote.ajp.AbstractAjpProtocol;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
@@ -26,6 +27,9 @@ public class TomcatConfiguration {
             ajpConnector.setSecure(false);
             ajpConnector.setAllowTrace(false);
             ajpConnector.setRedirectPort(8443);
+            // TODO: improve security
+            // See https://github.com/spring-projects/spring-boot/issues/20377
+            ((AbstractAjpProtocol<?>) ajpConnector.getProtocolHandler()).setSecretRequired(false);
             tomcat.addAdditionalTomcatConnectors(ajpConnector);
         }
         return tomcat;

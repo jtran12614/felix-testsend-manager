@@ -3,9 +3,10 @@ package com.rakuten.felix.testsend.manager.webclients;
 import com.rakuten.felix.testsend.manager.validator.ValidationException;
 import com.rakuten.felix.testsend.manager.webclients.dto.RegisterCampaignRequest;
 import com.rakuten.felix.testsend.manager.webclients.dto.RegisterCampaignResponse;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -19,32 +20,24 @@ import org.springframework.web.client.RestTemplate;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class CampaignSchedulerService {
+
+    @Value("${com.rakuten.felix.testsend-manager.campaign-scheduler.register-and-get-url}")
     private final String registerAndGetUrl;
+
     private final RestTemplate restTemplate;
-
-    /**
-     * Initialize the service.
-     *
-     * @param registerAndGetUrl Get campaign URL.
-     * @param restTemplate      REST template.
-     */
-    public CampaignSchedulerService(@Value("${com.rakuten.felix.testsend-manager.campaign-scheduler.register-and-get-url}") String registerAndGetUrl,
-                                    RestTemplate restTemplate) {
-
-        this.registerAndGetUrl = registerAndGetUrl;
-        this.restTemplate = restTemplate;
-    }
 
     /**
      * Register and get campaign.
      */
     @Retryable(include = Throwable.class, exclude = {RestClientException.class, ValidationException.class}, backoff = @Backoff(multiplier = 2))
-    public RegisterCampaignResponse registerSingle(ZonedDateTime reserveDate, JSONObject mailJob) throws ValidationException {
+    public RegisterCampaignResponse registerSingle(ZonedDateTime reserveDate, Map<String, Object> mailJob) throws ValidationException {
         val request = new RegisterCampaignRequest(Collections.singletonList(reserveDate), mailJob);
         log.debug("Register campaign: url={}, request={}", registerAndGetUrl, request);
         val response = restTemplate.exchange(registerAndGetUrl, HttpMethod.POST, new HttpEntity<>(request),

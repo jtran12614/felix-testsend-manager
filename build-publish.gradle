@@ -35,6 +35,7 @@ apply plugin: 'maven-publish'
 publishing {
     repositories {
         maven {
+            allowInsecureProtocol = true
             def releasesRepoUrl = "http://dev-qcmdaci101z.dev.jp.local:8082/repository/felix/"
             def snapshotsRepoUrl = "http://dev-qcmdaci101z.dev.jp.local:8082/repository/felix-dev/"
             url = project.hasProperty('release') ? releasesRepoUrl : snapshotsRepoUrl

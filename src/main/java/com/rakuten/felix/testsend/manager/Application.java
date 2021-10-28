@@ -1,5 +1,8 @@
 package com.rakuten.felix.testsend.manager;
 
+import com.rakuten.felix.common.VersionInfo;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -10,12 +13,10 @@ import org.springframework.retry.annotation.EnableRetry;
 @EnableRetry
 @SpringBootApplication
 @Slf4j
+@RequiredArgsConstructor
 public class Application implements CommandLineRunner {
-    private final VersionInfo versionInfo;
 
-    public Application(VersionInfo versionInfo) {
-        this.versionInfo = versionInfo;
-    }
+    private final VersionInfo versionInfo;
 
     /**
      * Application entry.

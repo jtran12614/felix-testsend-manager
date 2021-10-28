@@ -2,10 +2,12 @@ package com.rakuten.felix.testsend.manager.messaging;
 
 import com.rakuten.felix.jobmanager.dto.core.JobStartPayload;
 import com.rakuten.felix.testsend.manager.messaging.dto.Notification;
-import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -22,29 +24,14 @@ import java.util.Optional;
 @Slf4j
 @Service
 @EnableBinding(OutputChannels.class)
+@RequiredArgsConstructor
 public class MessageSender {
+
     private final OutputChannels outputChannels;
-    private final ObjectMapperWrapper objectMapperWrapper;
-    private final Clock clock;
+    private final ObjectMapper   mapper;
+    private final Clock          clock;
 
     private static final String CAMPAIGN_ID = "campaignId";
-
-    /**
-     * Initialize service.
-     *
-     * @param outputChannels      Output channels.
-     * @param objectMapperWrapper JSON object mapper wrapper.
-     * @param clock               Clock.
-     */
-    @Autowired
-    public MessageSender(OutputChannels outputChannels,
-                         ObjectMapperWrapper objectMapperWrapper,
-                         Clock clock) {
-
-        this.outputChannels = outputChannels;
-        this.objectMapperWrapper = objectMapperWrapper;
-        this.clock = clock;
-    }
 
     /**
      * Send a message to publish notification channel.
@@ -52,7 +39,13 @@ public class MessageSender {
      * @param notification Notification
      */
     public void publishNotification(Notification notification) {
-        val payload = objectMapperWrapper.serializeToBytes(notification);
+        final byte[] payload;
+        try {
+            payload = mapper.writeValueAsBytes(notification);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("Can't serialize to bytes", e);
+        }
+
         sendMessage(outputChannels.outPublishNotification(), MessageBuilder.withPayload(payload).build(), "Could not send publish notification");
     }
 
@@ -111,10 +104,10 @@ public class MessageSender {
      * @param header            Header to send
      * @param jobManagerPayload Job start payload
      */
-    public void sendJobManager(Map<String, Object> header, JobStartPayload jobManagerPayload) {
+    public void sendJobManager(Map<String, Object> header, JobStartPayload jobManagerPayload) throws JsonProcessingException {
         val campaignId = Optional.ofNullable(jobManagerPayload.getInfo().get(CAMPAIGN_ID)).map(Object::toString).orElse(null);
         log.info("Send job manager: Started: CampaignId: {}", campaignId);
-        val payload = objectMapperWrapper.serializeToBytes(jobManagerPayload);
+        val payload = mapper.writeValueAsBytes(jobManagerPayload);
         val message = MessageBuilder.withPayload(payload)
                                     .copyHeaders(header)
                                     .build();

@@ -1,17 +1,18 @@
 package com.rakuten.felix.testsend.manager;
 
+import com.rakuten.felix.common.VersionInfo;
 import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
 import com.rakuten.felix.testsend.manager.datastore.HistoryNotFoundException;
 import com.rakuten.felix.testsend.manager.datastore.TestSendHistoryRepository;
-import com.rakuten.felix.testsend.manager.messaging.MessageSender;
 import com.rakuten.felix.testsend.manager.processor.Processor;
-import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
 import com.rakuten.felix.testsend.manager.validator.ValidationException;
 import com.rakuten.felix.testsend.manager.web.GlobalExceptionHandler;
 import com.rakuten.felix.testsend.manager.web.UnauthorizedException;
 import com.rakuten.felix.testsend.manager.web.WebController;
 import com.rakuten.felix.testsend.manager.web.config.AuthConfiguration;
 import com.rakuten.felix.testsend.manager.web.config.AuthInterceptor;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,9 +33,9 @@ import static org.mockito.MockitoAnnotations.initMocks;
 @Slf4j
 class CommonClassesTest {
 
-    private VersionInfo versionInfo;
+    private VersionInfo       versionInfo;
     private AuthConfiguration authConfiguration;
-    private WebController controller;
+    private WebController     controller;
 
     @Mock
     private TestSendHistoryRepository repository;
@@ -49,7 +50,7 @@ class CommonClassesTest {
     void setUp() {
         initMocks(this);
         val dataStore = new DataStoreService(repository, clock);
-        val processor = new Processor(dataStore, null, null, null, new ObjectMapperWrapper(), null, null);
+        val processor = new Processor(dataStore, null, null, null, new ObjectMapper(), null, null);
         controller = new WebController(dataStore, processor);
         versionInfo = new VersionInfo();
         authConfiguration = new AuthConfiguration(new AuthInterceptor("auth-key", true));

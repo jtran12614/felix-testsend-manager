@@ -11,7 +11,6 @@ import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.messaging.MessageSender;
 import com.rakuten.felix.testsend.manager.messaging.NotificationService;
 import com.rakuten.felix.testsend.manager.messaging.dto.Header;
-import com.rakuten.felix.testsend.manager.serde.ObjectMapperWrapper;
 import com.rakuten.felix.testsend.manager.validator.ValidationException;
 import com.rakuten.felix.testsend.manager.validator.Validator;
 import com.rakuten.felix.testsend.manager.web.dto.KickMailTestSendRequest;
@@ -19,30 +18,35 @@ import com.rakuten.felix.testsend.manager.web.dto.KickTestSendRequest;
 import com.rakuten.felix.testsend.manager.webclients.CampaignSchedulerService;
 import com.rakuten.felix.testsend.manager.webclients.dto.MailJob;
 import com.rakuten.felix.testsend.manager.webclients.dto.User;
-import lombok.AllArgsConstructor;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class Processor {
-    private static final Integer BUNDLE_TYPE_MAIL = 1;
-    private final DataStoreService dataStore;
-    private final MailContentBuilder mailContentBuilder;
-    private final NotificationService notificationService;
-    private final CampaignSchedulerService schedulerService;
-    private final ObjectMapperWrapper objectMapperWrapper;
-    private final MessageSender messageSender;
-    private final ReplyConfig replyConfig;
 
-    private static final String LOG_ID = "logId";
+    private static final Integer BUNDLE_TYPE_MAIL = 1;
+    private static final String  LOG_ID           = "logId";
+
+    private final DataStoreService         dataStore;
+    private final MailContentBuilder       mailContentBuilder;
+    private final NotificationService      notificationService;
+    private final CampaignSchedulerService schedulerService;
+    private final ObjectMapper             mapper;
+    private final MessageSender            messageSender;
+    private final ReplyConfig              replyConfig;
 
     /**
      * Process for kicking mail test send.
@@ -50,7 +54,7 @@ public class Processor {
      * @param request Kick mail test send request.
      */
     public TestSendHistory processKickingTestSend(KickMailTestSendRequest request) throws ValidationException {
-        val mailJob = objectMapperWrapper.deserializeToObject(request.getMailJob().toJSONString(), MailJob.class);
+        val mailJob = mapper.convertValue(request.getMailJob(), MailJob.class);
         Validator.validate(mailJob);
 
         val reserveDate = mailJob.getSchedules().get(0).getReserveDate();
@@ -70,8 +74,8 @@ public class Processor {
      *
      * @param request Kick test send request.
      */
-    public TestSendHistory processKickingTestSend(KickTestSendRequest request) throws IOException, ValidationException {
-        JobStartPayload jobManagerPayload = objectMapperWrapper.deserializeToObject(request.getJob().toJSONString(), JobStartPayload.class);
+    public TestSendHistory processKickingTestSend(KickTestSendRequest request) throws ValidationException, JsonProcessingException {
+        JobStartPayload jobManagerPayload = mapper.convertValue(request.getJob(), JobStartPayload.class);
         Validator.validate(jobManagerPayload);
         val info = Info.builder().user(request.getUser()).contents(request.getContents()).recipients(request.getRecipients()).build();
         val history = dataStore.createHistory(request.getBundleId(), request.getBundleType(), null, info);
@@ -187,7 +191,12 @@ public class Processor {
      * @param header  Header.
      */
     public void handleReplyMessage(Header header, byte[] payload) throws ValidationException {
-        val jobStatus = objectMapperWrapper.deserializeToObject(payload, ReplyJobInfoPayload.class);
+        final ReplyJobInfoPayload jobStatus;
+        try {
+            jobStatus = mapper.readValue(payload, ReplyJobInfoPayload.class);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Can't deserialize to payload: json=" + new String(payload, StandardCharsets.UTF_8), e);
+        }
         Validator.validate(jobStatus);
         if (jobStatus.getStatus() == JobStatus.FINISHED) {
             log.info("Job finished:");
