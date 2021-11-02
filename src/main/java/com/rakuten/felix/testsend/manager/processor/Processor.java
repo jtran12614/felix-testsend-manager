@@ -15,6 +15,8 @@ import com.rakuten.felix.testsend.manager.validator.ValidationException;
 import com.rakuten.felix.testsend.manager.validator.Validator;
 import com.rakuten.felix.testsend.manager.web.dto.KickMailTestSendRequest;
 import com.rakuten.felix.testsend.manager.web.dto.KickTestSendRequest;
+import com.rakuten.felix.testsend.manager.web.dto.TestSendHistoryInitializeRequest;
+import com.rakuten.felix.testsend.manager.web.dto.TestSendHistoryInitializeResponse;
 import com.rakuten.felix.testsend.manager.webclients.CampaignSchedulerService;
 import com.rakuten.felix.testsend.manager.webclients.dto.MailJob;
 import com.rakuten.felix.testsend.manager.webclients.dto.User;
@@ -47,6 +49,23 @@ public class Processor {
     private final ObjectMapper             mapper;
     private final MessageSender            messageSender;
     private final ReplyConfig              replyConfig;
+
+    /**
+     * Initialize test send history.
+     *
+     * @param request test send history information
+     */
+    public TestSendHistoryInitializeResponse initializeTestSendHistory(TestSendHistoryInitializeRequest request) {
+        val history = dataStore.createHistory(
+                request.getBundleId(),
+                request.getBundleType(),
+                request.getJobId(),
+                request.getInfo());
+        return TestSendHistoryInitializeResponse
+                .builder()
+                .testSendHistoryId(history.getId())
+                .build();
+    }
 
     /**
      * Process for kicking mail test send.

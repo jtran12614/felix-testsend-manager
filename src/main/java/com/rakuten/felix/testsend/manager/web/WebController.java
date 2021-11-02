@@ -7,12 +7,16 @@ import com.rakuten.felix.testsend.manager.validator.ValidationException;
 import com.rakuten.felix.testsend.manager.web.dto.HistoryDto;
 import com.rakuten.felix.testsend.manager.web.dto.KickMailTestSendRequest;
 import com.rakuten.felix.testsend.manager.web.dto.KickTestSendRequest;
+import com.rakuten.felix.testsend.manager.web.dto.TestSendHistoryInitializeRequest;
+import com.rakuten.felix.testsend.manager.web.dto.TestSendHistoryInitializeResponse;
 import com.rakuten.felix.testsend.manager.web.dto.TestSendResponse;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -71,6 +76,19 @@ public class WebController {
                                         Pageable pageable) {
         log.debug("Get histories by bundleId={}, bundleType={}, pageInfo={}", bundleId, bundleType, pageable);
         return dataStore.getHistoriesByBundleIdAndType(bundleId, bundleType, pageable);
+    }
+
+    /**
+     * Initialize test send history.
+     */
+    @PostMapping("/api/v1/histories")
+    @ResponseStatus(HttpStatus.CREATED)
+    public TestSendHistoryInitializeResponse initializeTestSendHistory(@RequestBody @Valid TestSendHistoryInitializeRequest request) {
+        log.info("Initializing test send history: bundleId={}, bundleType={}", request.getBundleId(), request.getBundleType());
+        log.debug("TestSendHistoryInitializeRequest={}", request);
+        val response = processor.initializeTestSendHistory(request);
+        log.info("Initializing test send history completed");
+        return response;
     }
 
     /**

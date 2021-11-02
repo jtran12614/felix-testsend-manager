@@ -9,6 +9,7 @@ import org.springframework.boot.actuate.trace.http.HttpTraceRepository;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 
 import java.time.Clock;
@@ -16,6 +17,7 @@ import java.time.ZoneId;
 
 @Configuration
 @PropertySource("classpath:/version.properties")
+@Profile("!test")
 public class Config {
     public static final ZoneId APPLICATION_TIME_ZONE_ID = ZoneId.of("JST", ZoneId.SHORT_IDS);
 

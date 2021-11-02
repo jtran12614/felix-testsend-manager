@@ -1,0 +1,70 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false;MODE=MYSQL"
+  #initialization-mode: never # deprecated since Spring Boot 2.5
+  sql.init.mode: never # use after migrating to Spring Boot 2.5+
+
+  jpa:
+    show-sql: true
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.H2Dialect
+
+  cloud.stream:
+    rabbit.bindings:
+      in-job-manager-reply:
+        consumer.prefix: felix.
+      in-test-send-finished:
+        consumer.prefix: felix.
+      in-test-send-error:
+        consumer.prefix: felix.
+      out-error:
+        producer.prefix: felix.
+      out-publish-notification:
+        producer.prefix: felix.
+      send-job-manager:
+        producer.prefix: felix.
+
+    bindings:
+      in-job-manager-reply:
+        destination: job-manager-reply-test
+        group: default
+      in-test-send-finished:
+        destination: test-send-finished
+        group: default
+      in-test-send-error:
+        destination: test-send-error
+        group: default
+      out-error:
+        destination: error
+        group: default
+      out-publish-notification:
+        destination: publish-notification
+        group: default
+      send-job-manager:
+        destination: job-manager-start
+        group: default
+
+com.rakuten.felix.testsend-manager:
+  proxy:
+    host: localhost
+    port: 9000
+  auth:
+    key: example-auth-key
+    enabled: true
+  tomcat:
+    ajp:
+      port: 8000
+      enabled: true
+  notification:
+    url: "http://notification/url/{bundle_id}"
+    success:
+      title: "Test send success title!: bundleId={bundle_id}"
+      message: "Test send success message!!: bundleId={bundle_id}"
+    error:
+      title: "Test send error title!: bundleId={bundle_id}"
+      message: "Test send error message!!: bundleId={bundle_id}"
+  campaign-scheduler:
+    register-and-get-url: http://api.core.felix.prod.jp.local/v1.0/scheduler/single-and-get
