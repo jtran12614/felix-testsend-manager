@@ -75,6 +75,12 @@ spring:
     url: "{{spring_admin['url']}}"
     username: "{{spring_admin['username']}}"
     password: "{{spring_admin['password']}}"
+    instance:
+      metadata:
+        tags:
+          environment: "{{env}}"
+          commit: "${com.rakuten.felix.application.commit}"
+          builtFrom: "${com.rakuten.felix.application.branch:N/A}"
 
 management:
   trace.http.include: "request-headers,authorization-header,remote-address"

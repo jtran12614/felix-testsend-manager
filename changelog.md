@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 1.2.3 - 2021-11-dd
 ### Added
+- Metadata for SBA
 - FELIX-4151 Test send history initialization API
 - [FELIX-3715](https://jira.rakuten-it.com/jira/browse/FELIX-3715) Add trace log
 ### Changed
