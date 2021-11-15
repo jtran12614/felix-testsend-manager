@@ -9,7 +9,7 @@ app_log_level: "debug"
 # Spring Boot Admin Setting
 #----------------------------------------------------------------------------
 spring_admin:
-  url: "http://wfelix204z.prod.jp.local:{{spring_boot_admin_port}}"
+  url: "http://felix-springboot-admin-8080-dsaid-css-felix.prod-zed2-jpe2.prod.jp.local"
   username: "{{vault['spring_admin']['username']}}"
   password: "{{vault['spring_admin']['password']}}"
 

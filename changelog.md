@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - FELIX-4151 Test send history initialization API
 - [FELIX-3715](https://jira.rakuten-it.com/jira/browse/FELIX-3715) Add trace log
 ### Changed
+- FELIX-4291 Update SBA endpoints
 - Update dependencies, deprecate object mapper wrapper and JSONObject
 
 ## 1.2.2 - 2020-10-22
