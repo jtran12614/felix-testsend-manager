@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## 1.2.3 - 2021-11-dd
+## 1.2.3 - 2021-11-29
 ### Added
 - Metadata for SBA
 - FELIX-4151 Test send history initialization API
