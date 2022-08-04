@@ -1,0 +1,31 @@
+{
+  "id": 1,
+  "jobId": null,
+  "bundleType": 6,
+  "status": 0,
+  "info": {
+    "user": {
+      "userId": 1,
+      "userName": "developer",
+      "mailAddress": "abc@rakuten.com"
+    },
+    "recipients": [
+      "abc",
+      "xyz"
+    ],
+    "contents": {
+      "data": {
+        "select": "option1",
+        "checkbox": "[\"option1\", \"option3\"]",
+        "textarea": "Default Textarea",
+        "text": "Default Test",
+        "title": "Default Rich Title",
+        "message": "Default Rich Body",
+        "radio": "optionA"
+      }
+    }
+  },
+  "started": 1661136831,
+  "finished": null,
+  "version": 0
+}

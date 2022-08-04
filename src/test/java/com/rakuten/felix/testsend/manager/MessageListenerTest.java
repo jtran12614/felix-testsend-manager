@@ -19,6 +19,7 @@ import com.rakuten.felix.testsend.manager.processor.Processor;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rakuten.felix.testsend.manager.utils.TimeUtils;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -78,7 +79,7 @@ class MessageListenerTest {
     @BeforeEach
     void setUp() {
         initMocks(this);
-        val dataStore = new DataStoreService(repository, clock);
+        val dataStore = new DataStoreService(repository, clock, new TimeUtils());
         val outputChannels = new OutputChannels() {
             @Override
             public MessageChannel outError() {
@@ -103,7 +104,7 @@ class MessageListenerTest {
                 NOTIFICATION_ERROR_TITLE,
                 NOTIFICATION_ERROR_MESSAGE,
                 messageSender);
-        val processor = new Processor(dataStore, new MailContentBuilder(), notificationService, null, mapper, messageSender, null);
+        val processor = new Processor(dataStore, new MailContentBuilder(), notificationService, null, mapper, messageSender, null, null, null, null);
         messageListener = new MessageListener(mapper, errorHandler, processor);
     }
 

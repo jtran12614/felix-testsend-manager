@@ -104,7 +104,7 @@ public class MessageSender {
      * @param header            Header to send
      * @param jobManagerPayload Job start payload
      */
-    public void sendJobManager(Map<String, Object> header, JobStartPayload jobManagerPayload) throws JsonProcessingException {
+    public void sendJobManager(Map<String, Object> header, JobStartPayload<Map> jobManagerPayload) throws JsonProcessingException {
         val campaignId = Optional.ofNullable(jobManagerPayload.getInfo().get(CAMPAIGN_ID)).map(Object::toString).orElse(null);
         log.info("Send job manager: Started: CampaignId: {}", campaignId);
         val payload = mapper.writeValueAsBytes(jobManagerPayload);

@@ -47,13 +47,25 @@ spring:
         destination: job-manager-start
         group: default
 
+felix:
+  storage:
+    url: "http://localhost:8001"
+    access.key:
+    secret.key:
+    bucket: "test-storage"
+
 com.rakuten.felix.testsend-manager:
   proxy:
-    host: localhost
-    port: 9000
+    host:
+    port:
+    connect-timeout: 5000
+    read-timeout: 3000
   auth:
     key: example-auth-key
     enabled: true
+  auth2:
+    roots:
+      - "/api/v1/test-send"
   tomcat:
     ajp:
       port: 8000
@@ -68,3 +80,10 @@ com.rakuten.felix.testsend-manager:
       message: "Test send error message!!: bundleId={bundle_id}"
   campaign-scheduler:
     register-and-get-url: http://api.core.felix.prod.jp.local/v1.0/scheduler/single-and-get
+  test-recipients:
+    url: "get_recipient"
+    auth: "test_recipient"
+  workflow-client:
+    endpoints:
+      base: "base"
+      action: "action"

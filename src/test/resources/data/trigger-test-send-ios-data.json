@@ -1,0 +1,41 @@
+{
+  "id": 1,
+  "jobId": null,
+  "bundleType": 5,
+  "status": 0,
+  "info": {
+    "user": {
+      "userId": 1,
+      "userName": "developer",
+      "mailAddress": "abc@rakuten.com"
+    },
+    "recipients": [
+      "abc",
+      "xyz"
+    ],
+    "contents": {
+      "select": "option1",
+      "aps": {
+        "badge": 1,
+        "alert": {
+          "title": "Default Rich Title",
+          "message": "Default Rich Body"
+        },
+        "sound": "sound.file",
+        "content-available": 0,
+        "mutable-content": 0
+      },
+      "checkbox": "[\"option1\", \"option3\"]",
+      "textarea": "Default Textarea",
+      "text": "Default Test",
+      "switchable": {
+        "checkbox": "[\"option2\"]",
+        "text": "Default Test"
+      },
+      "radio": "optionA"
+    }
+  },
+  "started": 1661136831,
+  "finished": null,
+  "version": 0
+}

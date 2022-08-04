@@ -39,7 +39,6 @@ public class TestSendHistory {
     private Integer jobId;
     @Column(nullable = false)
     private Integer bundleType;
-    @Column(nullable = false)
     private Integer bundleId;
     @Convert(converter = TestSendStatusConverter.class)
     private TestSendStatus status;

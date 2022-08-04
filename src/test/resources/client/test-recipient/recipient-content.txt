@@ -1,0 +1,2 @@
+abc	https://beauty.rakuten.co.jp	Rakuten
+xyz	https://beauty.rakuten.co.jp	Rakuten

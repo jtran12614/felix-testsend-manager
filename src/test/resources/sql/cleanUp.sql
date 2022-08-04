@@ -1,0 +1,1 @@
+TRUNCATE TABLE test_send_histories;

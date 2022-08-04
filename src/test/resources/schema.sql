@@ -4,7 +4,7 @@ CREATE TABLE `test_send_histories`
     `id`          int(11)    NOT NULL AUTO_INCREMENT,
     `job_id`      int(11)  DEFAULT NULL,
     `bundle_type` tinyint(4) NOT NULL,
-    `bundle_id`   int(11)    NOT NULL,
+    `bundle_id`   int(11),
     `status`      tinyint(4) NOT NULL,
     `info`        text,
     `started`     datetime   NOT NULL,

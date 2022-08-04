@@ -1,0 +1,118 @@
+{
+  "request": {
+    "headers": {
+      "User-ID": "1",
+      "Username": "developer",
+      "Client-ID": "1"
+    },
+    "body": {
+      "info": {
+        "campaignId": null,
+        "logId": "[APP_PUSH-TEST-random0]:[IOS]:[random3]",
+        "referenceId": "APP_PUSH-TEST-random0",
+        "test": true
+      },
+      "namespace": "APP_PUSH",
+      "replyDestination": "felix.job-manager-reply-test",
+      "replyHeaders": {
+        "Username": "developer",
+        "User-ID": 1 ,
+        "Client-ID": 1 ,
+        "X-Env": "blue",
+        "contentType": "application/octet-stream",
+        "LOG_ID": "[APP_PUSH-TEST-random0]:[IOS]:[random3]",
+        "REPLY_DESTINATION": "felix.job-manager-reply-test",
+        "TEST_ID": 1
+      },
+      "workflow": [
+        {
+          "headers": {
+          },
+          "name": "FORMAT_IOS",
+          "order": 1,
+          "paused": false,
+          "payload": {
+            "info": {
+              "template": "{\"userid\":\"${userid}\",\"url\":\"${url}\",\"shopName\":\"${shopName}\"}",
+              "columnDelimiter": "\t",
+              "columnReplaceTags": {
+                "0": "userid",
+                "1": "url",
+                "2": "shopName"
+              },
+              "skipIfEmptyColumnExist": false
+            },
+            "inputPath": "/data/job/local/APP_PUSH/APP_PUSH-TEST-random0/test/ios_random1_random2",
+            "outputPath": "${currentPath}",
+            "type": 1
+          },
+          "type": "FORMAT"
+        },
+        {
+          "headers": {
+          },
+          "name": "PNP_RESERVATION",
+          "order": 2,
+          "paused": false,
+          "payload": {
+            "android": null,
+            "general": {
+              "clientRefId": 4,
+              "operator": "APP_PUSH-TEST-random0",
+              "targetType": "DEVICE_ID"
+            },
+            "ios": [
+              {
+                "audienceFile": "/data/job/local/APP_PUSH/APP_PUSH-TEST-random0/test/ios_random1_random2",
+                "clientRefId": 4,
+                "parameters": {
+                  "aps": {
+                    "alert": {
+                      "message": "Default Rich Body",
+                      "title": "Default Rich Title"
+                    },
+                    "badge": 1,
+                    "content-available": 0,
+                    "mutable-content": 0,
+                    "sound": "sound.file"
+                  },
+                  "checkbox": "[\"option1\", \"option3\"]",
+                  "radio": "optionA",
+                  "select": "option1",
+                  "switchable": {
+                    "checkbox": "[\"option2\"]",
+                    "text": "Default Test"
+                  },
+                  "text": "Default Test",
+                  "textarea": "Default Textarea"
+                },
+                "pushType": null,
+                "reserveDate": 1659459720,
+                "speed": 100,
+                "variantId": "random1"
+              }
+            ]
+          },
+          "type": "PNP_RESERVATION"
+        },
+        {
+          "headers": {
+          },
+          "name": "PNP_DELIVERY_CHECK",
+          "order": 3,
+          "paused": false,
+          "payload": {
+          },
+          "type": "PNP_DELIVERY_CHECK"
+        }
+      ]
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "jobId": null,
+      "message": "Create job successfully"
+    }
+  }
+}

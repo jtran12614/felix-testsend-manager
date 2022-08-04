@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 1.2.4 - 2022-mm-dd
 ### Fixed
 - FELIX-4409 Gradle downgrade due to incompatibility with JAR publish script
+### Added
+- FELIX-5306 New api in Trigger Test Send Manager to register the workflow for test experiment
 
 ## 1.2.3 - 2021-11-29
 ### Added

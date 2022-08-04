@@ -1,0 +1,135 @@
+server:
+  port: 8080
+  tomcat:
+    remote-ip-header: "x-forwarded-for"
+    protocol-header: "x-forwarded-proto"
+
+logging:
+  file: "log/main.log"
+  level.com.rakuten.felix: "debug"
+
+spring:
+  pid:
+    file: "app.pid"
+    fail-on-write-error: true
+
+  cloud.stream:
+    rabbit.bindings:
+      in-job-manager-reply:
+        consumer.prefix: felix.
+      in-test-send-finished:
+        consumer.prefix: felix.
+      in-test-send-error:
+        consumer.prefix: felix.
+      out-error:
+        producer.prefix: felix.
+      out-publish-notification:
+        producer.prefix: felix.
+      send-job-manager:
+        producer.prefix: felix.
+
+    bindings:
+      in-job-manager-reply:
+        destination: job-manager-reply-test
+        group: default
+      in-test-send-finished:
+        destination: test-send-finished
+        group: default
+      in-test-send-error:
+        destination: test-send-error
+        group: default
+      out-error:
+        destination: error
+        group: default
+      out-publish-notification:
+        destination: publish-notification
+        group: default
+      send-job-manager:
+        destination: job-manager-start
+        group: default
+
+  rabbitmq:
+    addresses: "dev-amqfelix101z.dev.jp.local:5672,dev-amqfelix102z.dev.jp.local:5672,dev-amqfelix103z.dev.jp.local:5672"
+    username: "felix"
+    password: "felix"
+
+  datasource:
+    url: "jdbc:mysql://dev-dm-felix201z.dev.jp.local:3301/felix_scenario_01"
+    username: "felix_developer"
+    password: "felix-DEV-team-1337"
+    driver-class-name: "com.mysql.jdbc.Driver"
+    tomcat:
+      test-on-borrow: true
+      validation-query: "SELECT 1"
+      initial-size: 1
+      max-active: 3
+      max-idle: 3
+      min-idle: 1
+    jpa:
+      show-sql: "true"
+
+  boot.admin.client:
+    enabled: true
+    url: "http://dev-wfelix201z.dev.jp.local:15116"
+    username: "felixuser"
+    password: "felixuser"
+
+management:
+  security.enabled: false
+  metrics.export.prometheus.enabled: true
+  endpoint:
+    health.show-details: "ALWAYS"
+  endpoints.web:
+    exposure.include: "*"
+    base-path: "/"
+    path-mapping.httptrace: trace
+    path-mapping.threaddump: dump
+
+felix:
+  storage:
+    url: "https://jpe2b-1000-staas.r-local.net"
+    access.key: "J690SGPESB3KXR7R42DN"
+    secret.key: "46awAYWenhdHSFqDxLff0rvjGAiAA3w5tpEykSBD"
+    bucket: "felix-bucket-dev"
+
+com.rakuten.felix.testsend-manager:
+  proxy:
+    host: "stb-dev-proxy.db.rakuten.co.jp"
+    port: 9501
+    connect-timeout: 1000
+    read-timeout: 1500
+
+  auth:
+    key: "auth-key"
+    enabled: false
+
+  auth2:
+    roots:
+      - "/api/v1/test-send"
+
+  tomcat:
+    ajp:
+      port: 1234
+      enabled: true
+
+  notification:
+    url: "http://notification/url/{bundle_id}"
+    success:
+      title: "notification-success-title: {bundle_id}"
+      message: "notification-success-message: {bundle_id}"
+    error:
+      title: "notification-error-title: {bundle_id}"
+      message: "notification-errorr-message: {bundle_id}"
+
+  campaign-scheduler:
+    register-and-get-url: "http://campaign-scheduler/register-and-get-single"
+
+  test-recipients:
+    url: "http://api.core.felix.prod.jp.local/v1.0/test-recipients/test-recipient-groups/recipients"
+    auth: "auth-dev"
+
+  workflow-client:
+    endpoints:
+      base: "https://felix-api-gateway-internal-dev-beta.jpe2-caas1-dev1.caas.jpe2b.r-local.net/api/v1.5/jobs"
+      action: "https://felix-api-gateway-internal-dev-beta.jpe2-caas1-dev1.caas.jpe2b.r-local.net/api/v1.5/jobs/{jobId}/{action}"
+

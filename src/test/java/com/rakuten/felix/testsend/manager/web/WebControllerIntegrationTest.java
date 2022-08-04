@@ -29,7 +29,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 
-import static com.rakuten.felix.testsend.manager.Config.APPLICATION_TIME_ZONE_ID;
+import static com.rakuten.felix.testsend.manager.BeanConfig.APPLICATION_TIME_ZONE_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;

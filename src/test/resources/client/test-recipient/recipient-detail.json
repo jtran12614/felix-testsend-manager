@@ -1,0 +1,22 @@
+{
+  "request": {
+    "headers": {
+      "Authentication": "test_recipient",
+      "clientId": "1"
+    },
+    "params": {
+      "groupId": 114
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": [
+      {
+        "recipientAddress": "abc"
+      },
+      {
+        "recipientAddress": "xyz"
+      }
+    ]
+  }
+}

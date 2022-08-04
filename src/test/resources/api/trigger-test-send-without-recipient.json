@@ -1,0 +1,123 @@
+{
+  "request": {
+    "headers": {
+      "Username": "developer",
+      "Email": "abc@rakuten.com",
+      "User-ID": 1,
+      "Client-ID": 1,
+      "X-Env": "blue"
+    },
+    "body": {
+      "bundleId": null,
+      "bundleType": 6,
+      "job": {
+        "namespace": "APP_PUSH",
+        "info": {
+          "campaignId": null,
+          "referenceId": "APP_PUSH-TEST-random0",
+          "test": true,
+          "logId": "[APP_PUSH-TEST-random0]:[ANDROID]:[random3]"
+        },
+        "workflow": [
+          {
+            "name": "FORMAT_ANDROID",
+            "headers": {},
+            "payload": {
+              "type": 1,
+              "info": {
+                "template": "{\"userid\":\"${userid}\",\"url\":\"${url}\",\"shopName\":\"${shopName}\"}",
+                "columnDelimiter": "\t",
+                "columnReplaceTags": {
+                  "0": "userid",
+                  "1": "url",
+                  "2": "shopName"
+                },
+                "skipIfEmptyColumnExist": false
+              },
+              "inputPath": "/data/job/local/APP_PUSH/APP_PUSH-TEST-random0/test/android_random1_random2",
+              "outputPath": "${currentPath}"
+            },
+            "order": 1,
+            "paused": false,
+            "type": "FORMAT"
+          },
+          {
+            "type": "PNP_RESERVATION",
+            "name": "PNP_RESERVATION",
+            "headers": {},
+            "payload": {
+              "general": {
+                "clientRefId": 4,
+                "targetType": "DEVICE_ID",
+                "operator": "APP_PUSH-TEST-random0"
+              },
+              "ios": null,
+              "android": [
+                {
+                  "variantId": "random1",
+                  "clientRefId": 4,
+                  "audienceFile": "/data/job/local/APP_PUSH/APP_PUSH-TEST-random0/test/android_random1_random2",
+                  "reserveDate": 1659459720,
+                  "speed": 100,
+                  "pushType": null,
+                  "parameters": {
+                    "data": {
+                      "select": "option1",
+                      "checkbox": "[\"option1\", \"option3\"]",
+                      "textarea": "Default Textarea",
+                      "text": "Default Test",
+                      "title": "Default Rich Title",
+                      "message": "Default Rich Body",
+                      "radio": "optionA"
+                    }
+                  }
+                }
+              ]
+            },
+            "order": 2,
+            "paused": false
+          },
+          {
+            "type": "PNP_DELIVERY_CHECK",
+            "name": "PNP_DELIVERY_CHECK",
+            "headers": {},
+            "payload": {},
+            "order": 3,
+            "paused": false
+          }
+        ],
+        "replyDestination": "felix.input-job-manager-reply",
+        "replyHeaders": {
+          "X-Flow": "Reservation_Delivery_Check",
+          "namespace": "APP_PUSH",
+          "LOG_ID": "[APP_PUSH-TEST-random0]:[ANDROID]:[random3]",
+          "contentType": "application/octet-stream",
+          "Client-ID": 1,
+          "REPLY_DESTINATION": "felix.input-job-manager-reply"
+        }
+      },
+      "user": {
+        "userId": 1,
+        "userName": "developer",
+        "mailAddress": "abc@rakuten.com"
+      },
+      "contents": {
+        "data": {
+          "select": "option1",
+          "checkbox": "[\"option1\", \"option3\"]",
+          "textarea": "Default Textarea",
+          "text": "Default Test",
+          "title": "Default Rich Title",
+          "message": "Default Rich Body",
+          "radio": "optionA"
+        }
+      }
+    }
+  },
+  "response": {
+    "status": 400,
+    "body": {
+      "message": "recipientData must not be null"
+    }
+  }
+}

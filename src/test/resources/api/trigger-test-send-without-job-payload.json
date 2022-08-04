@@ -1,0 +1,51 @@
+{
+  "request": {
+    "headers": {
+      "Username": "developer",
+      "Email": "abc@rakuten.com",
+      "User-ID": 1,
+      "Client-ID": 1,
+      "X-Env": "blue"
+    },
+    "body": {
+      "bundleId": null,
+      "bundleType": 6,
+      "user": {
+        "userId": 1,
+        "userName": "developer",
+        "mailAddress": "abc@rakuten.com"
+      },
+      "contents": {
+        "data": {
+          "select": "option1",
+          "checkbox": "[\"option1\", \"option3\"]",
+          "textarea": "Default Textarea",
+          "text": "Default Test",
+          "title": "Default Rich Title",
+          "message": "Default Rich Body",
+          "radio": "optionA"
+        }
+      },
+      "recipientData": {
+        "recipientGroupId": 114,
+        "recipientFilePath": "/data/job/local/APP_PUSH/APP_PUSH-TEST-random0/test/android_random1_random2",
+        "recipientAttributes": [
+          {
+            "order": 1,
+            "replaceValue": "https://beauty.rakuten.co.jp"
+          },
+          {
+            "order": 2,
+            "replaceValue": "Rakuten"
+          }
+        ]
+      }
+    }
+  },
+  "response": {
+    "status": 400,
+    "body": {
+      "message": "job must not be null"
+    }
+  }
+}

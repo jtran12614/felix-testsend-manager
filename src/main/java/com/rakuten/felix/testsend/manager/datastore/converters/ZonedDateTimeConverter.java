@@ -1,6 +1,6 @@
 package com.rakuten.felix.testsend.manager.datastore.converters;
 
-import com.rakuten.felix.testsend.manager.Config;
+import com.rakuten.felix.testsend.manager.BeanConfig;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
@@ -14,7 +14,7 @@ public class ZonedDateTimeConverter implements AttributeConverter<ZonedDateTime,
     public ZonedDateTime convertToEntityAttribute(Timestamp databaseDateTime) {
         return Optional.ofNullable(databaseDateTime)
                        .map(Timestamp::toInstant)
-                       .map(it -> ZonedDateTime.ofInstant(it, Config.APPLICATION_TIME_ZONE_ID))
+                       .map(it -> ZonedDateTime.ofInstant(it, BeanConfig.APPLICATION_TIME_ZONE_ID))
                        .orElse(null);
     }
 

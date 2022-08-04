@@ -3,9 +3,10 @@ package com.rakuten.felix.testsend.manager.datastore;
 import com.rakuten.felix.testsend.manager.datastore.entities.Info;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus;
+import com.rakuten.felix.testsend.manager.utils.TimeUtils;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Lock;
@@ -20,21 +21,11 @@ import java.time.ZonedDateTime;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class DataStoreService {
     private final TestSendHistoryRepository repository;
     private final Clock clock;
-
-    /**
-     * Initialize the service.
-     *
-     * @param repository Repository.
-     * @param clock      Clock.
-     */
-    @Autowired
-    public DataStoreService(TestSendHistoryRepository repository, Clock clock) {
-        this.repository = repository;
-        this.clock = clock;
-    }
+    private final TimeUtils timeUtils;
 
     /**
      * Get a history by id.
@@ -92,7 +83,7 @@ public class DataStoreService {
                                     .jobId(jobId)
                                     .info(info)
                                     .status(TestSendStatus.NEW)
-                                    .started(ZonedDateTime.now(clock))
+                                    .started(timeUtils.getCurrentTime(clock))
                                     .build();
         repository.saveAndFlush(entity);
         log.debug("Create history: {}", entity);

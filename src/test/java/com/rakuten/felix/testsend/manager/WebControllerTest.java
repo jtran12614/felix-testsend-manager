@@ -7,6 +7,7 @@ import com.rakuten.felix.testsend.manager.datastore.entities.TestSendHistory;
 import com.rakuten.felix.testsend.manager.datastore.entities.TestSendStatus;
 import com.rakuten.felix.testsend.manager.processor.MailContentBuilder;
 import com.rakuten.felix.testsend.manager.processor.Processor;
+import com.rakuten.felix.testsend.manager.utils.TimeUtils;
 import com.rakuten.felix.testsend.manager.validator.ValidationException;
 import com.rakuten.felix.testsend.manager.web.WebController;
 import com.rakuten.felix.testsend.manager.web.dto.HistoryDto;
@@ -64,9 +65,9 @@ class WebControllerTest {
     @BeforeEach
     void setUp() {
         initMocks(this);
-        val dataStore = new DataStoreService(repository, clock);
+        val dataStore = new DataStoreService(repository, clock, new TimeUtils());
         val schedulerService = new CampaignSchedulerService(SCHEDULER_REGISTER_AND_GET_URL, restTemplate);
-        val processor = new Processor(dataStore, new MailContentBuilder(), null, schedulerService, mapper, null, null);
+        val processor = new Processor(dataStore, new MailContentBuilder(), null, schedulerService, mapper, null, null, null, null, null);
 
         controller = new WebController(dataStore, processor);
     }

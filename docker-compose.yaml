@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  felix-testsend-manager:
+    build:
+      context: .
+      args:
+        - TARGET_DIR=build/libs
+    image: local/felix-testsend-manager:test
+    ports:
+      - "15080:8080"
+    environment:
+      - MY_IP_ADDR=${MY_IP_ADDR}
+      - JAVA_OPTS=-Dkubernetes.disable.autoConfig=true -Dspring.cloud.kubernetes.config.enabled=false -Dspring.cloud.kubernetes.secrets.enabled=false
+      - TZ=Asia/Tokyo
+    volumes:
+      - ./docker/config-local.yml:/config/application.yml
+      - ./docker/bootstrap.properties:/config/bootstrap.properties

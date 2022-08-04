@@ -1,0 +1,98 @@
+[
+  {
+    "name": "Trigger Test Send with IOS Device",
+    "apiDataPath": "classpath:/api/trigger-test-send-ios.json",
+    "workFlowApiPath": [
+      "classpath:/client/workflow/register-test-send-data-ios.json"
+    ],
+    "testRecipientApiPath": [
+      "classpath:/client/test-recipient/recipient-detail.json"
+    ],
+    "recipientFilePath": "client/test-recipient/recipient-content.txt",
+    "testSendHistoryPath": "classpath:/data/trigger-test-send-ios-data.json"
+  },
+  {
+    "name": "Trigger Test Send with Android Device",
+    "apiDataPath": "classpath:/api/trigger-test-send-android.json",
+    "workFlowApiPath": [
+      "classpath:/client/workflow/register-test-send-data-android.json"
+    ],
+    "testRecipientApiPath": [
+      "classpath:/client/test-recipient/recipient-detail.json"
+    ],
+    "recipientFilePath": "client/test-recipient/recipient-content.txt",
+    "testSendHistoryPath": "classpath:/data/trigger-test-send-android-data.json"
+  },
+  {
+    "name": "Trigger Test Send with specific bundle Id",
+    "apiDataPath": "classpath:/api/trigger-test-send-with-specific-bundle-id.json",
+    "workFlowApiPath": [
+      "classpath:/client/workflow/register-test-send-data-with-specific-bundle-id.json"
+    ],
+    "testRecipientApiPath": [
+      "classpath:/client/test-recipient/recipient-detail.json"
+    ],
+    "recipientFilePath": "client/test-recipient/recipient-content.txt",
+    "testSendHistoryPath": "classpath:/data/trigger-test-send-android-with-specific-bundle-id-data.json"
+  },
+  {
+    "name": "Trigger Test Send with empty replace value",
+    "apiDataPath": "classpath:/api/trigger-test-send-with-empty-replace-value.json",
+    "workFlowApiPath": [
+      "classpath:/client/workflow/register-test-send-data-android.json"
+    ],
+    "testRecipientApiPath": [
+      "classpath:/client/test-recipient/recipient-detail.json"
+    ],
+    "recipientFilePath": "client/test-recipient/recipient-content-without-replace-value.txt",
+    "testSendHistoryPath": "classpath:/data/trigger-test-send-android-data.json"
+  },
+  {
+    "name": "Trigger Test Send without header",
+    "apiDataPath": "classpath:/api/trigger-test-send-unauthenticated-request.json"
+  },
+  {
+    "name": "Trigger Test Send without bundle Type",
+    "apiDataPath": "classpath:/api/trigger-test-send-without-bundle-type.json"
+  },
+  {
+    "name": "Trigger Test Send with invalid bundle Type",
+    "apiDataPath": "classpath:/api/trigger-test-send-invalid-bundle-type.json"
+  },
+  {
+    "name": "Trigger Test Send without job payload",
+    "apiDataPath": "classpath:/api/trigger-test-send-without-job-payload.json"
+  },
+  {
+    "name": "Trigger Test Send without content",
+    "apiDataPath": "classpath:/api/trigger-test-send-without-content.json"
+  },
+  {
+    "name": "Trigger Test Send without recipient group Id",
+    "apiDataPath": "classpath:/api/trigger-test-send-without-recipient.json"
+  },
+  {
+    "name": "Trigger Test Send with invalid bundle Id",
+    "apiDataPath": "classpath:/api/trigger-test-send-with-invalid-bundle-id.json"
+  },
+  {
+    "name": "Trigger Test Send without user details",
+    "apiDataPath": "classpath:/api/trigger-test-send-without-user-detail.json"
+  },
+  {
+    "name": "Trigger Test Send without replace value details",
+    "apiDataPath": "classpath:/api/trigger-test-send-without-recipient-attribute.json"
+  },
+  {
+    "name": "Trigger Test Send with invalid recipient group id",
+    "apiDataPath": "classpath:/api/trigger-test-send-android-with-invalid-recipient-group-id.json"
+  },
+  {
+    "name": "Trigger Test Send with invalid order",
+    "apiDataPath": "classpath:/api/trigger-test-send-android-with-invalid-order.json"
+  },
+  {
+    "name": "Trigger Test Send without replace value",
+    "apiDataPath": "classpath:/api/trigger-test-send-android-without-replace-value.json"
+  }
+]

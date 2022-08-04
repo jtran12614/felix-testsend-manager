@@ -5,13 +5,13 @@ import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
 import com.rakuten.felix.testsend.manager.datastore.HistoryNotFoundException;
 import com.rakuten.felix.testsend.manager.datastore.TestSendHistoryRepository;
 import com.rakuten.felix.testsend.manager.processor.Processor;
+import com.rakuten.felix.testsend.manager.utils.TimeUtils;
 import com.rakuten.felix.testsend.manager.validator.ValidationException;
 import com.rakuten.felix.testsend.manager.web.GlobalExceptionHandler;
 import com.rakuten.felix.testsend.manager.web.UnauthorizedException;
 import com.rakuten.felix.testsend.manager.web.WebController;
 import com.rakuten.felix.testsend.manager.web.config.AuthConfiguration;
 import com.rakuten.felix.testsend.manager.web.config.AuthInterceptor;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -49,8 +49,8 @@ class CommonClassesTest {
     @BeforeEach
     void setUp() {
         initMocks(this);
-        val dataStore = new DataStoreService(repository, clock);
-        val processor = new Processor(dataStore, null, null, null, new ObjectMapper(), null, null);
+        val dataStore = new DataStoreService(repository, clock, new TimeUtils());
+        val processor = new Processor(dataStore, null, null, null, new ObjectMapper(), null, null, null, null, null);
         controller = new WebController(dataStore, processor);
         versionInfo = new VersionInfo();
         authConfiguration = new AuthConfiguration(new AuthInterceptor("auth-key", true));
