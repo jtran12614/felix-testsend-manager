@@ -17,6 +17,8 @@ public class Header extends HashMap<String, Object> {
     private static final String CLIENT_ID       = "Client-ID";
     private static final String ENV             = "X-Env";
     private static final String ENV_DEFAULT     = "blue";
+    private static final String DEFAULT         = "X-Default";
+    private static final String DEFAULT_VAL     = "true";
     private static final String USER_ID         = "User-ID";
     private static final String USER_NAME       = "Username";
 
@@ -57,6 +59,7 @@ public class Header extends HashMap<String, Object> {
         header.put(TEST_ID_KEY, testId);
         header.put(REPLY_DESTINATION_KEY, replyDestination);
         header.put(ENV, ENV_DEFAULT);
+        header.put(DEFAULT, DEFAULT_VAL);
         header.put(MessageHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
         return header;
     }
