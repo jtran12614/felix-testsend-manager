@@ -4,7 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## 1.2.4 - 2022-mm-dd
+## 1.2.5 - 2022-09-29
+### Changed
+- FELIX-5306 Add headers for backward compatible 
+
+## 1.2.4 - 2022-09-15
 ### Fixed
 - FELIX-4409 Gradle downgrade due to incompatibility with JAR publish script
 ### Added

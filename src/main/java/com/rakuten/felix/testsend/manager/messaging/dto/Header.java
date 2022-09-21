@@ -56,14 +56,9 @@ public class Header extends HashMap<String, Object> {
         header.put(LOG_ID_KEY, logId);
         header.put(TEST_ID_KEY, testId);
         header.put(REPLY_DESTINATION_KEY, replyDestination);
+        header.put(ENV, ENV_DEFAULT);
         header.put(MessageHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
         return header;
     }
 
-    public static Header buildWithContentType(String logId) {
-        val header = new Header();
-        header.put(LOG_ID_KEY, logId);
-        header.put(MessageHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        return header;
-    }
 }
