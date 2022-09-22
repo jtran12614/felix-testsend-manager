@@ -2,6 +2,7 @@ package com.rakuten.felix.testsend.manager;
 
 import com.rakuten.felix.common.VersionInfo;
 import com.rakuten.felix.common.actuator.ActuatorConfig;
+import com.rakuten.felix.common.actuator.FelixInMemoryHttpTraceRepository;
 import com.rakuten.felix.common.web.security.service.api.ApiAuthConfig;
 import com.rakuten.felix.common.web.security.service.api.ApiAuthService;
 import com.rakuten.felix.common.web.utils.FelixAuthInterceptor;
@@ -13,6 +14,7 @@ import org.apache.http.HttpHost;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.boot.actuate.trace.http.HttpTraceRepository;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -119,6 +121,14 @@ public class BeanConfig {
     @ConfigurationProperties(prefix = "com.rakuten.felix.testsend-manager.actuator")
     public ActuatorConfig actuatorConfig() {
         return new ActuatorConfig();
+    }
+
+    @Bean
+    public HttpTraceRepository httpTraceRepository(ActuatorConfig actuatorConfig) {
+        val httpTraceConfig = actuatorConfig.getTrace();
+        val httpTraceRepository = FelixInMemoryHttpTraceRepository.of(httpTraceConfig.getApis());
+        httpTraceRepository.setCapacity(httpTraceConfig.getCapacity());
+        return httpTraceRepository;
     }
 
     @ConfigurationProperties(prefix = "com.rakuten.felix.testsend-manager.auth2")

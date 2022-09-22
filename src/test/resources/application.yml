@@ -66,6 +66,13 @@ com.rakuten.felix.testsend-manager:
   auth2:
     roots:
       - "/api/v1/test-send"
+
+  actuator.trace:
+    capacity: 80
+    apis:
+      - "/api/v1/"
+      - "/testsend-manager"
+
   tomcat:
     ajp:
       port: 8000

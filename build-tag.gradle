@@ -1,0 +1,13 @@
+/**
+ * This script will generate tag from the version file automatically via command
+ * git tag <version>
+ *
+ */
+
+
+task generateTag {
+    doLast {
+        grgit.tag.add(name: "v${project.version}", message: "Release v${project.version}", force: true)
+        grgit.push(tags: true, force: true)
+    }
+}
