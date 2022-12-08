@@ -33,7 +33,7 @@ felix_persistence:
 #----------------------------------------------------------------------------
 felix_proxy:
   default:
-    host: "dev-proxy.db.rakuten.co.jp"
+    host: "dev-checkproxy.r-local.net"
     port: 9501
 
 #----------------------------------------------------------------------------

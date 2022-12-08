@@ -33,8 +33,8 @@ felix_persistence:
 #----------------------------------------------------------------------------
 felix_proxy:
   default:
-    host: "dev-proxy.db.rakuten.co.jp"
-    port: 8303
+    host: "prod.checkproxy.rakuten-it.com"
+    port: 7002
 
 #----------------------------------------------------------------------------
 # Messaging broker config.
