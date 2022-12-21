@@ -10,6 +10,7 @@ import com.rakuten.felix.testsend.manager.web.dto.KickTestSendRequest;
 import com.rakuten.felix.testsend.manager.web.dto.TestSendHistoryInitializeRequest;
 import com.rakuten.felix.testsend.manager.web.dto.TestSendHistoryInitializeResponse;
 import com.rakuten.felix.testsend.manager.web.dto.TestSendResponse;
+import com.rakuten.felix.testsend.manager.web.dto.TestSendHistoryUpdateRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -89,6 +90,18 @@ public class WebController {
         val response = processor.initializeTestSendHistory(request);
         log.info("Initializing test send history completed");
         return response;
+    }
+
+    /**
+     * Update test send history.
+     */
+    @PostMapping("/api/v1/update-history/{testHistoryId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void updateTestSendHistoryStatus(@PathVariable("testHistoryId") Integer testHistoryId,
+                                            @RequestBody @Valid TestSendHistoryUpdateRequest request) {
+        log.info("Test send history update status: request={}", request);
+        processor.updateTestSendHistoryStatus(testHistoryId, request);
+        log.info("Update test send history completed");
     }
 
     /**

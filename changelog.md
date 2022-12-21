@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 1.2.6 - 2022-11-30
+### Changed
+- FELIX-5680 Add endpoint for updating test send history
+
 ## 1.2.5 - 2022-09-29
 ### Changed
 - FELIX-5306 Add headers for backward compatible

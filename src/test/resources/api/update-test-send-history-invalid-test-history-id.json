@@ -1,0 +1,22 @@
+{
+  "request": {
+    "headers": {
+      "Authentication": "example-auth-key",
+      "Username": "developer",
+      "Email": "abc@rakuten.com",
+      "User-ID": 1 ,
+      "Client-ID": 1 ,
+      "X-Env": "blue"
+    },
+    "params": {
+      "testHistoryId": -1
+    },
+    "body": {
+      "errorMessage": "",
+      "jobStatus": 2
+    }
+  },
+  "response": {
+    "status": 404
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "request": {
+    "headers": {
+      "Authentication": "example-auth-key",
+      "Username": "developer",
+      "Email": "abc@rakuten.com",
+      "User-ID": 1 ,
+      "Client-ID": 1 ,
+      "X-Env": "blue"
+    },
+    "body": {
+      "jobId": 1,
+      "bundleId": 1,
+      "bundleType": 6,
+      "info": null
+    }
+  },
+  "response": {
+    "status": 400,
+    "body": {
+      "message": "info must not be null"
+    }
+  }
+}

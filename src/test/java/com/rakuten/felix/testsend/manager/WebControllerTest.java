@@ -1,5 +1,6 @@
 package com.rakuten.felix.testsend.manager;
 
+import com.rakuten.felix.jobmanager.dto.core.JobStatus;
 import com.rakuten.felix.testsend.manager.datastore.DataStoreService;
 import com.rakuten.felix.testsend.manager.datastore.TestSendHistoryRepository;
 import com.rakuten.felix.testsend.manager.datastore.entities.MailContent;
@@ -12,6 +13,7 @@ import com.rakuten.felix.testsend.manager.validator.ValidationException;
 import com.rakuten.felix.testsend.manager.web.WebController;
 import com.rakuten.felix.testsend.manager.web.dto.HistoryDto;
 import com.rakuten.felix.testsend.manager.web.dto.KickMailTestSendRequest;
+import com.rakuten.felix.testsend.manager.web.dto.TestSendHistoryUpdateRequest;
 import com.rakuten.felix.testsend.manager.webclients.CampaignSchedulerService;
 import com.rakuten.felix.testsend.manager.webclients.dto.RegisterCampaignResponse;
 import com.rakuten.felix.testsend.manager.webclients.dto.User;
@@ -295,6 +297,7 @@ class WebControllerTest {
         val mockedHistory = FakeData.getHistory();
         when(repository.findById(historyId))
                 .thenReturn(Optional.of(mockedHistory));
+
         // Execution
         val response = controller.getHistory(historyId);
         // Verification

@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Initialize history valid request",
+    "apiDataPath": "classpath:/api/initialize-test-send-history-valid.json"
+  },
+  {
+    "name": "Initialize history invalid job id",
+    "apiDataPath": "classpath:/api/initialize-test-send-history-invalid-job-id.json"
+  },
+  {
+    "name": "Initialize history invalid bundle id",
+    "apiDataPath": "classpath:/api/initialize-test-send-history-invalid-bundle-id.json"
+  },
+  {
+    "name": "Initialize history invalid bundle type",
+    "apiDataPath": "classpath:/api/initialize-test-send-history-invalid-bundle-type.json"
+  },
+  {
+    "name": "Initialize history invalid info",
+    "apiDataPath": "classpath:/api/initialize-test-send-history-invalid-info.json"
+  }
+]

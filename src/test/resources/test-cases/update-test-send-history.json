@@ -1,0 +1,72 @@
+[
+  {
+    "name": "Update test send history job finished",
+    "apiDataPath": "classpath:/api/update-test-send-history-job-finished.json",
+    "dataPaths": [
+      "classpath:/sql/test_send_histories.sql"
+    ]
+  },
+  {
+    "name": "Update test send history job created",
+    "apiDataPath": "classpath:/api/update-test-send-history-job-created.json",
+    "dataPaths": [
+      "classpath:/sql/test_send_histories.sql"
+    ]
+  },
+  {
+    "name": "Update test send history job deleted",
+    "apiDataPath": "classpath:/api/update-test-send-history-job-deleted.json",
+    "dataPaths": [
+      "classpath:/sql/test_send_histories.sql"
+    ]
+  },
+  {
+    "name": "Update test send history job failed",
+    "apiDataPath": "classpath:/api/update-test-send-history-job-failed.json",
+    "dataPaths": [
+      "classpath:/sql/test_send_histories.sql"
+    ]
+  },
+  {
+    "name": "Update test send history job paused",
+    "apiDataPath": "classpath:/api/update-test-send-history-job-paused.json",
+    "dataPaths": [
+      "classpath:/sql/test_send_histories.sql"
+    ]
+  },
+  {
+    "name": "Update test send history job processing",
+    "apiDataPath": "classpath:/api/update-test-send-history-job-processing.json",
+    "dataPaths": [
+      "classpath:/sql/test_send_histories.sql"
+    ]
+  },
+  {
+    "name": "Update test send history job stop processing",
+    "apiDataPath": "classpath:/api/update-test-send-history-job-stop-processing.json",
+    "dataPaths": [
+      "classpath:/sql/test_send_histories.sql"
+    ]
+  },
+  {
+    "name": "Update test send history job stopped",
+    "apiDataPath": "classpath:/api/update-test-send-history-job-stopped.json",
+    "dataPaths": [
+      "classpath:/sql/test_send_histories.sql"
+    ]
+  },
+  {
+    "name": "Update test send history job stopped",
+    "apiDataPath": "classpath:/api/update-test-send-history-job-stopped.json",
+    "dataPaths": [
+      "classpath:/sql/test_send_histories.sql"
+    ]
+  },
+  {
+    "name": "Update test send history invalid test history id",
+    "apiDataPath": "classpath:/api/update-test-send-history-invalid-test-history-id.json",
+    "dataPaths": [
+      "classpath:/sql/test_send_histories.sql"
+    ]
+  }
+]

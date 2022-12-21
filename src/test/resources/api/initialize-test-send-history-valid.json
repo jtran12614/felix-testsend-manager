@@ -1,0 +1,162 @@
+{
+  "request": {
+    "headers": {
+      "Authentication": "example-auth-key",
+      "Username": "developer",
+      "Email": "abc@rakuten.com",
+      "User-ID": 1 ,
+      "Client-ID": 1 ,
+      "X-Env": "blue"
+    },
+    "body": {
+      "jobId": 1,
+      "bundleId": 1,
+      "bundleType": 6,
+      "info": {
+        "subjects": null,
+        "htmlContents": null,
+        "textContents": null,
+        "columns": null,
+        "errorMessage": null,
+        "user": {
+          "userId": 137,
+          "userName": "developer",
+          "mailAddress": "abc@rakuten.com"
+        },
+        "recipients": [
+            "ab42231311649381879582636933981747853325523113971488596125947561",
+            "ab52891719593961782689582722141599251143211469197659336617322166"
+          ],
+        "contents": {
+          "json": {"ios":"{\"select\":\"option1\",\"aps\":{\"badge\":1,\"alert\":\"Default Message\",\"sound\":\"sound.file\",\"content-available\":0,\"mutable-content\":0},\"checkbox\":\"[\\\"option1\\\", \\\"option3\\\"]\",\"textarea\":\"Default Textarea\",\"text\":\"Default Test\",\"switchable\":{\"checkbox\":\"[\\\"option2\\\"]\",\"text\":\"Default Test\"},\"radio\":\"optionA\"}"},
+          "pushParameters":[
+            {
+              "id": 1,
+              "pushCampaignId": 123,
+              "appParameterId": 1001
+            },
+            {
+              "id": 2,
+              "pushCampaignId": 123,
+              "appParameterId": 1002,
+              "value": "Default Rich Title"
+            },
+            {
+              "id": 3,
+              "pushCampaignId": 123,
+              "appParameterId": 1003,
+              "value": "Default Rich Body"
+            },
+            {
+              "id": 4,
+              "pushCampaignId": 123,
+              "appParameterId": 1004,
+              "value": "sound.file"
+            },
+            {
+              "id": 5,
+              "pushCampaignId": 123,
+              "appParameterId": 1005,
+              "value": "1"
+            },
+            {
+              "id": 6,
+              "pushCampaignId": 123,
+              "appParameterId": 1006,
+              "value": "0"
+            },
+            {
+              "id": 7,
+              "pushCampaignId": 123,
+              "appParameterId": 1007,
+              "value": "0"
+            },
+            {
+              "id": 8,
+              "pushCampaignId": 123,
+              "appParameterId": 1008,
+              "value": "Default Test"
+            },
+            {
+              "id": 9,
+              "pushCampaignId": 123,
+              "appParameterId": 1009,
+              "value": "Default Textarea"
+            },
+            {
+              "id": 10,
+              "pushCampaignId": 123,
+              "appParameterId": 1010,
+              "value": "[\"option1\", \"option3\"]"
+            },
+            {
+              "id": 11,
+              "pushCampaignId": 123,
+              "appParameterId": 1011,
+              "value": "optionA"
+            },
+            {
+              "id": 12,
+              "pushCampaignId": 123,
+              "appParameterId": 1012,
+              "value": "option1"
+            },
+            {
+              "id": 13,
+              "pushCampaignId": 123,
+              "appParameterId": 1013,
+              "value": "Default Test"
+            },
+            {
+              "id": 14,
+              "pushCampaignId": 123,
+              "appParameterId": 1014
+            },
+            {
+              "id": 15,
+              "pushCampaignId": 123,
+              "appParameterId": 1015,
+              "value": "[\"option2\"]"
+            },
+            {
+              "id": 16,
+              "pushCampaignId": 123,
+              "appParameterId": 1016
+            },
+            {
+              "id": 17,
+              "pushCampaignId": 123,
+              "appParameterId": 1017
+            },
+            {
+              "id": 18,
+              "pushCampaignId": 123,
+              "appParameterId": 1018
+            },
+            {
+              "id": 19,
+              "pushCampaignId": 123,
+              "appParameterId": 1019
+            },
+            {
+              "id": 20,
+              "pushCampaignId": 123,
+              "appParameterId": 1020
+            },
+            {
+              "id": 21,
+              "pushCampaignId": 123,
+              "appParameterId": 1021
+            }
+          ]
+        }
+      }
+    }
+  },
+  "response": {
+    "status": 201,
+    "body": {
+      "testSendHistoryId": 1
+    }
+  }
+}

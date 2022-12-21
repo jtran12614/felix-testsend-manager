@@ -21,6 +21,7 @@ import com.rakuten.felix.testsend.manager.web.dto.RecipientAttribute;
 import com.rakuten.felix.testsend.manager.web.dto.TestSendHistoryInitializeRequest;
 import com.rakuten.felix.testsend.manager.web.dto.TestSendHistoryInitializeResponse;
 import com.rakuten.felix.testsend.manager.web.dto.TriggerTestSendRequest;
+import com.rakuten.felix.testsend.manager.web.dto.TestSendHistoryUpdateRequest;
 import com.rakuten.felix.testsend.manager.webclients.CampaignSchedulerService;
 import com.rakuten.felix.testsend.manager.webclients.dto.MailJob;
 import com.rakuten.felix.testsend.manager.webclients.dto.User;
@@ -85,6 +86,23 @@ public class Processor {
                 .testSendHistoryId(history.getId())
                 .build();
     }
+
+
+    public void updateTestSendHistoryStatus(Integer testHistoryId, TestSendHistoryUpdateRequest request) {
+        switch (request.getJobStatus()) {
+            case FINISHED:
+                dataStore.updateStatusToFinishedByTestId(testHistoryId);
+                log.info("Job finished: updated test send history to success");
+                break;
+            case PROCESSING:
+                log.info("Job still processing:");
+                break;
+            default:
+                dataStore.updateErrorMessageAndStatusToErrorByTestId(testHistoryId, request.getErrorMessage());
+                log.info("Job failed: marked test send history as failure");
+        }
+    }
+
 
     /**
      * Process for kicking mail test send.
