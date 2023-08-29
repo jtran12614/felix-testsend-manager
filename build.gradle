@@ -37,7 +37,7 @@ ext {
     //Logback
     logbackLogstashVersion = '6.6'
     disruptorVersion = '3.4.4'
-    felixCommonsVersion = '2.3.2'
+    felixCommonsVersion = '2.5.1'
     s3MockVersion       = '0.2.6'
     apacheCommonsLang3Version = '3.12.0'
     apacheCommonsCollection4Version = '4.4'
@@ -62,18 +62,8 @@ tasks.withType(JavaCompile) {
 }
 
 repositories {
-    maven {
-        url = 'http://dev-qcmdaci101z.dev.jp.local:8082/repository/cloudera'
-        allowInsecureProtocol = true
-    }
-    maven {
-        url = 'http://dev-qcmdaci101z.dev.jp.local:8082/repository/felix-dev/'
-        allowInsecureProtocol = true
-    }
-    maven {
-        url = 'http://dev-qcmdaci101z.dev.jp.local:8082/repository/felix/'
-        allowInsecureProtocol = true
-    }
+    maven { url = 'https://artifactory.rakuten-it.com/felix-mvn-release-local' }
+    maven { url = 'https://artifactory.rakuten-it.com/felix-mvn-snapshot-local' }
     maven { url = 'https://artifactory.rakuten-it.com/maven/' }
 }
 

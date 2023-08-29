@@ -143,10 +143,16 @@ public class Processor {
     }
 
     public TestSendHistory processTriggeringTestSend(TriggerTestSendRequest request, WebSession session) throws ValidationException, IOException {
-        val recipients = testRecipientClient.getTestRecipients(session.getClientId(), request.getRecipientData().getRecipientGroupId());
-        val recipientAddress = recipients.stream()
-                .map(TestRecipient::getRecipientAddress)
-                .collect(Collectors.toList());
+        List<String> recipientAddress;
+        if (request.getRecipientData().getInlineAddresses() != null) {
+            recipientAddress = request.getRecipientData().getInlineAddresses();
+        } else {
+            val recipients = testRecipientClient.getTestRecipients(session.getClientId(), request.getRecipientData().getRecipientGroupId());
+            recipientAddress = recipients.stream()
+                    .map(TestRecipient::getRecipientAddress)
+                    .collect(Collectors.toList());
+        }
+
         val jobPayload = request.getJob();
         val info = Info.builder()
                 .user(request.getUser())
@@ -160,18 +166,18 @@ public class Processor {
         val replyHeader = Header.buildWithContentTypeV2(logId, history.getId(), replyConfig.getJobStatusHandlingChannel(), session);
         jobPayload.replace(REPLY_HEADERS, replyHeader);
         jobPayload.replace(REPLY_DESTINATION, replyConfig.getJobStatusHandlingChannel());
-        writeRecipientFile(recipients, request.getRecipientData().getRecipientFilePath(), request.getRecipientData().getRecipientAttributes());
+        writeRecipientFile(recipientAddress, request.getRecipientData().getRecipientFilePath(), request.getRecipientData().getRecipientAttributes());
         workflowClient.createWorkflow(jobPayload, true);
         return history;
     }
 
-    private void writeRecipientFile(List<TestRecipient> testRecipientList, String filePath, List<RecipientAttribute> recipientAttributes) throws IOException {
+    private void writeRecipientFile(List<String> addresses, String filePath, List<RecipientAttribute> recipientAttributes) throws IOException {
         List<String> replaceValue = recipientAttributes.stream()
                 .sorted(Comparator.comparing(RecipientAttribute::getOrder))
                 .map(RecipientAttribute::getReplaceValue)
                 .collect(Collectors.toList());
-        val list = testRecipientList.stream()
-                .map(testRecipient -> getRecipientAttributes(testRecipient.getRecipientAddress(), replaceValue))
+        val list = addresses.stream()
+                .map(address -> getRecipientAttributes(address, replaceValue))
                 .collect(Collectors.joining(System.lineSeparator()));
         val resource = (WritableResource) resourceLoader.getResource(filePath);
         try (val outputWriter = new BufferedWriter(new OutputStreamWriter(resource.getOutputStream(), StandardCharsets.UTF_8))){

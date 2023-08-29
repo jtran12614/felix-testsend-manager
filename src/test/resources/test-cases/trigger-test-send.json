@@ -1,5 +1,14 @@
 [
   {
+    "name": "Trigger Test Send with inline addresses",
+    "apiDataPath": "classpath:/api/trigger-test-send-ios-inline.json",
+    "workFlowApiPath": [
+      "classpath:/client/workflow/register-test-send-data-ios.json"
+    ],
+    "recipientFilePath": "client/test-recipient/recipient-content.txt",
+    "testSendHistoryPath": "classpath:/data/trigger-test-send-ios-data.json"
+  },
+  {
     "name": "Trigger Test Send with IOS Device",
     "apiDataPath": "classpath:/api/trigger-test-send-ios.json",
     "workFlowApiPath": [

@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 1.3.0 - 2023-MM-dd
+### Changed
+- Support inline addresses for triggerTestSend
+
 ## 1.2.6 - 2022-11-30
 ### Changed
 - FELIX-5680 Add endpoint for updating test send history
