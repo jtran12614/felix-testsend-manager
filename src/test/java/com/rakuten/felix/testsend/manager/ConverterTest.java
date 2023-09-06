@@ -89,6 +89,6 @@ class ConverterTest {
         val timeStamp = new Timestamp(Date.from(Instant.from(now)).getTime());
         val actual = testObject.convertToDatabaseColumn(now);
         assertNotNull(actual);
-        assertEquals(timeStamp, actual);
+        assertEquals(timeStamp.getTime(), actual.getTime());
     }
 }
