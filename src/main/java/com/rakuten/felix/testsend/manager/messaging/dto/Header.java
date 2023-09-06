@@ -1,13 +1,17 @@
 package com.rakuten.felix.testsend.manager.messaging.dto;
 
 import com.rakuten.felix.common.web.security.service.WebSession;
+import com.rakuten.felix.jobfacade.dto.core.JobStartPayload;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.http.MediaType;
 import org.springframework.messaging.MessageHeaders;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+
+import static com.rakuten.felix.testsend.manager.processor.Processor.REPLY_HEADERS;
 
 @Slf4j
 public class Header extends HashMap<String, Object> {
@@ -22,9 +26,14 @@ public class Header extends HashMap<String, Object> {
     private static final String USER_ID         = "User-ID";
     private static final String USER_NAME       = "Username";
 
-    public static Header buildWithContentTypeV2(String logId, Integer testId, String replyDestination, WebSession session) {
+    public static Header buildWithContentTypeV2(Map<String, Object> jobPayload, String logId, Integer testId, String replyDestination, WebSession session) {
         log.debug("ReplyDestination: {}", replyDestination);
-        val header = new Header();
+        Header header = new Header();
+
+        HashMap<String, Object> currentHeader = (HashMap<String, Object>) jobPayload.get(REPLY_HEADERS);
+        if (currentHeader != null) {
+            header.putAll(currentHeader);
+        }
         header.put(CLIENT_ID, session.getClientId());
         header.put(USER_ID, session.getUserId());
         header.put(USER_NAME, session.getUserName());

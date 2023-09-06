@@ -88,6 +88,8 @@
         "Client-ID": 1 ,
         "X-Env": "blue",
         "TEST_ID": 1,
+        "namespace": "APP_PUSH",
+        "X-Flow": "Reservation_Delivery_Check",
         "LOG_ID": "[APP_PUSH-TEST-random0]:[ANDROID]:[random3]",
         "contentType": "application/octet-stream",
         "REPLY_DESTINATION": "felix.job-manager-reply-test"

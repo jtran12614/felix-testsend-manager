@@ -53,11 +53,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class Processor {
+    public static final String REPLY_HEADERS     = "replyHeaders";
 
     private static final Integer BUNDLE_TYPE_MAIL = 1;
     private static final String  LOG_ID           = "logId";
     private static final String  INFO             = "info";
-    private static final String REPLY_HEADERS     = "replyHeaders";
     private static final String REPLY_DESTINATION = "replyDestination";
 
     private final DataStoreService         dataStore;
@@ -163,7 +163,7 @@ public class Processor {
                 .map(map -> map.get(LOG_ID))
                 .map(Object::toString)
                 .orElse(null);
-        val replyHeader = Header.buildWithContentTypeV2(logId, history.getId(), replyConfig.getJobStatusHandlingChannel(), session);
+        val replyHeader = Header.buildWithContentTypeV2(jobPayload, logId, history.getId(), replyConfig.getJobStatusHandlingChannel(), session);
         jobPayload.replace(REPLY_HEADERS, replyHeader);
         jobPayload.replace(REPLY_DESTINATION, replyConfig.getJobStatusHandlingChannel());
         writeRecipientFile(recipientAddress, request.getRecipientData().getRecipientFilePath(), request.getRecipientData().getRecipientAttributes());

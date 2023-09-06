@@ -22,6 +22,8 @@
         "contentType": "application/octet-stream",
         "LOG_ID": "[APP_PUSH-TEST-random0]:[IOS]:[random3]",
         "REPLY_DESTINATION": "felix.job-manager-reply-test",
+        "namespace": "APP_PUSH",
+        "X-Flow": "Reservation_Delivery_Check",
         "TEST_ID": 1
       },
       "workflow": [
