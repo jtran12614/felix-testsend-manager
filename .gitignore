@@ -3,3 +3,4 @@
 build/
 /src/main/resources/application.properties
 /src/main/resources/version.properties
+.aider*
