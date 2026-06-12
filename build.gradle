@@ -37,7 +37,7 @@ ext {
     logbackLogstashVersion = '6.6'
     disruptorVersion = '3.4.4'
     felixCommonsVersion = '2.3.2-beta-SNAPSHOT'
-    s3MockVersion       = '0.2.6'
+    s3MockVersion = '0.2.6'
     apacheCommonsLang3Version = '3.12.0'
     apacheCommonsCollection4Version = '4.4'
     pioneerVersion = '1.5.0'
@@ -60,6 +60,8 @@ tasks.withType(JavaCompile) {
 }
 
 repositories {
+    //public
+    mavenCentral()
     maven {
         url = 'http://dev-qcmdaci101z.dev.jp.local:8082/repository/cloudera'
         allowInsecureProtocol = true
@@ -134,10 +136,11 @@ checkstyle {
     checkstyleTest.enabled = false
 }
 
-tasks.matching {task -> task.name.startsWith('spotbugs')}.forEach {
+tasks.matching { task -> task.name.startsWith('spotbugs') }.forEach {
     it.reports {
         html.enabled = true
-        xml.enabled = false // spotbugs does not allow to generate a xml and html report at once https://github.com/spotbugs/spotbugs/issues/857
+        xml.enabled = false
+        // spotbugs does not allow to generate a xml and html report at once https://github.com/spotbugs/spotbugs/issues/857
     }
 }
 
