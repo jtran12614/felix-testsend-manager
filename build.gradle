@@ -62,6 +62,8 @@ tasks.withType(JavaCompile) {
 }
 
 repositories {
+    // public
+    mavenCentral()
     maven { url = 'https://artifactory.rakuten-it.com/felix-mvn-release-local' }
     maven { url = 'https://artifactory.rakuten-it.com/felix-mvn-snapshot-local' }
     maven { url = 'https://artifactory.rakuten-it.com/maven/' }
