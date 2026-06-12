@@ -1,5 +1,7 @@
 # felix-testsend-manager
 
+Clone of: https://git.rakuten-it.com/projects/FELIX/repos/felix-testsend-manager/browse
+
 [![Quality Gate](http://dev-qcmdaci101z.dev.jp.local:9000/api/badges/gate?key=com.rakuten.felix:felix-testsend-manager)](http://dev-qcmdaci101z.dev.jp.local:9000/dashboard/index/com.rakuten.felix:felix-testsend-manager)
 [![Code Coverage](http://dev-qcmdaci101z.dev.jp.local:9000/api/badges/measure?key=com.rakuten.felix:felix-testsend-manager&metric=coverage)](http://dev-qcmdaci101z.dev.jp.local:9000/dashboard/index/com.rakuten.felix:felix-testsend-manager)
 [![NCLOC](http://dev-qcmdaci101z.dev.jp.local:9000/api/badges/measure?key=com.rakuten.felix:felix-testsend-manager&metric=ncloc)](http://dev-qcmdaci101z.dev.jp.local:9000/dashboard/index/com.rakuten.felix:felix-testsend-manager)
